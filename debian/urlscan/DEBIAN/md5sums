@@ -1,0 +1,11 @@
+306ac215960cadb7766b3a60b23d2c02  usr/bin/urlscan
+ada145d23ed17af99390b3ce65ad1d1e  usr/share/doc/urlscan/copyright
+e1b4bdf3135df09df5458264fac1ea43  usr/share/doc/urlscan/README
+fefcfd6f839481dd9a7cf5c264a6d949  usr/share/doc/urlscan/changelog.Debian.gz
+bbffbde1d8b6609cb7d7acce1b357f12  usr/share/pyshared/urlscan/urlscan.py
+f2be8321ac648fbc113a344047cdd418  usr/share/pyshared/urlscan/urlchoose.py
+11e44311b9bdec26a879a85cb77d804f  usr/share/pyshared/urlscan/browser.py
+495e9163dcd533c610753291d89c7a1c  usr/share/pyshared/urlscan/__init__.py
+25357264891f597e75e030acd3417d70  usr/share/pyshared/urlscan-0.5.egg-info
+5e27c2e4c2d91747b79eecd9b2acfa13  usr/share/pyshared-data/urlscan
+efdef46cdb7f39516b3c50e613e97e81  usr/share/man/man1/urlscan.1.gz

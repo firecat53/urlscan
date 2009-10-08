@@ -1,0 +1,26 @@
+Starting with tag:
+[TAG 0.5.5
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070105053047] 
+[Recognize HTML entity #8212 as a long hyphen.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070116153426] 
+[Recognize "&apos;" as an apostrophe.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070120180732] 
+[Recognize braces as valid URL characters (Closes: #407423).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070201032037] 
+[Retroactively fix a totally wrong changelog entry.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203014645] 
+[Remove some cruft left behind by applying both my changes for options.compact and the submitter's changes.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203015132] 
+[Add support to the browser-spawning code for running the browser either in the foreground or in the background.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203015220] 
+[Add support to the URL chooser for running the browser either in the foreground or in the background.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203015241] 
+[Add a command-line option that causes the browser to be invoked in the background. (Closes: #406083)
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203015258] 
+[Document both the short and the long form of --compact.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203015408] 
+[Document -b and --background.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203015531] 
+[Clean up the URL expression a bit and add support for guessing that BLAH.tld is likely a URL. (Closes: #408684)
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070203021227] [Add a changelog entry for 0.5.6.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20070204164158] 

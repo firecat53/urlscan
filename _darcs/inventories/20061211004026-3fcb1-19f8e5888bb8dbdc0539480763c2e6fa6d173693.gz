@@ -1,0 +1,84 @@
+[Add simple code to extract URLs from emails.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061113053419] 
+[Add a simple wrapper module to start a Web browser.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061113053437] 
+[Add a first cut at an urwid-based lister for the URLs extracted from a message.
+Daniel Burrows <dburrows@debian.org>**20061203053211] 
+[Fix a docstring typo.
+Daniel Burrows <dburrows@debian.org>**20061203061302] 
+[Correctly handle the case of a message containing a line that just has a URL.
+Daniel Burrows <dburrows@debian.org>**20061203061321] 
+[Improve the markup used to render URL references.
+Daniel Burrows <dburrows@debian.org>**20061204051855] 
+[Rewrite the URL scanning algorithm to (a) be correct, and (b) not interpolate URLs into the text up-front.  The latter point means that the display code can later interpolate URL footnotes with proper markup/active behavior (and it starts to now).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061208051841] 
+[Use proper grammar when saying how many URLs we have.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061208052004] 
+[For debugging, make repr(chunk) print something readable.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061208052016] 
+[Make the URL regexp more permissive, to include some common CGI metacharacters (= and ;).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061208052215] 
+[Use buttons instead of Text objects to display urls, so they can actually be selected (yay).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061209041111] 
+[Always focus the first button (if there is one).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061209042206] 
+[Fix browseto: spawnl needs its first argument to indicate whether to wait for the subprocess.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061209042244
+ Three cheers for untyped anguages where bugs like this can happen!
+] 
+[Add basic support for chunks with associated markup that's different from the URL; will be used to support HTML emails.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061209184846] 
+[Disable an old debugging message.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210052542] 
+[Disable another old debugging message.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210052556] 
+[Handle the case where the last line/paragraph in the file contains a URL.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210052605] 
+[Add basic support for text/html parts.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210053027] 
+[Remember whether the first/last lines of the message were used for each chunk-group, and suppress ellipses if they were.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210053039] 
+[Add support for images in HTML emails.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210053643] 
+[Add support for <h1> and friends in HTML email (hacky!)
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210054521] 
+[When a list (level) ends, terminate the current paragraph.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210054536] 
+[Pop header styles off the stack when the header terminates, instead of leaving the header sitting around forever.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210203502] 
+[Add a quick-and-dirty README file.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210210750] 
+[Break the internal modules out into a modules directory.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210213925] 
+[Add a simple distutils setup script.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210224839] 
+[Recognize https urls.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210225613] 
+[Don't report spurious matches in matchless emails.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210225621] 
+[Recognize "+" characters in URLs (perhaps I should do this on an exclusion basis?)
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210230443] 
+[Don't recognize ? or ; characters at the ends of URLs in text (since they could end a sentence).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210230547] 
+[Document another bug.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210231109] 
+[Fix a runoff error in parsing email messages.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210231116] 
+[Clear the screen every time that we draw it (avoids some problems where junk gets left behind).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210232544] 
+[Force a screen redraw when C-l is pressed.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210232604] 
+[Debianize urlscan as a native package.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210232828] 
+[Really clean up everything after a build.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210232910] 
+[Update the standards-version to make lintian happy.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210233638] 
+[Fix the python-central substvar.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210233649] 
+[Make sure to invoke dh_compress (so that the manpage gets properly compressed).
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210233659] 
+[Use \fB/\fR instead of .B/.R, since .R make lintian complain.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210233719] 
+[Be less awkward in the manpage.
+Daniel Burrows <Daniel_Burrows@alumni.brown.edu>**20061210233746] 

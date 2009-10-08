@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+
+clean:
+	dh_testdir
+	./setup.py clean -a
+	dh_clean
+
+build:
+
+install:
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	./setup.py install --no-compile --prefix=$(CURDIR)/debian/urlscan/usr
+
+binary-indep: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs README
+	dh_installman urlscan.1
+	dh_fixperms
+	dh_pycentral
+	dh_compress
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch:
+
+binary: binary-indep
+
+.PHONY: clean binary-indep binary-arch binary install build

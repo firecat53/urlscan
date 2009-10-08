@@ -1,0 +1,66 @@
+urlscan (0.5.6) unstable; urgency=low
+
+  * Render HTML entities #8212 and "apos" sensibly.
+  
+  * Recognize braces as valid URL characters (Closes: #407423).
+
+  * Add an option to allow the browser to be invoked in the background
+    (Closes: #406083).
+  
+  * Guess that FOO.tld is probably a URL (Closes: #408684).
+
+ -- Daniel Burrows <dburrows@debian.org>  Sun,  4 Feb 2007 08:41:55 -0800
+
+urlscan (0.5.5) unstable; urgency=low
+
+  * Add support for accepting a single message to scan on the command-line.
+  
+  * Add a --compact option that suppresses URL context. (Closes: #404605)
+
+ -- Daniel Burrows <dburrows@debian.org>  Thu,  4 Jan 2007 21:29:25 -0800
+
+urlscan (0.5.4) unstable; urgency=low
+
+  * Don't crash on ordered lists. (Closes: #404137)
+  
+  * Make the URL detection regexp cover more cases. (Closes: #403713)
+  
+  * Spawn the browser in the foreground, needed for text browsers that run
+    in the same terminal (Closes: #403644).
+
+  * Recognize &#8230; as an ellipsis.
+  
+  * Merge immediately adjacent references to the same URL (the HTML parser
+    tends to generate these if <a> contains markup or entities).
+
+ -- Daniel Burrows <dburrows@debian.org>  Sun, 24 Dec 2006 08:07:13 -0800
+
+urlscan (0.5.3) unstable; urgency=low
+
+  * Recognize URLs containing internal colons.
+
+ -- Daniel Burrows <dburrows@debian.org>  Sun, 17 Dec 2006 21:02:20 -0800
+
+urlscan (0.5.2) unstable; urgency=low
+
+  * Fix dumb typo in copyright notice.
+    (famous last words: "I'm just changing a comment.  What
+     could POSSIBLY go wrong with that?)
+    (Closes: #403179)
+
+ -- Daniel Burrows <dburrows@debian.org>  Sun, 17 Dec 2006 20:55:01 -0800
+
+urlscan (0.5.1) unstable; urgency=low
+
+  * Add explicit copyright notices.
+  
+  * Suggest mutt and www-browser.
+
+ -- Daniel Burrows <dburrows@debian.org>  Sun, 10 Dec 2006 17:13:49 -0800
+
+urlscan (0.5) unstable; urgency=low
+
+  * Initial Upload.
+
+ -- Daniel Burrows <dburrows@debian.org>  Sun, 10 Dec 2006 14:47:05 -0800
+

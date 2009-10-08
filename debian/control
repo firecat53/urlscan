@@ -1,0 +1,22 @@
+Source: urlscan
+Section: mail
+Priority: optional
+Maintainer: Daniel Burrows <dburrows@debian.org>
+Build-Depends: debhelper (>= 5.0.37.2)
+Build-Depends-Indep: python-central (>= 0.6), python (>= 2.3.0), python-dev (>= 2.3.0)
+Standards-Version: 3.7.3
+XS-Python-Version: current
+
+Package: urlscan
+Architecture: all
+Depends: ${python:Depends}, python-urwid
+Suggests: mutt, www-browser
+XB-Python-Version: ${python:Versions}
+Description: Extract and browse the URLs contained in an email (urlview replacement)
+ urlscan searches for URLs in email messages, then displays a list of
+ them in the current terminal.  It is primarily meant as a replacement
+ for urlview, which it improves upon in the following ways:
+ .
+  * urlscan understands email encodings such as quoted-printable;
+    urlview does not.
+  * urlscan extracts and displays the context surrounding each URL.

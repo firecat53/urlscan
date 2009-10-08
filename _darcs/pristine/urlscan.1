@@ -1,0 +1,69 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+
+.TH URLSCAN 1 "December 10, 2006"
+
+.SH NAME
+urlscan \- browse the URLs in an email message from a terminal
+.SH SYNOPSIS
+\fBurlscan\fR [options] <
+.I message
+
+\fBurlscan\fR [options]
+.I message
+
+.SH DESCRIPTION
+\fBurlscan\fR accepts a single email message on standard
+input, then displays a terminal-based list of the URLs in the given
+message.  Selecting a URL will invoke \fBsensible-browser\fR(1) on it
+(and hence any browser specified in the \fBBROWSER\fR environment
+variable).
+
+\fBurlscan\fR is primarily intended to be used with the
+.B mutt
+(1) mailreader, but it should work well with any terminal-based mail
+program.
+
+\fBurlscan\fR is similar to \fBurlview\fR(1), but has the following
+additional features:
+
+\fB1.\fR Support for more message encodings, such as quoted-printable
+and base64.
+
+\fB2.\fR Extraction and display of the context surrounding each URL.
+
+.SH OPTIONS
+.TP
+.B \-b, \-\-background
+Run the Web browser in the background, so you can select another URL
+without closing it (this will not work with terminal-based Web
+browsers such as lynx, links, or w3m).
+.TP
+.B \-c, \-\-compact
+Display a simple list of the extracted URLs, instead of showing the
+context of each URL.
+
+.SH MUTT INTEGRATION
+
+To integrate urlscan with mutt, include the following two commands in
+\fB~/.muttrc\fR:
+
+
+.ad l
+macro index,pager \\cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+
+macro attach,compose \\cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+.ad b
+
+
+Once these lines are in your mutt configuration file, pressing
+Control-b will allow you to browse and open the URLs in the currently
+selected message.
+
+.SH SEE ALSO
+\fI/usr/share/doc/urlscan/README\fR,
+\fBsensible-browser\fR(1),
+\fBurlview\fR(1),
+\fBmutt\fR(1)
+
+.SH AUTHOR
+This manual page was written by Daniel Burrows <dburrows@debian.org>.

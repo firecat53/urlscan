@@ -1,0 +1,70 @@
+			       urlscan
+		 Daniel Burrows <dburrows@debian.org>
+
+0) Purpose and Requirements
+
+  urlscan is  a small program that  is designed to  integrate with the
+"mutt" mailreader to allow you to easily launch a Web browser for URLs
+contained in  email messages.  It  is a replacement for  the "urlview"
+program.
+
+  urlscan  requires Python and  the python-urwid  library, as  well as
+  sensible-browser from the debianutils package.
+
+1) Features
+
+  urlscan parses an  email message passed on standard  input and scans
+it for URLs.   It then displays the URLs and  their context within the
+message, and allows you to choose one or more URLs to send to your Web
+browser.
+
+  Relative to urlview, urlscan has the following additional features:
+
+  (1) Support for emails in quoted-printable and base64 encodings.  No
+      more stripping out =40D from URLs by hand!
+
+  (2) The context  of each  URL is provided  along with the  URL.  For
+      HTML mails, a crude parser is used to render the HTML into text.
+
+2) Setting up urlscan
+
+  To  set up  urlscan, install  the Debian  "urlscan" package  (or use
+setup.py to install the program).   Once urlscan is installed, add the
+following lines to your .muttrc:
+
+macro index,pager \cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+macro attach,compose \cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+
+  Once  this  is done,  Control-b  while  reading  mail in  mutt  will
+automatically invoke urlscan on the message.
+
+  urlscan uses  sensible-browser to invoke the default  Web browser of
+the  current environment.   To choose  a particular  browser,  set the
+environment variable BROWSER; e.g.,
+
+export BROWSER=/usr/bin/epiphany
+
+  .
+
+3) Known bugs and limitations
+
+  (1) Because  the   Python  curses  module  does   not  support  wide
+      characters  (see Debian bug  #336861), non-ASCII  characters can
+      cause unpredictable  results in  urlscan.  This problem  will go
+      away if Python and urwid are patched to support wide characters.
+
+  (6) Running urlscan  sometimes "messes up"  the terminal background.
+      This seems to  be an urwid bug, but I  haven't tracked down just
+      what's going on.
+
+  (2) Extraction of context from  HTML messages leaves something to be
+      desired.   Probably  the  ideal  solution would  be  to  extract
+      context on a word basis rather than on a paragraph basis.
+
+  (3) The HTML message handling is a bit kludgy in general.
+
+  (4) multipart/alternative  sections are  handled by  descending into
+      all the sub-parts, rather than  just picking one, which may lead
+      to URLs and context appearing twice.
+
+  (5) Configurability is more than a little bit lacking.
