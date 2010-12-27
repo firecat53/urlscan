@@ -8,8 +8,7 @@
 contained in  email messages.  It  is a replacement for  the "urlview"
 program.
 
-  urlscan  requires Python and  the python-urwid  library, as  well as
-  sensible-browser from the debianutils package.
+  urlscan  requires Python and  the python-urwid  library.
 
 1) Features
 
@@ -38,9 +37,7 @@ macro attach,compose \cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract 
   Once  this  is done,  Control-b  while  reading  mail in  mutt  will
 automatically invoke urlscan on the message.
 
-  urlscan uses  sensible-browser to invoke the default  Web browser of
-the  current environment.   To choose  a particular  browser,  set the
-environment variable BROWSER; e.g.,
+  To choose  a particular  browser,  set the environment variable BROWSER; e.g.,
 
 export BROWSER=/usr/bin/epiphany
 

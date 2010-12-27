@@ -17,11 +17,11 @@
 
 '''Contains logic to invoke the default system browser.'''
 
-import os
+import os, subprocess
 
 def browseto(url, background = False):
     if background:
-        mode = os.P_NOWAIT
+        cmd = subprocess.call
     else:
-        mode = os.P_WAIT
-    os.spawnl(mode, '/usr/bin/sensible-browser', '/usr/bin/sensible-browser', url)
+        cmd = subprocess.Popen
+    cmd([os.environ["BROWSER"], url])

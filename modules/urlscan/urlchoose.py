@@ -148,7 +148,7 @@ class URLChooser:
                     elif k == 'k':
                         self.top.keypress(size, "up")
                     elif k == 'enter':
-                        footer = "loading %s" % self.listbox.get_focus()[0].user_data
+                        footer = "loading %s" % self.listbox.get_focus()[0].label
                         footerwid = urwid.AttrWrap(urwid.Text(footer), 'footer')
                         self.top.set_footer(footerwid)
                         self.top.keypress(size, k)
