@@ -96,7 +96,7 @@ class URLChooser:
                     ' ',
                     ('urlref:url', url)
                     ]
-                self.items.append(urwid.Button(markup, mkbrowseto(url, background), url))
+                self.items.append(urwid.Button(markup, mkbrowseto(url, background), user_data=url))
 
         self.listbox = urwid.ListBox(self.items)
         self.listbox.set_focus(firstbutton)
@@ -148,7 +148,7 @@ class URLChooser:
                     elif k == 'k':
                         self.top.keypress(size, "up")
                     elif k == 'enter':
-                        footer = "loading %s" % self.listbox.get_focus()[0].label
+                        footer = "loading URL" # % self.listbox.get_focus()[0].user_data
                         footerwid = urwid.AttrWrap(urwid.Text(footer), 'footer')
                         self.top.set_footer(footerwid)
                         self.top.keypress(size, k)
