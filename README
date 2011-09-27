@@ -65,3 +65,5 @@ export BROWSER=/usr/bin/epiphany
       to URLs and context appearing twice.
 
   (5) Configurability is more than a little bit lacking.
+
+Archlinux Package: https://aur.archlinux.org/packages.php?ID=44853
