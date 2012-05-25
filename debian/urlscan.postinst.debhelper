@@ -1,9 +1,0 @@
-# Automatically added by dh_pycentral
-rm -f /var/lib/pycentral/urlscan.pkgremove
-if which pycentral >/dev/null 2>&1; then
-	pycentral pkginstall urlscan
-	if grep -qs '^urlscan$' /var/lib/pycentral/delayed-pkgs; then
-		sed -i '/^urlscan$/d' /var/lib/pycentral/delayed-pkgs
-	fi
-fi
-# End automatically added section
