@@ -1,6 +1,6 @@
 *.pyc
-goobook.egg-info
 *.egg
 *.gz
+*.xz
 build
 dist
