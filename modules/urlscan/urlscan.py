@@ -50,7 +50,7 @@ class HTMLChunker(HTMLParser.HTMLParser):
 
     def __init__(self):
         HTMLParser.HTMLParser.__init__(self)
-        
+
         # This attribute is the current output list.
         self.rval = []
 
@@ -229,7 +229,7 @@ class HTMLChunker(HTMLParser.HTMLParser):
 
 urlinternalpattern=r'[{}a-zA-Z/\-_0-9%?&.=:;+,#~]'
 urltrailingpattern=r'[{}a-zA-Z/\-_0-9%&=+#]'
-httpurlpattern = r'(?:https?://' + urlinternalpattern + r'*' + urltrailingpattern + r')'
+httpurlpattern = r'(?:(https?|file)://' + urlinternalpattern + r'*' + urltrailingpattern + r')'
 # Used to guess that blah.blah.blah.TLD is a URL.
 tlds=['biz', 'com', 'edu', 'info', 'org', 'de']
 guessedurlpattern=r'(?:[a-zA-Z0-9_\-%]+(?:\.[a-zA-Z0-9_\-%]+)*\.(?:' + '|'.join(tlds) + '))'
