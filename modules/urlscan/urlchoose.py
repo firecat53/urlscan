@@ -81,7 +81,7 @@ class URLChooser:
                     markup += '\n'
                 if not usedlast:
                     markup += [('msgtext:ellipses', '...\n\n')]
-    
+
                 self.items.append(urwid.Text(markup))
 
             i = len(self.urls) - len(groupurls)
@@ -160,3 +160,4 @@ class URLChooser:
     def draw_screen(self, size):
         canvas = self.top.render(size, focus = True)
         self.ui.draw_screen(size, canvas)
+
