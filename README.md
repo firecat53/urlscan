@@ -12,11 +12,7 @@ Scott Hansen `<firecat4153 at moc.liamg reversed>` (Maintainer)
 contained in  email messages.  It  is a replacement for  the "urlview"
 program.
 
-    Requires: Python 2.6 + and the python-urwid  library (python2-urwid for
-Archlinux)
-
-    If you are not using Archlinux, the shebangs will need to be adjusted, as
-Arch uses `#!/usr/bin/env python2`
+	Requires: Python 2.6+ (including Python 3.x) and the python-urwid  library
 
 2. Features
 

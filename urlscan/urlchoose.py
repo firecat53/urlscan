@@ -15,32 +15,33 @@
 #   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 #   Boston, MA 02111-1307, USA.
 
-'''An urwid listview-based widget that lets you choose a URL from a
-list of URLs.'''
+"""An urwid listview-based widget that lets you choose a URL from a list of
+URLs."""
 
 import urwid
 import urwid.curses_display
-import browser
+from . import browser
+
 
 def mkbrowseto(url, background):
-    return lambda *args:browser.browseto(url, background)
+    return lambda *args: browser.browseto(url, background)
+
 
 # Based on urwid examples.
 class URLChooser:
-    def __init__(self, extractedurls, compact_mode = False, background = True):
+    def __init__(self, extractedurls, compact_mode=False, background=True):
         self.compact_mode = compact_mode
-        self.items = [ ]
-        urlidx = 1
+        self.items = []
         first = True
-        firstbutton=0
+        firstbutton = 0
         self.urls = []
         for group, usedfirst, usedlast in extractedurls:
             if first:
                 first = False
             elif not self.compact_mode:
-                self.items.append(urwid.Divider(div_char = '-',
-                                                top = 1,
-                                                bottom = 1))
+                self.items.append(urwid.Divider(div_char='-',
+                                                top=1,
+                                                bottom=1))
 
             groupurls = []
             markup = []
@@ -60,7 +61,7 @@ class URLChooser:
                     while i < len(chunks):
                         chunk = chunks[i]
                         i += 1
-                        if chunk.url == None:
+                        if chunk.url is None:
                             markup.append(chunk.markup)
                         else:
                             self.urls.append(chunk.url)
@@ -70,13 +71,14 @@ class URLChooser:
                             tmpmarkup = []
                             if chunk.markup:
                                 tmpmarkup.append(chunk.markup)
-                            while i < len(chunks) and chunks[i].url == chunk.url:
+                            while i < len(chunks) and \
+                                    chunks[i].url == chunk.url:
                                 if chunks[i].markup:
                                     tmpmarkup.append(chunks[i].markup)
                                 i += 1
                             markup += [tmpmarkup or '<URL>',
                                        ('urlref:number:braces', ' ['),
-                                       ('urlref:number', `len(self.urls)`),
+                                       ('urlref:number', repr(len(self.urls))),
                                        ('urlref:number:braces', ']')]
                     markup += '\n'
                 if not usedlast:
@@ -89,21 +91,21 @@ class URLChooser:
                 if firstbutton == 0 and not self.compact_mode:
                     firstbutton = len(self.items)
                 i += 1
-                markup = [
-                    ('urlref:number:braces', '['),
-                    ('urlref:number', `i`),
-                    ('urlref:number:braces', ']'),
-                    ' ',
-                    ('urlref:url', url)
-                    ]
-                self.items.append(urwid.Button(markup, mkbrowseto(url, background), user_data=url))
+                markup = [('urlref:number:braces', '['),
+                          ('urlref:number', repr(i)),
+                          ('urlref:number:braces', ']'),
+                          ' ',
+                          ('urlref:url', url)]
+                self.items.append(urwid.Button(markup,
+                                               mkbrowseto(url, background),
+                                               user_data=url))
 
         self.listbox = urwid.ListBox(self.items)
         self.listbox.set_focus(firstbutton)
         if len(self.urls) == 1:
             header = 'Found 1 url.'
         else:
-            header = 'Found %d urls.'%len(self.urls)
+            header = 'Found %d urls.' % len(self.urls)
         headerwid = urwid.AttrWrap(urwid.Text(header), 'header')
         self.top = urwid.Frame(self.listbox, headerwid)
 
@@ -114,7 +116,7 @@ class URLChooser:
             ('footer', 'white', 'dark red', 'standout'),
             ('msgtext', 'light gray', 'black'),
             ('msgtext:bullet', 'white', 'black', 'standout'),
-            ('msgtext:bold', 'white', 'black' , 'standout'),
+            ('msgtext:bold', 'white', 'black', 'standout'),
             ('msgtext:italic', 'dark cyan', 'black', 'standout'),
             ('msgtext:bolditalic', 'light cyan', 'black', 'standout'),
             ('anchor', 'yellow', 'black', 'standout'),
@@ -125,7 +127,7 @@ class URLChooser:
             ('urlref:number:braces', 'light gray', 'black'),
             ('urlref:number', 'yellow', 'black', 'standout'),
             ('urlref:url', 'white', 'black', 'standout')
-            ])
+        ])
         return self.ui.run_wrapper(self.run)
 
     def run(self):
@@ -148,8 +150,9 @@ class URLChooser:
                     elif k == 'k':
                         self.top.keypress(size, "up")
                     elif k == 'enter':
-                        footer = "loading URL" # % self.listbox.get_focus()[0].user_data
-                        footerwid = urwid.AttrWrap(urwid.Text(footer), 'footer')
+                        footer = "loading URL"
+                        footerwid = urwid.AttrWrap(urwid.Text(footer),
+                                                   'footer')
                         self.top.set_footer(footerwid)
                         self.top.keypress(size, k)
                     else:
@@ -158,6 +161,5 @@ class URLChooser:
             return None
 
     def draw_screen(self, size):
-        canvas = self.top.render(size, focus = True)
+        canvas = self.top.render(size, focus=True)
         self.ui.draw_screen(size, canvas)
-

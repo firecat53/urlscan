@@ -15,11 +15,13 @@
 #   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 #   Boston, MA 02111-1307, USA.
 
-'''Contains logic to invoke the default system browser.'''
+"""Contains logic to invoke the default system browser."""
 
-import os, subprocess
+import os
+import subprocess
 
-def browseto(url, background = False):
+
+def browseto(url, background=False):
     if background:
         cmd = subprocess.call
     else:

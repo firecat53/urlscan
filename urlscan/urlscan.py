@@ -15,10 +15,14 @@
 #   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 #   Boston, MA 02111-1307, USA.
 
-'''Contains the backend logic that scans messages for URLs and context.'''
+"""Contains the backend logic that scans messages for URLs and context."""
 
 import re
-import HTMLParser
+try:
+    from HTMLParser import HTMLParser
+except ImportError:
+    from html.parser import HTMLParser
+
 
 class Chunk:
     '''Represents a chunk of (marked-up) text that
@@ -36,20 +40,23 @@ class Chunk:
         self.url = url
 
     def __str__(self):
-        return 'Chunk(markup=%s, url=%s)'%(`self.markup`, `self.url`)
+        return 'Chunk(markup = %s, url= %s)' % (repr(self.markup),
+                                                repr(self.url))
 
     def __repr__(self):
         return self.__str__()
 
+
 def isheadertag(t):
     return len(t) == 2 and t[0] == 'h' and t[1].isdigit()
 
-class HTMLChunker(HTMLParser.HTMLParser):
-    '''An HTMLParser that generates a sequence of lists of chunks.
-    Each list represents a single paragraph.'''
+
+class HTMLChunker(HTMLParser):
+    """An HTMLParser that generates a sequence of lists of chunks.
+    Each list represents a single paragraph."""
 
     def __init__(self):
-        HTMLParser.HTMLParser.__init__(self)
+        HTMLParser.__init__(self)
 
         # This attribute is the current output list.
         self.rval = []
@@ -69,12 +76,9 @@ class HTMLChunker(HTMLParser.HTMLParser):
     # are always sorted in alphabetic order.
     # (if the text is in an anchor, substitute
     # "msgtext:anchor" for "msgtext")
-    tag_styles = {
-        'b' : 'bold',
-        'i' : 'italic'
-        }
+    tag_styles = {'b': 'bold', 'i': 'italic'}
 
-    ul_tags = [ '*', '+', '-' ]
+    ul_tags = ['*', '+', '-']
 
     def cur_url(self):
         return self.anchor_stack[-1]
@@ -96,7 +100,8 @@ class HTMLChunker(HTMLParser.HTMLParser):
             self.at_para_start = True
         self.trailing_space = False
         if len(self.list_stack) > 0:
-            self.add_chunk(Chunk(' '*3*len(self.list_stack), self.cur_url()))
+            self.add_chunk(Chunk(' ' * 3 * len(self.list_stack),
+                                 self.cur_url()))
 
     def end_list_para(self):
         if self.at_para_start:
@@ -106,11 +111,12 @@ class HTMLChunker(HTMLParser.HTMLParser):
             if tp == 'ul':
                 depth = len([t for t in self.list_stack if t[0] == tp])
                 ul_tags = HTMLChunker.ul_tags
-                chunk = Chunk('%s  '%(ul_tags[depth % len(ul_tags)]), self.cur_url())
+                chunk = Chunk('%s  ' % (ul_tags[depth % len(ul_tags)]),
+                              self.cur_url())
             else:
                 counter = self.list_stack[-1][1]
                 self.list_stack[-1] = (tp, counter + 1)
-                chunk = Chunk("%2d."%counter, self.cur_url())
+                chunk = Chunk("%2d." % counter, self.cur_url())
             self.add_chunk(chunk)
         else:
             self.end_para()
@@ -130,7 +136,8 @@ class HTMLChunker(HTMLParser.HTMLParser):
             self.list_stack.append((tag, 1))
             self.end_para()
         elif tag in HTMLChunker.tag_styles:
-            self.style_stack.append(self.style_stack[-1] | set([HTMLChunker.tag_styles[tag]]))
+            self.style_stack.append(self.style_stack[-1] |
+                                    set([HTMLChunker.tag_styles[tag]]))
         elif isheadertag(tag):
             self.style_stack.append(self.style_stack[-1] | set(['bold']))
         elif tag == 'p' or tag == 'br':
@@ -139,13 +146,13 @@ class HTMLChunker(HTMLParser.HTMLParser):
             # Since we expect HTML *email*, image links
             # should be external (naja?)
             alt = self.findattr(attrs, 'alt')
-            if alt == None:
+            if alt is None:
                 alt = '[IMG]'
             src = self.findattr(attrs, 'src')
-            if src <> None and src[:7] <> 'http://':
+            if src is not None and src[:7] != 'http://':
                 src = None
 
-            if src <> None:
+            if src is not None:
                 self.anchor_stack.append(src)
                 self.handle_data(alt)
                 del self.anchor_stack[-1]
@@ -178,7 +185,7 @@ class HTMLChunker(HTMLParser.HTMLParser):
             if data[-1].isspace():
                 future_trailing_space = True
         data = ' '.join(data.split())
-        if self.anchor_stack[-1] == None:
+        if self.anchor_stack[-1] is None:
             style = 'msgtext'
         else:
             style = 'anchor'
@@ -190,13 +197,11 @@ class HTMLChunker(HTMLParser.HTMLParser):
         self.add_chunk(Chunk((style, data), self.cur_url()))
         self.trailing_space = future_trailing_space
 
-    extrachars = {
-        8212 : "--",
-        8217 : "'",
-        8220 : "``",
-        8221 : "''",
-        8230 : "..."
-        }
+    extrachars = {8212: "--",
+                  8217: "'",
+                  8220: "``",
+                  8221: "''",
+                  8230: "..."}
 
     def handle_charref(self, name):
         n = int(name)
@@ -205,19 +210,16 @@ class HTMLChunker(HTMLParser.HTMLParser):
         elif n in HTMLChunker.extrachars:
             name = HTMLChunker.extrachars[n]
         else:
-            name = '&#%s;'%name
+            name = '&#%s;' % name
         self.handle_data(name)
 
-    entities = {
-        'nbsp' : ' ',
-        'lt' : '<',
-        'gt' : '>',
-        'amp' : '&',
-        'ldquo' : '``',
-        'rdquo' : "''",
-        'apos' : "'"
-    }
-
+    entities = {'nbsp': ' ',
+                'lt': '<',
+                'gt': '>',
+                'amp': '&',
+                'ldquo': '``',
+                'rdquo': "''",
+                'apos': "'"}
 
     def handle_entityref(self, name):
         if name in HTMLChunker.entities:
@@ -225,15 +227,19 @@ class HTMLChunker(HTMLParser.HTMLParser):
         else:
             # If you see a reference, it needs to be
             # added above.
-            self.handle_data('&%s;'%name)
+            self.handle_data('&%s;' % name)
 
-urlinternalpattern=r'[{}a-zA-Z/\-_0-9%?&.=:;+,#~]'
-urltrailingpattern=r'[{}a-zA-Z/\-_0-9%&=+#]'
-httpurlpattern = r'(?:(https?|file)://' + urlinternalpattern + r'*' + urltrailingpattern + r')'
+urlinternalpattern = r'[{}a-zA-Z/\-_0-9%?&.=:;+,#~]'
+urltrailingpattern = r'[{}a-zA-Z/\-_0-9%&=+#]'
+httpurlpattern = (r'(?:(https?|file)://' + urlinternalpattern +
+                  r'*' + urltrailingpattern + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
-tlds=['biz', 'com', 'edu', 'info', 'org', 'de']
-guessedurlpattern=r'(?:[a-zA-Z0-9_\-%]+(?:\.[a-zA-Z0-9_\-%]+)*\.(?:' + '|'.join(tlds) + '))'
-urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' + guessedurlpattern + '|(?:mailto:[a-zA-Z0-9\-_]*@[0-9a-zA-Z_\-.]*[0-9a-zA-Z_\-]))>?')
+tlds = ['biz', 'com', 'edu', 'info', 'org', 'de']
+guessedurlpattern = (r'(?:[a-zA-Z0-9_\-%]+(?:\.[a-zA-Z0-9_\-%]+)*\.(?:' +
+                     '|'.join(tlds) + '))')
+urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' +
+                   guessedurlpattern +
+                   '|(?:mailto:[a-zA-Z0-9\-_]*@[0-9a-zA-Z_\-.]*[0-9a-zA-Z_\-]))>?')
 
 # Poor man's test cases.
 assert(urlre.match('<URL:http://linuxtoday.com>'))
@@ -246,8 +252,10 @@ assert(urlre.match('blah.bar.info'))
 assert(urlre.match('goodpr.org'))
 assert(not urlre.match('blah..org'))
 
+
 def parse_text_urls(s):
-    '''Parse a block of text, splitting it into its url and non-url components.'''
+    """Parse a block of text, splitting it into its url and non-url
+    components."""
 
     rval = []
 
@@ -264,6 +272,7 @@ def parse_text_urls(s):
 
     return rval
 
+
 def extract_with_context(lst, pred, before_context, after_context):
     rval = []
 
@@ -273,7 +282,8 @@ def extract_with_context(lst, pred, before_context, after_context):
         usedfirst = False
         usedlast = False
         # Extend to the next match.
-        while start + length < len(lst) and length < before_context + 1 and not pred(lst[start + length]):
+        while start + length < len(lst) and length < before_context + 1 \
+                and not pred(lst[start + length]):
             length += 1
 
         # Slide to the next match.
@@ -289,7 +299,9 @@ def extract_with_context(lst, pred, before_context, after_context):
         while start + length < len(lst) and pred(lst[start + length]):
             extendlength = 1
             # Read in the 'after' context and see if it holds a URL.
-            while extendlength < after_context + 1 and start + length + extendlength < len(lst) and not pred(lst[start + length + extendlength]):
+            while extendlength < after_context + 1 and start + length + \
+                    extendlength < len(lst) and \
+                    not pred(lst[start + length + extendlength]):
                 extendlength += 1
             length += extendlength
             if start + length < len(lst) and not pred(lst[start + length]):
@@ -300,9 +312,12 @@ def extract_with_context(lst, pred, before_context, after_context):
                 # from the next URL; if we don't find one,
                 # we discard the readahead.
                 extendlength = 1
-                while extendlength < before_context and start + length + extendlength < len(lst) and not pred(lst[start + length + extendlength]):
+                while extendlength < before_context and start + length + \
+                        extendlength < len(lst) and \
+                        not pred(lst[start + length + extendlength]):
                     extendlength += 1
-                if start + length + extendlength < len(lst) and pred(lst[start + length + extendlength]):
+                if start + length + extendlength < len(lst) and \
+                        pred(lst[start + length + extendlength]):
                     length += extendlength
 
         if length > 0 and start + length <= len(lst):
@@ -319,20 +334,20 @@ def extract_with_context(lst, pred, before_context, after_context):
 
 nlre = re.compile('\r\n|\n|\r')
 
+
 def extracturls(s):
-    '''Given a text message, extract all the URLs found in the
-    message, along with their surrounding context.  The output is a
-    list of sequences of Chunk objects, corresponding to the
-    contextual regions extracted from the string.'''
+    """Given a text message, extract all the URLs found in the message, along
+    with their surrounding context.  The output is a list of sequences of Chunk
+    objects, corresponding to the contextual regions extracted from the
+    string.
 
-    rval = []
-
+    """
     lines = nlre.split(s)
 
     # The number of lines of context above to provide.
-    above_context = 1
+    #above_context = 1
     # The number of lines of context below to provide.
-    below_context = 1
+    #below_context = 1
 
     # Plan here is to first transform lines into the form
     # [line_fragments] where each fragment is a chunk as
@@ -343,22 +358,22 @@ def extracturls(s):
     linechunks = [parse_text_urls(l) for l in lines]
 
     return extract_with_context(linechunks,
-                                lambda chunk:len(chunk) > 1 or (len(chunk) == 1 and chunk[0].url <> None),
+                                lambda chunk: len(chunk) > 1 or
+                                (len(chunk) == 1 and chunk[0].url is not None),
                                 1, 1)
+
 
 def extracthtmlurls(s):
     c = HTMLChunker()
     c.feed(s)
     c.close()
-    above_context = 1
-    below_context = 1
+    #above_context = 1
+    #below_context = 1
 
     def somechunkisurl(chunks):
         for chunk in chunks:
-            if chunk.url <> None:
+            if chunk.url is not None:
                 return True
         return False
 
-    return extract_with_context(c.rval,
-                                somechunkisurl,
-                                1, 1)
+    return extract_with_context(c.rval, somechunkisurl, 1, 1)

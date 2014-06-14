@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python
 #
 # A simple urlview replacement that handles things like quoted-printable properly.
 # aka "urlview minus teh suck"
@@ -26,7 +26,10 @@ import sys
 import re
 import optparse
 
-import email.Parser
+try:
+    from email.Parser import Parser as parser
+except ImportError:
+    from email.parser import Parser as parser
 
 optparser = optparse.OptionParser(usage='%prog [options] [<] message')
 optparser.add_option('-c', '--compact', action='store_true',
@@ -38,10 +41,10 @@ optparser.add_option('-b', '--background', action='store_true',
 
 options, args = optparser.parse_args()
 
-homedir = os.path.dirname(sys.argv[0])
-moduledir = os.path.join(homedir, 'modules')
-if os.path.isdir(moduledir):
-    sys.path = [moduledir] + sys.path
+#homedir = os.path.dirname(sys.argv[0])
+#moduledir = os.path.join(homedir, 'modules')
+#if os.path.isdir(moduledir):
+#    sys.path = [moduledir] + sys.path
 
 from urlscan import urlchoose
 from urlscan import urlscan
@@ -77,10 +80,10 @@ def main(msg):
 if len(args) > 1:
     sys.stderr.write('Too many messages.\n')
 elif len(args) == 1:
-    msg = email.Parser.Parser().parse(file(args[0], 'r'))
+    msg = parser().parse(file(args[0], 'r'))
     main(msg)
 else:
-    msg = email.Parser.Parser().parse(sys.stdin)
+    msg = parser().parse(sys.stdin)
     if not os.isatty(0):
         fd = os.open('/dev/tty', os.O_RDONLY)
         if fd < 0:
