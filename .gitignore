@@ -1,5 +1,6 @@
 *.pyc
 *.egg
+*.egg-info
 *.gz
 *.xz
 build
