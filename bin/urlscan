@@ -20,12 +20,12 @@
 #   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 #   Boston, MA 02111-1307, USA.
 
-
+from __future__ import unicode_literals
 import os
 import sys
 import re
 import optparse
-
+from urlscan import urlchoose, urlscan
 try:
     from email.Parser import Parser as parser
 except ImportError:
@@ -41,32 +41,49 @@ optparser.add_option('-b', '--background', action='store_true',
 
 options, args = optparser.parse_args()
 
-#homedir = os.path.dirname(sys.argv[0])
-#moduledir = os.path.join(homedir, 'modules')
-#if os.path.isdir(moduledir):
-#    sys.path = [moduledir] + sys.path
-
-from urlscan import urlchoose
-from urlscan import urlscan
 
 # Written as a generator so I can easily choose only
 # one subpart in the future (e.g., for
 # multipart/alternative).  Actually, I might even add
 # a browser for the message structure?
-def msgurls(msg, urlidx = 1):
+def msgurls(msg, urlidx=1):
+    enc = urlscan.get_charset(msg)
     if msg.is_multipart():
         for part in msg.get_payload():
             for chunk in msgurls(part, urlidx):
                 urlidx += 1
                 yield chunk
     elif msg.get_content_type() == 'text/plain':
-        for chunk in urlscan.extracturls(msg.get_payload(decode = True)):
+        msg = decode_bytes(msg.get_payload(decode=True), enc)
+        for chunk in urlscan.extracturls(msg):
             urlidx += 1
             yield chunk
     elif msg.get_content_type() == 'text/html':
-        for chunk in urlscan.extracthtmlurls(msg.get_payload(decode = True)):
+        msg = decode_bytes(msg.get_payload(decode=True), enc)
+        for chunk in urlscan.extracthtmlurls(msg):
             urlidx += 1
             yield chunk
+
+def decode_bytes(b, enc='utf-8'):
+    """Given a string or bytes input, return a string.
+
+    If the default encoding or detected encoding don't work, try 'latin-1'
+
+        Args: b - bytes or string
+              enc - encoding to use for decoding the byte string.
+
+    """
+    try:
+        s = b.decode(enc)
+    except UnicodeDecodeError:
+        try:
+            s = b.decode('latin-1')
+        except UnicodeDecodeError as e:
+            s = "Unable to decode message:\n{}\n{}".format(str(b), e)
+    except AttributeError:
+        # If b is already a string, just return it
+        return b
+    return s
 
 def main(msg):
     global options

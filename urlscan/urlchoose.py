@@ -39,10 +39,7 @@ class URLChooser:
             if first:
                 first = False
             elif not self.compact_mode:
-                self.items.append(urwid.Divider(div_char='-',
-                                                top=1,
-                                                bottom=1))
-
+                self.items.append(urwid.Divider(div_char='-', top=1, bottom=1))
             groupurls = []
             markup = []
             if self.compact_mode:
@@ -100,6 +97,9 @@ class URLChooser:
                                                mkbrowseto(url, background),
                                                user_data=url))
 
+        if not self.items:
+            self.items.append(urwid.Text("No URLs found"))
+            firstbutton = 1
         self.listbox = urwid.ListBox(self.items)
         self.listbox.set_focus(firstbutton)
         if len(self.urls) == 1:

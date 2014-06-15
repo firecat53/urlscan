@@ -17,11 +17,21 @@
 
 """Contains the backend logic that scans messages for URLs and context."""
 
+from __future__ import unicode_literals
 import re
 try:
     from HTMLParser import HTMLParser
 except ImportError:
     from html.parser import HTMLParser
+
+
+def get_charset(message, default="ascii"):
+    """Get the message charset"""
+    if message.get_content_charset():
+        return message.get_content_charset()
+    if message.get_charset():
+        return message.get_charset()
+    return default
 
 
 class Chunk:
@@ -338,8 +348,7 @@ nlre = re.compile('\r\n|\n|\r')
 def extracturls(s):
     """Given a text message, extract all the URLs found in the message, along
     with their surrounding context.  The output is a list of sequences of Chunk
-    objects, corresponding to the contextual regions extracted from the
-    string.
+    objects, corresponding to the contextual regions extracted from the string.
 
     """
     lines = nlre.split(s)
