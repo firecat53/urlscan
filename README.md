@@ -2,7 +2,7 @@ urlscan
 =======
 Daniel Burrows <dburrows@debian.org> (Original Author)
 ------------------------------------
-Scott Hansen `<firecat4153 at moc.liamg reversed>` (Maintainer)
+Scott Hansen `<firecat4153@gmail.com>` (Maintainer)
 -----------------------------------------------
 
 1. Purpose and Requirements
