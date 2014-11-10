@@ -14,9 +14,9 @@ urlscan \- browse the URLs in an email message from a terminal
 .SH DESCRIPTION
 \fBurlscan\fR accepts a single email message on standard
 input, then displays a terminal-based list of the URLs in the given
-message.  Selecting a URL will invoke \fBsensible-browser\fR(1) on it
-(and hence any browser specified in the \fBBROWSER\fR environment
-variable).
+message.  Selecting a URL uses the Python webbrowser module to 
+determine which browser to open. The \fBBROWSER\fR environment 
+variable will be used if it is set.
 
 \fBurlscan\fR is primarily intended to be used with the
 .B mutt
@@ -32,11 +32,6 @@ and base64.
 \fB2.\fR Extraction and display of the context surrounding each URL.
 
 .SH OPTIONS
-.TP
-.B \-b, \-\-background
-Run the Web browser in the background, so you can select another URL
-without closing it (this will not work with terminal-based Web
-browsers such as lynx, links, or w3m).
 .TP
 .B \-c, \-\-compact
 Display a simple list of the extracted URLs, instead of showing the
@@ -61,7 +56,6 @@ selected message.
 
 .SH SEE ALSO
 \fI/usr/share/doc/urlscan/README\fR,
-\fBsensible-browser\fR(1),
 \fBurlview\fR(1),
 \fBmutt\fR(1)
 

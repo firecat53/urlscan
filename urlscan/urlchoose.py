@@ -23,13 +23,13 @@ import urwid.curses_display
 from . import browser
 
 
-def mkbrowseto(url, background):
-    return lambda *args: browser.browseto(url, background)
+def mkbrowseto(url):
+    return lambda *args: browser.browseto(url)
 
 
 # Based on urwid examples.
 class URLChooser:
-    def __init__(self, extractedurls, compact_mode=False, background=True):
+    def __init__(self, extractedurls, compact_mode=False):
         self.compact_mode = compact_mode
         self.items = []
         first = True
@@ -94,7 +94,7 @@ class URLChooser:
                           ' ',
                           ('urlref:url', url)]
                 self.items.append(urwid.Button(markup,
-                                               mkbrowseto(url, background),
+                                               mkbrowseto(url),
                                                user_data=url))
 
         if not self.items:

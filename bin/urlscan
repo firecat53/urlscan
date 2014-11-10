@@ -35,9 +35,6 @@ optparser = optparse.OptionParser(usage='%prog [options] [<] message')
 optparser.add_option('-c', '--compact', action='store_true',
                      dest="compact", default=False,
                      help='Don\'t display the context of each URL.')
-optparser.add_option('-b', '--background', action='store_true',
-                     dest="background", default=False,
-                     help='Run the Web browser as a background process.')
 
 options, args = optparser.parse_args()
 
@@ -89,8 +86,7 @@ def main(msg):
     global options
 
     ui = urlchoose.URLChooser(msgurls(msg),
-                              compact_mode = options.compact,
-                              background = options.background)
+                              compact_mode = options.compact)
     ui.main()
 
 # TODO: accept messages on the command-line?

@@ -17,13 +17,10 @@
 
 """Contains logic to invoke the default system browser."""
 
-import os
-import subprocess
+import webbrowser
 
 
-def browseto(url, background=False):
-    if background:
-        cmd = subprocess.call
-    else:
-        cmd = subprocess.Popen
-    cmd([os.environ["BROWSER"], url])
+def browseto(url):
+    if not url.startswith('http'):
+        url = "http://{}".format(url)
+    webbrowser.open(url)
