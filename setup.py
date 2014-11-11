@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name="urlscan",
-      version="0.6.0",
+      version="0.7.0",
       description="View the URLs in an email message",
       author="Daniel Burrows",
       author_email="dburrows@debian.org",

@@ -1,9 +1,12 @@
 urlscan
 =======
+
+.. NOTE::
+	The Github project name has change from urlscan-git to urlscan. Please update your local repositories. Sorry for the inconvenience!
+
 Daniel Burrows <dburrows@debian.org> (Original Author)
-------------------------------------
-Scott Hansen `<firecat4153@gmail.com>` (Maintainer)
------------------------------------------------
+
+Scott Hansen <firecat4153@gmail.com> (Maintainer)
 
 1. Purpose and Requirements
 
