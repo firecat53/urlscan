@@ -72,4 +72,4 @@ automatically invoke urlscan on the message.
 
     - Configurability is more than a little bit lacking.
 
-5. [Archlinux Package](https://aur.archlinux.org/packages.php?ID=44853)
+5. [Archlinux Package](https://aur.archlinux.org/packages/urlscan-git/)
