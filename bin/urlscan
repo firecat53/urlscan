@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
-# A simple urlview replacement that handles things like quoted-printable properly.
-# aka "urlview minus teh suck"
+# A simple urlview replacement that handles things like quoted-printable
+# properly.  aka "urlview minus teh suck"
 #
 #   Copyright (C) 2006-2007 Daniel Burrows
 #   Copyright (C) 2014 Scott Hansen
@@ -22,29 +22,21 @@
 #   Boston, MA 02111-1307, USA.
 
 from __future__ import unicode_literals
+import argparse
 import os
 import sys
-import re
-import optparse
 from urlscan import urlchoose, urlscan
 try:
     from email.Parser import Parser as parser
 except ImportError:
     from email.parser import Parser as parser
 
-optparser = optparse.OptionParser(usage='%prog [options] [<] message')
-optparser.add_option('-c', '--compact', action='store_true',
-                     dest="compact", default=False,
-                     help='Don\'t display the context of each URL.')
 
-options, args = optparser.parse_args()
-
-
-# Written as a generator so I can easily choose only
-# one subpart in the future (e.g., for
-# multipart/alternative).  Actually, I might even add
-# a browser for the message structure?
 def msgurls(msg, urlidx=1):
+    # Written as a generator so I can easily choose only
+    # one subpart in the future (e.g., for
+    # multipart/alternative).  Actually, I might even add
+    # a browser for the message structure?
     enc = urlscan.get_charset(msg)
     if msg.is_multipart():
         for part in msg.get_payload():
@@ -61,6 +53,7 @@ def msgurls(msg, urlidx=1):
         for chunk in urlscan.extracthtmlurls(msg):
             urlidx += 1
             yield chunk
+
 
 def decode_bytes(b, enc='utf-8'):
     """Given a string or bytes input, return a string.
@@ -83,21 +76,28 @@ def decode_bytes(b, enc='utf-8'):
         return b
     return s
 
-def main(msg):
-    global options
 
-    ui = urlchoose.URLChooser(msgurls(msg),
-                              compact_mode = options.compact)
-    ui.main()
+def parse_arguments():
+    """Parse command line options.
 
-# TODO: accept messages on the command-line?
-if len(args) > 1:
-    sys.stderr.write('Too many messages.\n')
-elif len(args) == 1:
-    msg = parser().parse(file(args[0], 'r'))
-    main(msg)
-else:
-    msg = parser().parse(sys.stdin)
+    Returns: args
+
+    """
+    arg_parse = argparse.ArgumentParser(description="Parse and display URLs")
+    arg_parse.add_argument('--compact', '-c',
+                           action='store_true', default=False,
+                           help="Don't display the context of each URL.")
+    arg_parse.add_argument('message', type=argparse.FileType('r'),
+                           help="Filename or pipe content using '-' for stdin")
+    args = arg_parse.parse_args(sys.argv[1:])
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
+    msg = parser().parse(args.message)
+    # This section closes out sys.stdin if necessary so as not to block curses
+    # keyboard inputs
     if not os.isatty(0):
         fd = os.open('/dev/tty', os.O_RDONLY)
         if fd < 0:
@@ -106,5 +106,6 @@ else:
         else:
             os.dup2(fd, 0)
             os.close(fd)
-    main(msg)
-
+    ui = urlchoose.URLChooser(msgurls(msg),
+                              compact_mode=args.compact)
+    ui.main()
