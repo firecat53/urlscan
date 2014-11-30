@@ -215,8 +215,11 @@ class HTMLChunker(HTMLParser):
                   8230: "..."}
 
     def handle_charref(self, name):
-        n = int(name)
-        if n < 256:
+        if name[0] == 'x':
+            n = int(name[1:], 16)
+        else:
+            n = int(name)
+        if n < 128:
             name = chr(n)
         elif n in HTMLChunker.extrachars:
             name = HTMLChunker.extrachars[n]
