@@ -219,7 +219,7 @@ class HTMLChunker(HTMLParser):
             n = int(name[1:], 16)
         else:
             n = int(name)
-        if n < 256:
+        if n < 128:
             name = chr(n)
         elif n in HTMLChunker.extrachars:
             name = HTMLChunker.extrachars[n]
