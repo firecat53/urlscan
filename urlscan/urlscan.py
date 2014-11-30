@@ -240,8 +240,8 @@ class HTMLChunker(HTMLParser):
             # added above.
             self.handle_data('&%s;' % name)
 
-urlinternalpattern = r'[{}a-zA-Z/\-_0-9%?&.=:;+,#~]'
-urltrailingpattern = r'[{}a-zA-Z/\-_0-9%&=+#]'
+urlinternalpattern = r'[{}()@a-zA-Z/\-_0-9%?&.=:;+,#~]'
+urltrailingpattern = r'[{}()@a-zA-Z/\-_0-9%&=+#]'
 httpurlpattern = (r'(?:(https?|file)://' + urlinternalpattern +
                   r'*' + urltrailingpattern + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
