@@ -28,85 +28,108 @@ def mkbrowseto(url):
     return lambda *args: browser.browseto(url)
 
 
+def process_urls(extractedurls, compact_mode=False, nobrowser=False):
+    """Process the 'extractedurls' and ready them for either the curses browser
+    or non-interactive output
+
+    Args: extractedurls
+          compact_mode - True/False (Default False)
+          nobrowser - True/False (Default False)
+
+    Returns: items
+             urls
+             firstbutton - Number of first URL button
+             if nobrowser, then _only_ return urls
+
+    """
+    items = []
+    urls = []
+    first = True
+    firstbutton = 0
+    if nobrowser is True:
+        compact_mode = True
+    for group, usedfirst, usedlast in extractedurls:
+        if first:
+            first = False
+        elif not compact_mode:
+            items.append(urwid.Divider(div_char='-', top=1, bottom=1))
+        groupurls = []
+        markup = []
+        if compact_mode:
+            lasturl = None
+            for chunks in group:
+                for chunk in chunks:
+                    if chunk.url and chunk.url != lasturl:
+                        groupurls.append(chunk.url)
+                        urls.append(chunk.url)
+                        lasturl = chunk.url
+        else:
+            if not usedfirst:
+                markup.append(('msgtext:ellipses', '...\n'))
+            for chunks in group:
+                i = 0
+                while i < len(chunks):
+                    chunk = chunks[i]
+                    i += 1
+                    if chunk.url is None:
+                        markup.append(chunk.markup)
+                    else:
+                        urls.append(chunk.url)
+                        groupurls.append(chunk.url)
+                        # Collect all immediately adjacent
+                        # chunks with the same URL.
+                        tmpmarkup = []
+                        if chunk.markup:
+                            tmpmarkup.append(chunk.markup)
+                        while i < len(chunks) and \
+                                chunks[i].url == chunk.url:
+                            if chunks[i].markup:
+                                tmpmarkup.append(chunks[i].markup)
+                            i += 1
+                        markup += [tmpmarkup or '<URL>',
+                                   ('urlref:number:braces', ' ['),
+                                   ('urlref:number', repr(len(urls))),
+                                   ('urlref:number:braces', ']')]
+                markup += '\n'
+            if not usedlast:
+                markup += [('msgtext:ellipses', '...\n\n')]
+
+            items.append(urwid.Text(markup))
+
+        i = len(urls) - len(groupurls)
+        for url in groupurls:
+            if firstbutton == 0 and not compact_mode:
+                firstbutton = len(items)
+            i += 1
+            markup = [('urlref:number:braces', '['),
+                      ('urlref:number', repr(i)),
+                      ('urlref:number:braces', ']'),
+                      ' ',
+                      ('urlref:url', url)]
+            items.append(urwid.Button(markup,
+                                      mkbrowseto(url),
+                                      user_data=url))
+
+    if not items:
+        items.append(urwid.Text("No URLs found"))
+        firstbutton = 1
+    if nobrowser is True:
+        return urls
+    else:
+        return items, urls, firstbutton
+
+
 # Based on urwid examples.
 class URLChooser:
     def __init__(self, extractedurls, compact_mode=False):
-        self.compact_mode = compact_mode
-        self.items = []
-        first = True
-        firstbutton = 0
-        self.urls = []
-        for group, usedfirst, usedlast in extractedurls:
-            if first:
-                first = False
-            elif not self.compact_mode:
-                self.items.append(urwid.Divider(div_char='-', top=1, bottom=1))
-            groupurls = []
-            markup = []
-            if self.compact_mode:
-                lasturl = None
-                for chunks in group:
-                    for chunk in chunks:
-                        if chunk.url and chunk.url != lasturl:
-                            groupurls.append(chunk.url)
-                            self.urls.append(chunk.url)
-                            lasturl = chunk.url
-            else:
-                if not usedfirst:
-                    markup.append(('msgtext:ellipses', '...\n'))
-                for chunks in group:
-                    i = 0
-                    while i < len(chunks):
-                        chunk = chunks[i]
-                        i += 1
-                        if chunk.url is None:
-                            markup.append(chunk.markup)
-                        else:
-                            self.urls.append(chunk.url)
-                            groupurls.append(chunk.url)
-                            # Collect all immediately adjacent
-                            # chunks with the same URL.
-                            tmpmarkup = []
-                            if chunk.markup:
-                                tmpmarkup.append(chunk.markup)
-                            while i < len(chunks) and \
-                                    chunks[i].url == chunk.url:
-                                if chunks[i].markup:
-                                    tmpmarkup.append(chunks[i].markup)
-                                i += 1
-                            markup += [tmpmarkup or '<URL>',
-                                       ('urlref:number:braces', ' ['),
-                                       ('urlref:number', repr(len(self.urls))),
-                                       ('urlref:number:braces', ']')]
-                    markup += '\n'
-                if not usedlast:
-                    markup += [('msgtext:ellipses', '...\n\n')]
-
-                self.items.append(urwid.Text(markup))
-
-            i = len(self.urls) - len(groupurls)
-            for url in groupurls:
-                if firstbutton == 0 and not self.compact_mode:
-                    firstbutton = len(self.items)
-                i += 1
-                markup = [('urlref:number:braces', '['),
-                          ('urlref:number', repr(i)),
-                          ('urlref:number:braces', ']'),
-                          ' ',
-                          ('urlref:url', url)]
-                self.items.append(urwid.Button(markup,
-                                               mkbrowseto(url),
-                                               user_data=url))
-
-        if not self.items:
-            self.items.append(urwid.Text("No URLs found"))
-            firstbutton = 1
-        self.listbox = urwid.ListBox(self.items)
+        items, urls, firstbutton = process_urls(extractedurls,
+                                                compact_mode)
+        self.listbox = urwid.ListBox(items)
         self.listbox.set_focus(firstbutton)
-        if len(self.urls) == 1:
+        if len(urls) == 1:
             header = 'Found 1 url.'
         else:
-            header = 'Found %d urls.' % len(self.urls)
+            header = 'Found %d urls.' % len(urls)
         headerwid = urwid.AttrWrap(urwid.Text(header), 'header')
         self.top = urwid.Frame(self.listbox, headerwid)
 
