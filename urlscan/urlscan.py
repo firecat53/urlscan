@@ -358,9 +358,9 @@ def extracturls(s):
     lines = nlre.split(s)
 
     # The number of lines of context above to provide.
-    #above_context = 1
+    # above_context = 1
     # The number of lines of context below to provide.
-    #below_context = 1
+    # below_context = 1
 
     # Plan here is to first transform lines into the form
     # [line_fragments] where each fragment is a chunk as
@@ -380,8 +380,8 @@ def extracthtmlurls(s):
     c = HTMLChunker()
     c.feed(s)
     c.close()
-    #above_context = 1
-    #below_context = 1
+    # above_context = 1
+    # below_context = 1
 
     def somechunkisurl(chunks):
         for chunk in chunks:
@@ -390,3 +390,48 @@ def extracthtmlurls(s):
         return False
 
     return extract_with_context(c.rval, somechunkisurl, 1, 1)
+
+
+def msgurls(msg, urlidx=1):
+    # Written as a generator so I can easily choose only
+    # one subpart in the future (e.g., for
+    # multipart/alternative).  Actually, I might even add
+    # a browser for the message structure?
+    enc = get_charset(msg)
+    if msg.is_multipart():
+        for part in msg.get_payload():
+            for chunk in msgurls(part, urlidx):
+                urlidx += 1
+                yield chunk
+    elif msg.get_content_type() == 'text/plain':
+        msg = decode_bytes(msg.get_payload(decode=True), enc)
+        for chunk in extracturls(msg):
+            urlidx += 1
+            yield chunk
+    elif msg.get_content_type() == 'text/html':
+        msg = decode_bytes(msg.get_payload(decode=True), enc)
+        for chunk in extracthtmlurls(msg):
+            urlidx += 1
+            yield chunk
+
+
+def decode_bytes(b, enc='utf-8'):
+    """Given a string or bytes input, return a string.
+
+    If the default encoding or detected encoding don't work, try 'latin-1'
+
+        Args: b - bytes or string
+              enc - encoding to use for decoding the byte string.
+
+    """
+    try:
+        s = b.decode(enc)
+    except UnicodeDecodeError:
+        try:
+            s = b.decode('latin-1')
+        except UnicodeDecodeError as e:
+            s = "Unable to decode message:\n{}\n{}".format(str(b), e)
+    except AttributeError:
+        # If b is already a string, just return it
+        return b
+    return s

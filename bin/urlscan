@@ -32,51 +32,6 @@ except ImportError:
     from email.parser import Parser as parser
 
 
-def msgurls(msg, urlidx=1):
-    # Written as a generator so I can easily choose only
-    # one subpart in the future (e.g., for
-    # multipart/alternative).  Actually, I might even add
-    # a browser for the message structure?
-    enc = urlscan.get_charset(msg)
-    if msg.is_multipart():
-        for part in msg.get_payload():
-            for chunk in msgurls(part, urlidx):
-                urlidx += 1
-                yield chunk
-    elif msg.get_content_type() == 'text/plain':
-        msg = decode_bytes(msg.get_payload(decode=True), enc)
-        for chunk in urlscan.extracturls(msg):
-            urlidx += 1
-            yield chunk
-    elif msg.get_content_type() == 'text/html':
-        msg = decode_bytes(msg.get_payload(decode=True), enc)
-        for chunk in urlscan.extracthtmlurls(msg):
-            urlidx += 1
-            yield chunk
-
-
-def decode_bytes(b, enc='utf-8'):
-    """Given a string or bytes input, return a string.
-
-    If the default encoding or detected encoding don't work, try 'latin-1'
-
-        Args: b - bytes or string
-              enc - encoding to use for decoding the byte string.
-
-    """
-    try:
-        s = b.decode(enc)
-    except UnicodeDecodeError:
-        try:
-            s = b.decode('latin-1')
-        except UnicodeDecodeError as e:
-            s = "Unable to decode message:\n{}\n{}".format(str(b), e)
-    except AttributeError:
-        # If b is already a string, just return it
-        return b
-    return s
-
-
 def parse_arguments():
     """Parse command line options.
 
@@ -87,6 +42,9 @@ def parse_arguments():
     arg_parse.add_argument('--compact', '-c',
                            action='store_true', default=False,
                            help="Don't display the context of each URL.")
+    arg_parse.add_argument('--no-browser', '-n', dest="nobrowser",
+                           action='store_true', default=False,
+                           help="Pipe URLs to stdout")
     arg_parse.add_argument('message', type=argparse.FileType('r'),
                            help="Filename or pipe content using '-' for stdin")
     args = arg_parse.parse_args(sys.argv[1:])
@@ -106,6 +64,10 @@ if __name__ == "__main__":
         else:
             os.dup2(fd, 0)
             os.close(fd)
-    ui = urlchoose.URLChooser(msgurls(msg),
-                              compact_mode=args.compact)
-    ui.main()
+    if args.nobrowser is False:
+        ui = urlchoose.URLChooser(urlscan.msgurls(msg),
+                                  compact_mode=args.compact)
+        ui.main()
+    else:
+        out = urlchoose.process_urls(urlscan.msgurls(msg), nobrowser=True)
+        print("\n".join(out))
