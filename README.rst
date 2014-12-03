@@ -8,7 +8,7 @@ Daniel Burrows <dburrows@debian.org> (Original Author)
 
 Scott Hansen <firecat4153@gmail.com> (Maintainer)
 
-Maxime Chatelle (Ubuntu Maintainer)
+Maxime Chatelle <xakz@rxsoft.eu> (Debian Maintainer)
 
 Purpose and Requirements
 ------------------------
