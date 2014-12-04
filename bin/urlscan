@@ -45,7 +45,8 @@ def parse_arguments():
     arg_parse.add_argument('--no-browser', '-n', dest="nobrowser",
                            action='store_true', default=False,
                            help="Pipe URLs to stdout")
-    arg_parse.add_argument('message', type=argparse.FileType('r'), nargs='?', default=sys.stdin,
+    arg_parse.add_argument('message', type=argparse.FileType('r'), nargs='?',
+                           default=sys.stdin,
                            help="Filename of the message to parse")
     args = arg_parse.parse_args(sys.argv[1:])
     return args
