@@ -21,6 +21,8 @@ URLs."""
 
 import urwid
 import urwid.curses_display
+from threading import Thread
+from time import sleep
 from . import browser
 
 
@@ -173,16 +175,29 @@ class URLChooser:
                         self.top.keypress(size, "down")
                     elif k == 'k':
                         self.top.keypress(size, "up")
-                    elif k == 'enter':
+                    elif k == 'enter' or k == ' ':
                         footer = "loading URL"
                         footerwid = urwid.AttrWrap(urwid.Text(footer),
                                                    'footer')
                         self.top.set_footer(footerwid)
                         self.top.keypress(size, k)
+                        Thread(target=self._loading_thread).start()
+                        self.ui.s.clear()
                     else:
                         self.top.keypress(size, k)
         except KeyboardInterrupt:
             return None
+
+    def _loading_thread(self):
+        """Simple thread to wait 5 seconds after launching a URL,
+        clearing the screen and clearing the footer loading message.
+
+        """
+        sleep(5)
+        footerwid = urwid.AttrWrap(urwid.Text(""), "default")
+        self.top.set_footer(footerwid)
+        size = self.ui.get_cols_rows()
+        self.draw_screen(size)
 
     def draw_screen(self, size):
         canvas = self.top.render(size, focus=True)
