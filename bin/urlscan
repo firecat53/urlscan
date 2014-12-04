@@ -23,8 +23,11 @@
 
 from __future__ import unicode_literals
 import argparse
+import fileinput
+import locale
 import os
 import sys
+from io import StringIO
 from urlscan import urlchoose, urlscan
 try:
     from email.Parser import Parser as parser
@@ -45,18 +48,17 @@ def parse_arguments():
     arg_parse.add_argument('--no-browser', '-n', dest="nobrowser",
                            action='store_true', default=False,
                            help="Pipe URLs to stdout")
-    arg_parse.add_argument('message', type=argparse.FileType('r'), nargs='?',
-                           default=sys.stdin,
+    arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
-    args = arg_parse.parse_args(sys.argv[1:])
+    args = arg_parse.parse_args()
     return args
 
 
-if __name__ == "__main__":
-    args = parse_arguments()
-    msg = parser().parse(args.message)
-    # This section closes out sys.stdin if necessary so as not to block curses
-    # keyboard inputs
+def close_stdin():
+    """This section closes out sys.stdin if necessary so as not to block curses
+    keyboard inputs
+
+    """
     if not os.isatty(0):
         fd = os.open('/dev/tty', os.O_RDONLY)
         if fd < 0:
@@ -65,10 +67,69 @@ if __name__ == "__main__":
         else:
             os.dup2(fd, 0)
             os.close(fd)
+
+
+def process_input(fn):
+    """Return the parsed text of stdin or the message. Accounts for possible
+    file encoding differences.
+
+        Args: fn - filename or sys.stdin
+        Returns: msg - parsed (email parser) text of the message with the
+            correct encoding set
+
+    """
+    enc_list = ['UTF-8', 'LATIN-1', 'iso8859-1', 'iso8859-2',
+                'UTF-16', 'CP720', 'CP437']
+    locale.setlocale(locale.LC_ALL, '')
+    code = locale.getpreferredencoding()
+    if code not in enc_list:
+        enc_list.insert(0, code)
+    if fn is sys.stdin:
+        try:
+            stdin_file = fn.buffer.read()
+        except AttributeError:
+            stdin_file = fn.read()
+    else:
+        stdin_file = None
+    for c in enc_list:
+        try:
+            if stdin_file is not None:
+                f = StringIO(stdin_file.decode(c))
+            else:
+                fi = fileinput.input(fn, mode='r',
+                                     openhook=fileinput.hook_encoded(c))
+                f = StringIO("\n".join(fi))
+            msg = parser().parse(f)
+        except (UnicodeDecodeError, UnicodeError):
+            continue
+        else:
+            break
+        finally:
+            try:
+                fi.close()
+            except NameError:
+                pass
+        print("Encoding not detected. Please pass encoding value manually")
+        raise
+    close_stdin()
+    # When msg is passed via stdin, it makes multiple payloads, each of which
+    # needs the charset set.
+    try:
+        msg.set_charset(c)
+    except AttributeError:
+        for i in msg.get_payload():
+            i.set_charset(c)
+    return msg
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
+    msg = process_input(args.message)
     if args.nobrowser is False:
         ui = urlchoose.URLChooser(urlscan.msgurls(msg),
                                   compact_mode=args.compact)
         ui.main()
     else:
-        out = urlchoose.process_urls(urlscan.msgurls(msg), nobrowser=True)
+        out = urlchoose.process_urls(urlscan.msgurls(msg),
+                                     nobrowser=True)
         print("\n".join(out))

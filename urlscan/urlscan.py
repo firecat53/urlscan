@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #   Copyright (C) 2006-2007 Daniel Burrows
 #   Copyright (C) 2014 Scott Hansen
 #
@@ -243,17 +244,17 @@ class HTMLChunker(HTMLParser):
             # added above.
             self.handle_data('&%s;' % name)
 
-urlinternalpattern = r'[{}()@a-zA-Z/\-_0-9%?&.=:;+,#~]'
-urltrailingpattern = r'[{}()@a-zA-Z/\-_0-9%&=+#]'
+urlinternalpattern = r'[{}()@\w/\-%?&.=:;+,#~]'
+urltrailingpattern = r'[{}()@\w/\-%&=+#]'
 httpurlpattern = (r'(?:(https?|file)://' + urlinternalpattern +
                   r'*' + urltrailingpattern + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
 tlds = ['biz', 'com', 'edu', 'info', 'org', 'de']
-guessedurlpattern = (r'(?:[a-zA-Z0-9_\-%]+(?:\.[a-zA-Z0-9_\-%]+)*\.(?:' +
+guessedurlpattern = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
                      '|'.join(tlds) + '))')
 urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' +
                    guessedurlpattern +
-                   '|(?:mailto:[a-zA-Z0-9\-_]*@[0-9a-zA-Z_\-.]*[0-9a-zA-Z_\-]))>?')
+                   '|(?:mailto:[\w\-]*@[\w\-.]*[\w\-]))>?', flags=re.U)
 
 # Poor man's test cases.
 assert(urlre.match('<URL:http://linuxtoday.com>'))
@@ -264,6 +265,9 @@ assert(urlre.match('linuxtoday.com'))
 assert(urlre.match('master.wizard.edu'))
 assert(urlre.match('blah.bar.info'))
 assert(urlre.match('goodpr.org'))
+assert(urlre.match('http://github.com/firecat53/ürlscan'))
+assert(urlre.match('https://Schöne_Grüße.es/test'))
+assert(urlre.match('http://www.pantherhouse.com/newshelton/my-wife-thinks-i’m-a-swan/'))
 assert(not urlre.match('blah..org'))
 
 
@@ -426,12 +430,9 @@ def decode_bytes(b, enc='utf-8'):
     """
     try:
         s = b.decode(enc)
-    except UnicodeDecodeError:
-        try:
-            s = b.decode('latin-1')
-        except UnicodeDecodeError as e:
-            s = "Unable to decode message:\n{}\n{}".format(str(b), e)
-    except AttributeError:
+    except UnicodeDecodeError as e:
+        s = "Unable to decode message:\n{}\n{}".format(str(b), e)
+    except (AttributeError, UnicodeEncodeError):
         # If b is already a string, just return it
         return b
     return s

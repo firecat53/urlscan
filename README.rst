@@ -52,8 +52,6 @@ To choose a particular browser, set the environment variable BROWSER:
 Known bugs and limitations
 --------------------------
 
-- Because the Python curses module does not support wide characters (see Debian bug #336861), non-ASCII characters can cause unpredictable results in urlscan. This problem will go away if Python and urwid are patched to support wide characters.
-
 - Running urlscan sometimes "messes up" the terminal background. This seems to be an urwid bug, but I haven't tracked down just what's going on.
 
 - Extraction of context from HTML messages leaves something to be desired. Probably the ideal solution would be to extract context on a word basis rather than on a paragraph basis.
