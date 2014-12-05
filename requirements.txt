@@ -1,1 +1,1 @@
-urwid
+urwid>=1.2.1
