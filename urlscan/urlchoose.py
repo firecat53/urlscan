@@ -181,7 +181,9 @@ class URLChooser:
                                                    'footer')
                         self.top.set_footer(footerwid)
                         self.top.keypress(size, k)
-                        Thread(target=self._loading_thread).start()
+                        load_thread = Thread(target=self._loading_thread)
+                        load_thread.daemon = True
+                        load_thread.start()
                         self.ui.s.clear()
                     else:
                         self.top.keypress(size, k)
