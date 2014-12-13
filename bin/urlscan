@@ -112,14 +112,20 @@ def process_input(fn):
         print("Encoding not detected. Please pass encoding value manually")
         raise
     close_stdin()
-    # When msg is passed via stdin, it makes multiple payloads, each of which
-    # needs the charset set.
-    try:
-        msg.set_charset(c)
-    except AttributeError:
-        for i in msg.get_payload():
-            i.set_charset(c)
+    # Handle multiple nested message parts
+    _msg_set_charset(msg, c)
     return msg
+
+
+def _msg_set_charset(msg, encoding):
+    """Recursive function to set the charset of nested message parts.
+
+    """
+    try:
+        msg.set_charset(encoding)
+    except (AttributeError, TypeError):
+        for part in msg.get_payload():
+            _msg_set_charset(part, encoding)
 
 
 if __name__ == "__main__":
