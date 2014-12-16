@@ -254,7 +254,8 @@ guessedurlpattern = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
                      '|'.join(tlds) + '))')
 urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' +
                    guessedurlpattern +
-                   '|(?:mailto:[\w\-]*@[\w\-.]*[\w\-]))>?', flags=re.U)
+                   '|(?P<email>(mailto:)?[\w\-]*@[\w\-.]*[\w\-]))>?',
+                   flags=re.U)
 
 # Poor man's test cases.
 assert(urlre.match('<URL:http://linuxtoday.com>'))
@@ -282,7 +283,13 @@ def parse_text_urls(s):
     for match in urlre.finditer(s):
         if loc < match.start():
             rval.append(Chunk(s[loc:match.start()], None))
-        rval.append(Chunk(None, match.group(1)))
+        # Turn email addresses into mailto: links
+        email = match.group("email")
+        if email and "mailto" not in email:
+            m = "mailto:{}".format(email)
+        else:
+            m = match.group(1)
+        rval.append(Chunk(None, m))
         loc = match.end()
 
     if loc < len(s):

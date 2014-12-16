@@ -21,13 +21,18 @@ URLs."""
 
 import urwid
 import urwid.curses_display
+import webbrowser
 from threading import Thread
 from time import sleep
-from . import browser
 
 
 def mkbrowseto(url):
-    return lambda *args: browser.browseto(url)
+    """Create the urwid callback function to open the web browser.
+
+    """
+    def browse(*args):
+        webbrowser.open(url)
+    return browse
 
 
 def process_urls(extractedurls, compact_mode=False, nobrowser=False):
