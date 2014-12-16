@@ -5,3 +5,4 @@
 *.xz
 build
 dist
+test_emails/
