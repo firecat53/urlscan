@@ -254,7 +254,7 @@ guessedurlpattern = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
                      '|'.join(tlds) + '))')
 urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' +
                    guessedurlpattern +
-                   '|(?P<email>(mailto:)?[\w\-]*@[\w\-.]*[\w\-]))>?',
+                   '|(?P<email>(mailto:)?[\w\-.]*@[\w\-.]*[\w\-]))>?',
                    flags=re.U)
 
 # Poor man's test cases.
