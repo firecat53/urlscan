@@ -246,7 +246,7 @@ class HTMLChunker(HTMLParser):
 
 urlinternalpattern = r'[{}()@\w/\-%?&.=:;+,#~]'
 urltrailingpattern = r'[{}()@\w/\-%&=+#]'
-httpurlpattern = (r'(?:(https?|file)://' + urlinternalpattern +
+httpurlpattern = (r'(?:(https?|file|ftps?)://' + urlinternalpattern +
                   r'*' + urltrailingpattern + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
 tlds = ['biz', 'com', 'edu', 'info', 'org', 'de']
