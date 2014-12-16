@@ -118,6 +118,7 @@ def _msg_set_charset(msg, encoding):
     """Recursive function to set the charset of nested message parts.
 
     """
+    encoding = msg.get_content_charset() or encoding
     try:
         msg.set_charset(encoding)
     except (AttributeError, TypeError):

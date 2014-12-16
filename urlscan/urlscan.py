@@ -429,8 +429,6 @@ def msgurls(msg, urlidx=1):
 def decode_bytes(b, enc='utf-8'):
     """Given a string or bytes input, return a string.
 
-    If the default encoding or detected encoding don't work, try 'latin-1'
-
         Args: b - bytes or string
               enc - encoding to use for decoding the byte string.
 
