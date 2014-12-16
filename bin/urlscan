@@ -23,11 +23,10 @@
 
 from __future__ import unicode_literals
 import argparse
-import fileinput
+import io
 import locale
 import os
 import sys
-from io import StringIO
 from urlscan import urlchoose, urlscan
 try:
     from email.Parser import Parser as parser
@@ -94,11 +93,9 @@ def process_input(fn):
     for c in enc_list:
         try:
             if stdin_file is not None:
-                f = StringIO(stdin_file.decode(c))
+                f = io.StringIO(stdin_file.decode(c))
             else:
-                fi = fileinput.input(fn, mode='r',
-                                     openhook=fileinput.hook_encoded(c))
-                f = StringIO("\n".join(fi))
+                f = io.open(fn, mode='r', encoding=(c))
             msg = parser().parse(f)
         except (UnicodeDecodeError, UnicodeError):
             continue
