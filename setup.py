@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name="urlscan",
       version="0.8.0",
       description="View/select the URLs in an email message or file",
       author="Scott Hansen",
       author_email="firecat4153@gmail.com",
+      url="https://github.com/firecat53/urlscan",
+      download_url="https://github.com/firecat53/urlscan/archive/0.8.0.zip",
       packages=['urlscan'],
       scripts=['bin/urlscan'],
       package_data={'urlscan': ['README.rst']},
