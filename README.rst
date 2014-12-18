@@ -20,7 +20,7 @@ Requires: Python 2.6+ (including Python 3.x) and the python-urwid library
 Features
 --------
 
-Urlscan parses an email message passed on standard input and scans it for URLs. It then displays the URLs and their context within the message, and allows you to choose one or more URLs to send to your Web browser.
+Urlscan parses an email message or file and scans it for URLs and email addresses. It then displays the URLs and their context within the message, and allows you to choose one or more URLs to send to your Web browser. Alternatively, it send a list of all URLs to stdout.
 
 Relative to urlview, urlscan has the following additional features:
 
@@ -31,7 +31,7 @@ Relative to urlview, urlscan has the following additional features:
 Installation and setup
 ----------------------
 
-To install urlscan, install from your distribution repositories, install the `Archlinux Package`_ , or install from source using setup.py.
+To install urlscan, install from your distribution repositories, from Pypi, install the `Archlinux Package`_ , or install from source using setup.py.
 
 .. NOTE::
 
@@ -48,6 +48,16 @@ Once this is done, Control-b while reading mail in mutt will automatically invok
 To choose a particular browser, set the environment variable BROWSER:
 
     export BROWSER=/usr/bin/epiphany
+
+
+Command Line usage
+------------------
+
+::
+
+    urlscan [-n] <file>
+
+Urlscan can extract URLs and email addresses from emails, or any text file. Calling without the '-n' flag will start the curses browser. Calling with '-n' will just output a list of URLs/email addressess to stdout. Files can also be piped to urlscan using normal shell pipe mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
 
 Known bugs and limitations
 --------------------------

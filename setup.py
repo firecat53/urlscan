@@ -3,8 +3,8 @@
 from distutils.core import setup
 
 setup(name="urlscan",
-      version="0.7.2",
-      description="View the URLs in an email message",
+      version="0.8.0",
+      description="View/select the URLs in an email message or file",
       author="Scott Hansen",
       author_email="firecat4153@gmail.com",
       packages=['urlscan'],
