@@ -27,7 +27,7 @@ except ImportError:
     from html.parser import HTMLParser
 
 
-def get_charset(message, default="ascii"):
+def get_charset(message, default="utf-8"):
     """Get the message charset"""
     if message.get_content_charset():
         return message.get_content_charset()
