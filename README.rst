@@ -39,9 +39,9 @@ To install urlscan, install from your distribution repositories, from Pypi, inst
 
 Once urlscan is installed, add the following lines to your .muttrc:
 
-    macro index,pager \cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+    macro index,pager \\cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
 
-    macro attach,compose \cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+    macro attach,compose \\cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs out of a message"
 
 Once this is done, Control-b while reading mail in mutt will automatically invoke urlscan on the message.
 
