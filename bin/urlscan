@@ -122,7 +122,12 @@ def _msg_set_charset(msg, encoding):
         msg.set_charset(encoding)
     except (AttributeError, TypeError):
         for part in msg.get_payload():
-            _msg_set_charset(part, encoding)
+            try:
+                # Try once to set correct encoding on the message part, then
+                # continue without crashing if it fails
+                _msg_set_charset(part, encoding)
+            except UnicodeEncodeError:
+                continue
 
 
 if __name__ == "__main__":
