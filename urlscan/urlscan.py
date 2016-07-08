@@ -20,6 +20,7 @@
 
 from __future__ import unicode_literals
 import re
+import os
 try:
     from HTMLParser import HTMLParser
 except ImportError:
@@ -248,9 +249,19 @@ urltrailingpattern = r'[{}()@\w/\-%&=+#]'
 httpurlpattern = (r'(?:(https?|file|ftps?)://' + urlinternalpattern +
                   r'*' + urltrailingpattern + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
-tlds = ['biz', 'com', 'edu', 'info', 'org', 'de']
+
+
+def load_tlds():
+    file = os.path.join(os.path.dirname(__file__),
+                        'assets',
+                        'tlds-alpha-by-domain.txt')
+    with open(file) as f:
+        return [elem for elem in f.read().lower().splitlines()[1:]
+                if "--" not in elem]
+
+tlds = load_tlds()
 guessedurlpattern = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
-                     '|'.join(tlds) + '))')
+                     '|'.join(tlds) + ')$)')
 urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' +
                    guessedurlpattern +
                    '|(?P<email>(mailto:)?[\w\-.]*@[\w\-.]*[\w\-]))>?',
@@ -269,6 +280,12 @@ assert(urlre.match('http://github.com/firecat53/ürlscan'))
 assert(urlre.match('https://Schöne_Grüße.es/test'))
 assert(urlre.match('http://www.pantherhouse.com/newshelton/my-wife-thinks-i’m-a-swan/'))
 assert(not urlre.match('blah..org'))
+assert(urlre.match('http://www.testurl.zw'))
+assert(urlre.match('http://www.testurl.smile'))
+assert(urlre.match('testurl.smile.smile'))
+assert(urlre.match('testurl.biz.smile.zw'))
+assert(not urlre.match('example..biz'))
+assert(not urlre.match('blah.baz.obviouslynotarealdomain'))
 
 
 def parse_text_urls(s):
