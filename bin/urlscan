@@ -26,7 +26,9 @@ import io
 import locale
 import os
 import sys
+import tempfile
 from urlscan import urlchoose, urlscan
+from email.mime.text import MIMEText
 try:
     from email.Parser import Parser as parser
 except ImportError:
@@ -46,6 +48,12 @@ def parse_arguments():
     arg_parse.add_argument('--no-browser', '-n', dest="nobrowser",
                            action='store_true', default=False,
                            help="Pipe URLs to stdout")
+    arg_parse.add_argument('--urlview-compat', '-u', dest="urlview",
+                           action='store_true', default=False,
+                           help="Switch to urlview compatibility mode.  This"
+                           " will allow for piping input other than a filename"
+                           " directly to urlscan.  Other switches apply as"
+                           " normal")
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     args = arg_parse.parse_args()
@@ -127,7 +135,16 @@ def _msg_set_charset(msg, encoding):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    msg = process_input(args.message)
+    name = args.message
+    if args.urlview:
+        # Parser expects everything to be an email-like file
+        # So we'll read stdin, put that in an email file as
+        # the body, then pass the filename to the parser
+        t = tempfile.NamedTemporaryFile(mode='w')
+        t.write(MIMEText(args.message.read()).as_string())
+        name = t.name
+        t.seek(0)
+    msg = process_input(name)
     if args.nobrowser is False:
         ui = urlchoose.URLChooser(urlscan.msgurls(msg),
                                   compact_mode=args.compact)
