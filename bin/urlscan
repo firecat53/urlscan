@@ -95,6 +95,7 @@ def process_input(fn):
                 f = io.StringIO(stdin_file.decode(c))
             else:
                 f = io.open(fn, mode='r', encoding=(c))
+            f = _fix_first_line(f)
             msg = parser().parse(f)
         except (UnicodeDecodeError, UnicodeError):
             continue
@@ -111,6 +112,28 @@ def process_input(fn):
     # Handle multiple nested message parts
     _msg_set_charset(msg, c)
     return msg
+
+
+def _fix_first_line(f):
+    """If the first line starts with http*, the URLs on that line will not be
+    parsed by email.Parser.
+
+      1. Take the file object 'f'.
+      2. Read it...if the first line starts with 'http', then save that, create
+      a new StringIO object that starts with a blank line and read the file
+      into that. Return as open StringIO object 'f'
+      3. Return 'f'
+
+    """
+    if not f.readline().strip().startswith('http'):
+        f.seek(0)
+        return f
+    f.seek(0)
+    new = io.StringIO()
+    new.write("\n{}".format(f.read()))
+    f.close()
+    new.seek(0)
+    return new
 
 
 def _msg_set_charset(msg, encoding):
