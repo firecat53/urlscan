@@ -55,9 +55,9 @@ Command Line usage
 
 ::
 
-    urlscan [-n] <file>
+    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] <file>
 
-Urlscan can extract URLs and email addresses from emails, or any text file. Calling without the '-n' flag will start the curses browser. Calling with '-n' will just output a list of URLs/email addressess to stdout. Files can also be piped to urlscan using normal shell pipe mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
+Urlscan can extract URLs and email addresses from emails or any text file. Calling with no flags will start the curses browser. Calling with '-n' will just output a list of URLs/email addressess to stdout. The '-c' flag removes the context from around the URLs in the curses browser, and the '-d' flag removes duplicate URLs. Files can also be piped to urlscan using normal shell pipe mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
 
 Known bugs and limitations
 --------------------------
@@ -68,7 +68,7 @@ Known bugs and limitations
 
 - The HTML message handling is a bit kludgy in general.
 
-- multipart/alternative sections are handled by descending into all the sub-parts, rather than just picking one, which may lead to URLs and context appearing twice.
+- multipart/alternative sections are handled by descending into all the sub-parts, rather than just picking one, which may lead to URLs and context appearing twice. (Bypass this by selecting the '--dedupe' option)
 
 - Configurability is more than a little bit lacking.
 

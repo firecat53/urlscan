@@ -46,6 +46,9 @@ def parse_arguments():
     arg_parse.add_argument('--no-browser', '-n', dest="nobrowser",
                            action='store_true', default=False,
                            help="Pipe URLs to stdout")
+    arg_parse.add_argument('--dedupe', '-d', dest="dedupe",
+                           action='store_true', default=False,
+                           help="Remove duplicate URLs from list")
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     args = arg_parse.parse_args()
@@ -158,9 +161,11 @@ if __name__ == "__main__":
     msg = process_input(args.message)
     if args.nobrowser is False:
         ui = urlchoose.URLChooser(urlscan.msgurls(msg),
-                                  compact_mode=args.compact)
+                                  compact_mode=args.compact,
+                                  dedupe=args.dedupe)
         ui.main()
     else:
         out = urlchoose.process_urls(urlscan.msgurls(msg),
-                                     nobrowser=True)
+                                     nobrowser=True,
+                                     dedupe=args.dedupe)
         print("\n".join(out))

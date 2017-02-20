@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "October 26, 2015"
+.TH URLSCAN 1 "February 19, 2017"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -37,6 +37,9 @@ and base64.
 Display a simple list of the extracted URLs, instead of showing the
 context of each URL.
 .TP
+.B \-d, \-\-dedupe
+Remove duplicated URLs from the list of URLs.
+.TP
 .B \-n, \-\-no-browser
 Disables the selection interface and print the links to standard output.
 Useful for scripting (implies \fB\-\-compact\fR).
@@ -57,6 +60,9 @@ macro attach,compose \\cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract
 Once these lines are in your mutt configuration file, pressing
 Control-b will allow you to browse and open the URLs in the currently
 selected message.
+
+Alternately, you can pipe a message into urlscan using the '|' operator. This
+can be useful for applying a different flag (such as the '-d' or '-c' options).
 
 .SH SEE ALSO
 \fI/usr/share/doc/urlscan/README\fR,

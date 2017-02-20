@@ -34,13 +34,15 @@ def mkbrowseto(url):
     return browse
 
 
-def process_urls(extractedurls, compact_mode=False, nobrowser=False):
+def process_urls(extractedurls, compact_mode=False, nobrowser=False,
+                 dedupe=False):
     """Process the 'extractedurls' and ready them for either the curses browser
     or non-interactive output
 
     Args: extractedurls
           compact_mode - True/False (Default False)
           nobrowser - True/False (Default False)
+          dedupe - True/False (Default False). Remove duplicate URLs from list
 
     Returns: items
              urls
@@ -59,13 +61,20 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False):
             first = False
         elif not compact_mode:
             items.append(urwid.Divider(div_char='-', top=1, bottom=1))
+        if dedupe is True:
+            # If no unique URLs exist, then skip the group completely
+            if not [chunk for chunks in group for chunk in chunks
+                    if chunk.url is not None and chunk.url not in urls]:
+                continue
         groupurls = []
         markup = []
         if compact_mode:
             lasturl = None
             for chunks in group:
                 for chunk in chunks:
-                    if chunk.url and chunk.url != lasturl:
+                    if chunk.url and chunk.url != lasturl \
+                            and ((dedupe is True and chunk.url not in urls) or
+                                 dedupe is False):
                         groupurls.append(chunk.url)
                         urls.append(chunk.url)
                         lasturl = chunk.url
@@ -79,7 +88,8 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False):
                     i += 1
                     if chunk.url is None:
                         markup.append(chunk.markup)
-                    else:
+                    elif (dedupe is True and chunk.url not in urls) \
+                            or dedupe is False:
                         urls.append(chunk.url)
                         groupurls.append(chunk.url)
                         # Collect all immediately adjacent
@@ -127,9 +137,11 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False):
 
 # Based on urwid examples.
 class URLChooser:
-    def __init__(self, extractedurls, compact_mode=False):
+    def __init__(self, extractedurls, compact_mode=False, dedupe=False):
         items, urls, firstbutton = process_urls(extractedurls,
-                                                compact_mode)
+                                                compact_mode,
+                                                nobrowser=False,
+                                                dedupe=dedupe)
         self.listbox = urwid.ListBox(items)
         self.listbox.set_focus(firstbutton)
         if len(urls) == 1:
