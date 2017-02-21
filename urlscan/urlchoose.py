@@ -117,14 +117,15 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False,
             if firstbutton == 0 and not compact_mode:
                 firstbutton = len(items)
             i += 1
-            markup = [('urlref:number:braces', '['),
-                      ('urlref:number', repr(i)),
-                      ('urlref:number:braces', ']'),
-                      ' ',
-                      ('urlref:url', url)]
-            items.append(urwid.Button(markup,
-                                      mkbrowseto(url),
-                                      user_data=url))
+            markup = [(6, urwid.Text([('urlref:number:braces', '['),
+                                      ('urlref:number', repr(i)),
+                                      ('urlref:number:braces', ']'),
+                                      ' '])),
+                      urwid.AttrMap(urwid.Button(url,
+                                                 mkbrowseto(url),
+                                                 user_data=url),
+                                    'urlref:url', 'url:sel')]
+            items.append(urwid.Columns(markup))
 
     if not items:
         items.append(urwid.Text("No URLs found"))
@@ -168,7 +169,8 @@ class URLChooser:
             ('msgtext:ellipses', 'light gray', 'black'),
             ('urlref:number:braces', 'light gray', 'black'),
             ('urlref:number', 'yellow', 'black', 'standout'),
-            ('urlref:url', 'white', 'black', 'standout')
+            ('urlref:url', 'white', 'black', 'standout'),
+            ('url:sel', 'white', 'dark blue', 'bold')
         ])
         return self.ui.run_wrapper(self.run)
 
