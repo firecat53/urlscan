@@ -149,7 +149,7 @@ class URLChooser:
             header = 'Found 1 url.'
         else:
             header = 'Found %d urls.' % len(urls)
-        headerwid = urwid.AttrWrap(urwid.Text(header), 'header')
+        headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(self.listbox, headerwid)
 
     def main(self):
@@ -195,8 +195,8 @@ class URLChooser:
                         self.top.keypress(size, "up")
                     elif k == 'enter' or k == ' ':
                         footer = "loading URL"
-                        footerwid = urwid.AttrWrap(urwid.Text(footer),
-                                                   'footer')
+                        footerwid = urwid.AttrMap(urwid.Text(footer),
+                                                  'footer')
                         self.top.set_footer(footerwid)
                         self.top.keypress(size, k)
                         load_thread = Thread(target=self._loading_thread)
@@ -214,7 +214,7 @@ class URLChooser:
 
         """
         sleep(5)
-        footerwid = urwid.AttrWrap(urwid.Text(""), "default")
+        footerwid = urwid.AttrMap(urwid.Text(""), "default")
         self.top.set_footer(footerwid)
         size = self.ui.get_cols_rows()
         self.draw_screen(size)
