@@ -136,7 +136,6 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False,
         return items, urls, firstbutton
 
 
-# Based on urwid examples.
 class URLChooser:
     def __init__(self, extractedurls, compact_mode=False, dedupe=False):
         items, urls, firstbutton = process_urls(extractedurls,
@@ -151,10 +150,8 @@ class URLChooser:
             header = 'Found %d urls.' % len(urls)
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(self.listbox, headerwid)
-
-    def main(self):
         self.ui = urwid.curses_display.Screen()
-        self.ui.register_palette([
+        self.palette = [
             ('header', 'white', 'dark blue', 'standout'),
             ('footer', 'white', 'dark red', 'standout'),
             ('msgtext', 'light gray', 'black'),
@@ -171,42 +168,44 @@ class URLChooser:
             ('urlref:number', 'yellow', 'black', 'standout'),
             ('urlref:url', 'white', 'black', 'standout'),
             ('url:sel', 'white', 'dark blue', 'bold')
-        ])
-        return self.ui.run_wrapper(self.run)
+        ]
 
-    def run(self):
+    def main(self):
+        loop = urwid.MainLoop(self.top, self.palette, screen=self.ui,
+                              input_filter=self.handle_keys,
+                              unhandled_input=self.unhandled)
+        loop.run()
+
+    def handle_keys(self, keys, raw):
+        """Handle the enter or space key to trigger the 'loading' footer
+
+        """
+        for k in keys:
+            if k == 'enter' or k == ' ':
+                footerwid = urwid.AttrMap(urwid.Text("Loading URL..."),
+                                          'footer')
+                self.top.footer = footerwid
+                load_thread = Thread(target=self._loading_thread, daemon=True)
+                load_thread.start()
+        return keys
+
+    def unhandled(self, keys):
+        """Add other keyboard actions (q, j, k) not handled by the ListBox
+        widget.
+
+        """
         size = self.ui.get_cols_rows()
-
-        try:
-            while True:
-                self.ui.s.erase()
+        for k in keys:
+            if k == 'q' or k == 'Q':
+                raise urwid.ExitMainLoop()
+            elif k == 'ctrl l':
                 self.draw_screen(size)
-                keys = self.ui.get_input()
-                for k in keys:
-                    if k == 'window resize':
-                        size = self.ui.get_cols_rows()
-                    elif k == 'q':
-                        return None
-                    elif k == 'ctrl l':
-                        self.ui.s.clear()
-                    elif k == 'j':
-                        self.top.keypress(size, "down")
-                    elif k == 'k':
-                        self.top.keypress(size, "up")
-                    elif k == 'enter' or k == ' ':
-                        footer = "loading URL"
-                        footerwid = urwid.AttrMap(urwid.Text(footer),
-                                                  'footer')
-                        self.top.set_footer(footerwid)
-                        self.top.keypress(size, k)
-                        load_thread = Thread(target=self._loading_thread)
-                        load_thread.daemon = True
-                        load_thread.start()
-                        self.ui.s.clear()
-                    else:
-                        self.top.keypress(size, k)
-        except KeyboardInterrupt:
-            return None
+            elif k == 'j':
+                self.top.keypress(size, "down")
+            elif k == 'k':
+                self.top.keypress(size, "up")
+            else:
+                self.top.keypress(size, k)
 
     def _loading_thread(self):
         """Simple thread to wait 5 seconds after launching a URL,
@@ -215,10 +214,11 @@ class URLChooser:
         """
         sleep(5)
         footerwid = urwid.AttrMap(urwid.Text(""), "default")
-        self.top.set_footer(footerwid)
+        self.top.footer = footerwid
         size = self.ui.get_cols_rows()
         self.draw_screen(size)
 
     def draw_screen(self, size):
+        self.ui.clear()
         canvas = self.top.render(size, focus=True)
         self.ui.draw_screen(size, canvas)
