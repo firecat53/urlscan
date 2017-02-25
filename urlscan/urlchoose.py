@@ -1,5 +1,5 @@
 #   Copyright (C) 2006-2007 Daniel Burrows
-#   Copyright (C) 2016 Scott Hansen
+#   Copyright (C) 2017 Scott Hansen
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -51,12 +51,12 @@ def process_urls(extractedurls, compact_mode, nobrowser, dedupe, shorten):
     or non-interactive output
 
     Args: extractedurls
-          compact_mode - True/False (Default False)
-          nobrowser - True/False (Default False)
-          dedupe - True/False (Default False). Remove duplicate URLs from list
+          compact_mode - No context displayed
+          nobrowser - Just produce list of URLs for stdout
+          dedupe - Remove duplicate URLs from list
 
-    Returns: items
-             urls
+    Returns: items - List of widgets for the ListBox
+             urls - List of all URLs
              firstbutton - Number of first URL button
              if nobrowser, then _only_ return urls
 
@@ -164,7 +164,10 @@ class URLChooser:
         if len(self.urls) == 1:
             header = 'Found 1 url.'
         else:
-            header = 'Found %d urls.' % len(urls)
+            header = 'Found %d urls.' % len(self.urls)
+        header = "{} :: {}".format(header, "q - Quit :: "
+                                   "s - toggle selected URL shortener :: "
+                                   "S - toggle all URL shorteners")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
         self.ui = urwid.curses_display.Screen()
