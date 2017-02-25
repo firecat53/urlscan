@@ -162,7 +162,8 @@ if __name__ == "__main__":
     if args.nobrowser is False:
         ui = urlchoose.URLChooser(urlscan.msgurls(msg),
                                   compact_mode=args.compact,
-                                  dedupe=args.dedupe)
+                                  dedupe=args.dedupe,
+                                  shorten=True)
         ui.main()
     else:
         out = urlchoose.process_urls(urlscan.msgurls(msg),

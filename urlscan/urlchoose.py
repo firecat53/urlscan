@@ -20,6 +20,7 @@ URLs."""
 
 import urwid
 import urwid.curses_display
+import urwid.raw_display
 import webbrowser
 from threading import Thread
 from time import sleep
@@ -34,8 +35,18 @@ def mkbrowseto(url):
     return browse
 
 
-def process_urls(extractedurls, compact_mode=False, nobrowser=False,
-                 dedupe=False):
+def shorten_url(url, cols, shorten):
+    """Shorten long URLs to fit on one line.
+
+    """
+    cols = ((cols - 6) * .85)  # 6 cols for urlref and don't use while line
+    if shorten is False or len(url) < cols:
+        return url
+    split = int(cols * .5)
+    return url[:split] + "..." + url[-split:]
+
+
+def process_urls(extractedurls, compact_mode, nobrowser, dedupe, shorten):
     """Process the 'extractedurls' and ready them for either the curses browser
     or non-interactive output
 
@@ -50,6 +61,7 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False,
              if nobrowser, then _only_ return urls
 
     """
+    cols, _ = urwid.raw_display.Screen().get_cols_rows()
     items = []
     urls = []
     first = True
@@ -121,7 +133,9 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False,
                                       ('urlref:number', repr(i)),
                                       ('urlref:number:braces', ']'),
                                       ' '])),
-                      urwid.AttrMap(urwid.Button(url,
+                      urwid.AttrMap(urwid.Button(shorten_url(url,
+                                                             cols,
+                                                             shorten),
                                                  mkbrowseto(url),
                                                  user_data=url),
                                     'urlref:url', 'url:sel')]
@@ -137,19 +151,22 @@ def process_urls(extractedurls, compact_mode=False, nobrowser=False,
 
 
 class URLChooser:
-    def __init__(self, extractedurls, compact_mode=False, dedupe=False):
-        items, urls, firstbutton = process_urls(extractedurls,
-                                                compact_mode,
-                                                nobrowser=False,
-                                                dedupe=dedupe)
-        self.listbox = urwid.ListBox(items)
-        self.listbox.set_focus(firstbutton)
-        if len(urls) == 1:
+    def __init__(self, extractedurls, compact_mode=False, dedupe=False,
+                 shorten=False):
+        self.shorten = shorten
+        self.items, self.urls, firstbutton = process_urls(extractedurls,
+                                                          compact_mode,
+                                                          nobrowser=False,
+                                                          dedupe=dedupe,
+                                                          shorten=self.shorten)
+        listbox = urwid.ListBox(self.items)
+        listbox.set_focus(firstbutton)
+        if len(self.urls) == 1:
             header = 'Found 1 url.'
         else:
             header = 'Found %d urls.' % len(urls)
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
-        self.top = urwid.Frame(self.listbox, headerwid)
+        self.top = urwid.Frame(listbox, headerwid)
         self.ui = urwid.curses_display.Screen()
         self.palette = [
             ('header', 'white', 'dark blue', 'standout'),
@@ -204,6 +221,26 @@ class URLChooser:
                 self.top.keypress(size, "down")
             elif k == 'k':
                 self.top.keypress(size, "up")
+            elif k == 's':
+                # Toggle shortened URL for selected item
+                fp = self.top.focus.focus_position
+                url_idx = len([i for i in self.items[:fp + 1]
+                               if isinstance(i, urwid.Columns)]) - 1
+                url = self.urls[url_idx]
+                short = False if "..." in self.items[fp][1].label else True
+                self.items[fp][1].set_label(shorten_url(url, size[0], short))
+            elif k == 'S':
+                # Toggle all shortened URLs
+                self.shorten = False if self.shorten is True else True
+                urls = iter(self.urls)
+                columns_idx = 1
+                for item in self.items:
+                    # Each Column has (Text, Button). Update the Button label
+                    if isinstance(item, urwid.Columns):
+                        item[1].set_label(shorten_url(next(urls),
+                                                      size[0],
+                                                      self.shorten))
+                        columns_idx += 1
             else:
                 self.top.keypress(size, k)
 
