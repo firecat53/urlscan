@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "February 19, 2017"
+.TH URLSCAN 1 "February 26, 2017"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -29,13 +29,17 @@ additional features:
 \fB1.\fR Support for more message encodings, such as quoted-printable
 and base64.
 
-\fB2.\fR Extraction and display of the context surrounding each URL.
+\fB2.\fR Extraction and display of the context surrounding each URL. Toggle
+context view on/off with `c`.
+
+\fB3.\fR URLs are shortened by default to fit on one line. Toggle one or all
+shortened URLs with `s` or `S`.
 
 .SH OPTIONS
 .TP
 .B \-c, \-\-compact
 Display a simple list of the extracted URLs, instead of showing the
-context of each URL.
+context of each URL. Also toggle with `c` from within the viewer.
 .TP
 .B \-d, \-\-dedupe
 Remove duplicated URLs from the list of URLs.

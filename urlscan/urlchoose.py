@@ -46,33 +46,25 @@ def shorten_url(url, cols, shorten):
     return url[:split] + "..." + url[-split:]
 
 
-def process_urls(extractedurls, compact_mode, nobrowser, dedupe, shorten):
+def process_urls(extractedurls, dedupe, shorten):
     """Process the 'extractedurls' and ready them for either the curses browser
     or non-interactive output
 
     Args: extractedurls
-          compact_mode - No context displayed
-          nobrowser - Just produce list of URLs for stdout
           dedupe - Remove duplicate URLs from list
 
     Returns: items - List of widgets for the ListBox
              urls - List of all URLs
-             firstbutton - Number of first URL button
-             if nobrowser, then _only_ return urls
 
     """
     cols, _ = urwid.raw_display.Screen().get_cols_rows()
     items = []
     urls = []
     first = True
-    firstbutton = 0
-    if nobrowser is True:
-        compact_mode = True
     for group, usedfirst, usedlast in extractedurls:
         if first:
             first = False
-        elif not compact_mode:
-            items.append(urwid.Divider(div_char='-', top=1, bottom=1))
+        items.append(urwid.Divider(div_char='-', top=1, bottom=1))
         if dedupe is True:
             # If no unique URLs exist, then skip the group completely
             if not [chunk for chunks in group for chunk in chunks
@@ -80,54 +72,40 @@ def process_urls(extractedurls, compact_mode, nobrowser, dedupe, shorten):
                 continue
         groupurls = []
         markup = []
-        if compact_mode:
-            lasturl = None
-            for chunks in group:
-                for chunk in chunks:
-                    if chunk.url and chunk.url != lasturl \
-                            and ((dedupe is True and chunk.url not in urls) or
-                                 dedupe is False):
-                        groupurls.append(chunk.url)
-                        urls.append(chunk.url)
-                        lasturl = chunk.url
-        else:
-            if not usedfirst:
-                markup.append(('msgtext:ellipses', '...\n'))
-            for chunks in group:
-                i = 0
-                while i < len(chunks):
-                    chunk = chunks[i]
-                    i += 1
-                    if chunk.url is None:
-                        markup.append(chunk.markup)
-                    elif (dedupe is True and chunk.url not in urls) \
-                            or dedupe is False:
-                        urls.append(chunk.url)
-                        groupurls.append(chunk.url)
-                        # Collect all immediately adjacent
-                        # chunks with the same URL.
-                        tmpmarkup = []
-                        if chunk.markup:
-                            tmpmarkup.append(chunk.markup)
-                        while i < len(chunks) and \
-                                chunks[i].url == chunk.url:
-                            if chunks[i].markup:
-                                tmpmarkup.append(chunks[i].markup)
-                            i += 1
-                        markup += [tmpmarkup or '<URL>',
-                                   ('urlref:number:braces', ' ['),
-                                   ('urlref:number', repr(len(urls))),
-                                   ('urlref:number:braces', ']')]
-                markup += '\n'
-            if not usedlast:
-                markup += [('msgtext:ellipses', '...\n\n')]
-
-            items.append(urwid.Text(markup))
+        if not usedfirst:
+            markup.append(('msgtext:ellipses', '...\n'))
+        for chunks in group:
+            i = 0
+            while i < len(chunks):
+                chunk = chunks[i]
+                i += 1
+                if chunk.url is None:
+                    markup.append(chunk.markup)
+                elif (dedupe is True and chunk.url not in urls) \
+                        or dedupe is False:
+                    urls.append(chunk.url)
+                    groupurls.append(chunk.url)
+                    # Collect all immediately adjacent
+                    # chunks with the same URL.
+                    tmpmarkup = []
+                    if chunk.markup:
+                        tmpmarkup.append(chunk.markup)
+                    while i < len(chunks) and \
+                            chunks[i].url == chunk.url:
+                        if chunks[i].markup:
+                            tmpmarkup.append(chunks[i].markup)
+                        i += 1
+                    markup += [tmpmarkup or '<URL>',
+                               ('urlref:number:braces', ' ['),
+                               ('urlref:number', repr(len(urls))),
+                               ('urlref:number:braces', ']')]
+            markup += '\n'
+        if not usedlast:
+            markup += [('msgtext:ellipses', '...\n\n')]
+        items.append(urwid.Text(markup))
 
         i = len(urls) - len(groupurls)
         for url in groupurls:
-            if firstbutton == 0 and not compact_mode:
-                firstbutton = len(items)
             i += 1
             markup = [(6, urwid.Text([('urlref:number:braces', '['),
                                       ('urlref:number', repr(i)),
@@ -143,33 +121,36 @@ def process_urls(extractedurls, compact_mode, nobrowser, dedupe, shorten):
 
     if not items:
         items.append(urwid.Text("No URLs found"))
-        firstbutton = 1
-    if nobrowser is True:
-        return urls
-    else:
-        return items, urls, firstbutton
+    return items, urls
 
 
 class URLChooser:
-    def __init__(self, extractedurls, compact_mode=False, dedupe=False,
-                 shorten=False):
+    def __init__(self, extractedurls, compact=False, dedupe=False,
+                 shorten=True):
         self.shorten = shorten
-        self.items, self.urls, firstbutton = process_urls(extractedurls,
-                                                          compact_mode,
-                                                          nobrowser=False,
-                                                          dedupe=dedupe,
-                                                          shorten=self.shorten)
-        listbox = urwid.ListBox(self.items)
-        listbox.set_focus(firstbutton)
+        self.compact = compact
+        self.items, self.urls = process_urls(extractedurls,
+                                             dedupe=dedupe,
+                                             shorten=self.shorten)
+        # Store 'compact' mode items
+        self.items_com = [i for i in self.items if
+                          isinstance(i, urwid.Columns) is True]
+        if self.compact is True:
+            self.items, self.items_com = self.items_com, self.items
+        self.contents = urwid.SimpleFocusListWalker(self.items)
+        listbox = urwid.ListBox(self.contents)
         if len(self.urls) == 1:
             header = 'Found 1 url.'
         else:
             header = 'Found %d urls.' % len(self.urls)
         header = "{} :: {}".format(header, "q - Quit :: "
-                                   "s - toggle selected URL shortener :: "
-                                   "S - toggle all URL shorteners")
+                                   "c - context :: "
+                                   "s - URL short :: "
+                                   "S - all URL short :: ")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
+        self.top.body.focus_position = \
+            self._cur_focus(2 if self.compact is False else 0)
         self.ui = urwid.curses_display.Screen()
         self.palette = [
             ('header', 'white', 'dark blue', 'standout'),
@@ -210,14 +191,16 @@ class URLChooser:
         return keys
 
     def unhandled(self, keys):
-        """Add other keyboard actions (q, j, k) not handled by the ListBox
-        widget.
+        """Add other keyboard actions (q, j, k, s, S, c) not handled by the
+        ListBox widget.
 
         """
         size = self.ui.get_cols_rows()
         for k in keys:
             if k == 'q' or k == 'Q':
                 raise urwid.ExitMainLoop()
+            elif not self.urls:
+                continue  # No other actions are useful with no URLs
             elif k == 'ctrl l':
                 self.draw_screen(size)
             elif k == 'j':
@@ -226,7 +209,7 @@ class URLChooser:
                 self.top.keypress(size, "up")
             elif k == 's':
                 # Toggle shortened URL for selected item
-                fp = self.top.focus.focus_position
+                fp = self.top.body.focus_position
                 url_idx = len([i for i in self.items[:fp + 1]
                                if isinstance(i, urwid.Columns)]) - 1
                 url = self.urls[url_idx]
@@ -244,6 +227,13 @@ class URLChooser:
                                                       size[0],
                                                       self.shorten))
                         columns_idx += 1
+            elif k == 'c':
+                # Show/hide context
+                fp = self.top.body.focus_position
+                self.items, self.items_com = self.items_com, self.items
+                self.top.body = urwid.ListBox(self.items)
+                self.top.body.focus_position = self._cur_focus(fp)
+                self.compact = False if self.compact is True else True
             else:
                 self.top.keypress(size, k)
 
@@ -257,6 +247,16 @@ class URLChooser:
         self.top.footer = footerwid
         size = self.ui.get_cols_rows()
         self.draw_screen(size)
+
+    def _cur_focus(self, fp=0):
+        # Return correct focus when toggling 'show context'
+        if self.compact is False:
+            idx = len([i for i in self.items_com[:fp + 1]
+                       if isinstance(i, urwid.Columns)]) - 1
+        elif self.compact is True:
+            idx = [i for i in enumerate(self.items)
+                   if isinstance(i[1], urwid.Columns)][fp][0]
+        return idx
 
     def draw_screen(self, size):
         self.ui.clear()

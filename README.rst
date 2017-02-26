@@ -26,7 +26,9 @@ Relative to urlview, urlscan has the following additional features:
 
 - Support for emails in quoted-printable and base64 encodings. No more stripping out =40D from URLs by hand!
 
-- The context of each URL is provided along with the URL. For HTML mails, a crude parser is used to render the HTML into text.
+- The context of each URL is provided along with the URL. For HTML mails, a crude parser is used to render the HTML into text. Context view can be toggled on/off with `c`.
+
+- URLs are shortened by default to fit on one line. Viewing full URL (for one or all) is toggled with `s` or `S`.
 
 Installation and setup
 ----------------------
