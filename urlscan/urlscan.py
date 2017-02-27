@@ -244,6 +244,7 @@ class HTMLChunker(HTMLParser):
             # added above.
             self.handle_data('&%s;' % name)
 
+
 urlinternalpattern = r'[{}()@\w/\-%?!&.=:;+,#~]'
 urltrailingpattern = r'[{}()@\w/\-%&=+#]'
 httpurlpattern = (r'(?:(https?|file|ftps?)://' + urlinternalpattern +
@@ -264,7 +265,7 @@ guessedurlpattern = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
                      '|'.join(tlds) + ')$)')
 urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' +
                    guessedurlpattern +
-                   '|(?P<email>(mailto:)?[\w\-.]*@[\w\-.]*[\w\-]))>?',
+                   '|(?P<email>(mailto:)?[\w\-.]+@[\w\-.]*[\w\-]))>?',
                    flags=re.U)
 
 # Poor man's test cases.
