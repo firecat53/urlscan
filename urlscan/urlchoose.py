@@ -186,7 +186,8 @@ class URLChooser:
                 footerwid = urwid.AttrMap(urwid.Text("Loading URL..."),
                                           'footer')
                 self.top.footer = footerwid
-                load_thread = Thread(target=self._loading_thread, daemon=True)
+                load_thread = Thread(target=self._loading_thread)
+                load_thread.daemon = True
                 load_thread.start()
         return keys
 
