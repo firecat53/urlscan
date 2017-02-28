@@ -119,8 +119,6 @@ def process_urls(extractedurls, dedupe, shorten):
                                     'urlref:url', 'url:sel')]
             items.append(urwid.Columns(markup))
 
-    if not items:
-        items.append(urwid.Text("No URLs found"))
     return items, urls
 
 
@@ -149,8 +147,9 @@ class URLChooser:
                                    "S - all URL short :: ")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
-        self.top.body.focus_position = \
-            self._cur_focus(2 if self.compact is False else 0)
+        if self.urls:
+            self.top.body.focus_position = \
+                self._cur_focus(2 if self.compact is False else 0)
         self.ui = urwid.curses_display.Screen()
         self.palette = [
             ('header', 'white', 'dark blue', 'standout'),
@@ -182,7 +181,7 @@ class URLChooser:
 
         """
         for k in keys:
-            if k == 'enter' or k == ' ':
+            if (k == 'enter' or k == ' ') and self.urls:
                 footerwid = urwid.AttrMap(urwid.Text("Loading URL..."),
                                           'footer')
                 self.top.footer = footerwid
