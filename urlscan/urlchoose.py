@@ -251,8 +251,8 @@ class URLChooser:
     def _cur_focus(self, fp=0):
         # Return correct focus when toggling 'show context'
         if self.compact is False:
-            idx = len([i for i in self.items_com[:fp + 1]
-                       if isinstance(i, urwid.Columns)]) - 1
+            idx = max(2, len([i for i in self.items_com[:fp + 1]
+                      if isinstance(i, urwid.Columns)]) - 1)
         elif self.compact is True:
             idx = [i for i in enumerate(self.items)
                    if isinstance(i[1], urwid.Columns)][fp][0]
