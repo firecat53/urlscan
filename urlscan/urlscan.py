@@ -246,7 +246,7 @@ class HTMLChunker(HTMLParser):
 
 
 urlinternalpattern = r'[{}()@\w/\-%?!&.=:;+,#~]'
-urltrailingpattern = r'[{}()@\w/\-%&=+#]'
+urltrailingpattern = r'[{}(@\w/\-%&=+#]'
 httpurlpattern = (r'(?:(https?|file|ftps?)://' + urlinternalpattern +
                   r'*' + urltrailingpattern + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
@@ -259,6 +259,7 @@ def load_tlds():
     with open(file) as f:
         return [elem for elem in f.read().lower().splitlines()[1:]
                 if "--" not in elem]
+
 
 tlds = load_tlds()
 guessedurlpattern = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
