@@ -149,7 +149,7 @@ class URLChooser:
         self.top = urwid.Frame(listbox, headerwid)
         if self.urls:
             self.top.body.focus_position = \
-                self._cur_focus(2 if self.compact is False else 0)
+                (2 if self.compact is False else 0)
         self.ui = urwid.curses_display.Screen()
         self.palette = [
             ('header', 'white', 'dark blue', 'standout'),
@@ -251,8 +251,8 @@ class URLChooser:
     def _cur_focus(self, fp=0):
         # Return correct focus when toggling 'show context'
         if self.compact is False:
-            idx = max(2, len([i for i in self.items_com[:fp + 1]
-                      if isinstance(i, urwid.Columns)]) - 1)
+            idx = len([i for i in self.items_com[:fp + 1]
+                      if isinstance(i, urwid.Columns)]) - 1
         elif self.compact is True:
             idx = [i for i in enumerate(self.items)
                    if isinstance(i[1], urwid.Columns)][fp][0]
