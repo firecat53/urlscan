@@ -98,8 +98,15 @@ def process_input(fn):
                 f = io.StringIO(stdin_file.decode(c))
             else:
                 f = io.open(fn, mode='r', encoding=(c))
-            f = _fix_first_line(f)
+            f_keep = f
             msg = parser().parse(f)
+            if 'From' not in msg.keys() and 'Date' not in msg.keys():
+                # If it's not an email message, don't let the email parser
+                # delete the first line. If it is, let the parser do its job so
+                # we don't get mailto: links for all the To and From addresses
+                f = _fix_first_line(f_keep)
+                msg = parser().parse(f)
+
         except (UnicodeDecodeError, UnicodeError):
             continue
         else:
@@ -118,19 +125,16 @@ def process_input(fn):
 
 
 def _fix_first_line(f):
-    """If the first line starts with http*, the URLs on that line will not be
-    parsed by email.Parser.
+    """If the first line starts with http* or [ or other non-text characters,
+    the URLs on that line will not be parsed by email.Parser. Add a blank line
+    at the top of the file to ensure everything is read in a non-email file.
 
       1. Take the file object 'f'.
-      2. Read it...if the first line starts with 'http', then save that, create
-      a new StringIO object that starts with a blank line and read the file
-      into that. Return as open StringIO object 'f'
+      2. Create a new StringIO object that starts with a blank line and read the
+      file into that. Return as open StringIO object 'f'
       3. Return 'f'
 
     """
-    if not f.readline().strip().startswith('http'):
-        f.seek(0)
-        return f
     f.seek(0)
     new = io.StringIO()
     new.write("\n{}".format(f.read()))
