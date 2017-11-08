@@ -123,8 +123,7 @@ def process_urls(extractedurls, dedupe, shorten):
 
 
 class URLChooser:
-    def __init__(self, extractedurls, compact=False, dedupe=False,
-                 shorten=True):
+    def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True):
         self.shorten = shorten
         self.compact = compact
         self.items, self.urls = process_urls(extractedurls,
@@ -144,7 +143,8 @@ class URLChooser:
         header = "{} :: {}".format(header, "q - Quit :: "
                                    "c - context :: "
                                    "s - URL short :: "
-                                   "S - all URL short :: ")
+                                   "S - all URL short :: "
+                                   "<number> - jump to <number> :: ")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
         if self.urls:
@@ -169,6 +169,7 @@ class URLChooser:
             ('urlref:url', 'white', 'black', 'standout'),
             ('url:sel', 'white', 'dark blue', 'bold')
         ]
+        self.number = ""
 
     def main(self):
         loop = urwid.MainLoop(self.top, self.palette, screen=self.ui,
@@ -182,13 +183,9 @@ class URLChooser:
         """
         for k in keys:
             if (k == 'enter' or k == ' ') and self.urls:
-                footerwid = urwid.AttrMap(urwid.Text("Loading URL..."),
-                                          'footer')
-                self.top.footer = footerwid
-                load_thread = Thread(target=self._loading_thread)
-                load_thread.daemon = True
-                load_thread.start()
-        return keys
+                self._footer_start_thread("Loading URL...", 5)
+        # filter backspace out before the widget, it has a weird interaction
+        return [i for i in keys if i != 'backspace']
 
     def unhandled(self, keys):
         """Add other keyboard actions (q, j, k, s, S, c) not handled by the
@@ -201,6 +198,20 @@ class URLChooser:
                 raise urwid.ExitMainLoop()
             elif not self.urls:
                 continue  # No other actions are useful with no URLs
+            elif k.isdigit():
+                self.number += k
+                try:
+                    if self.compact is False:
+                        self.top.body.focus_position = \
+                            self.items.index(self.items_com[max(int(self.number) - 1, 0)])
+                    else:
+                        self.top.body.focus_position = \
+                            self.items.index(self.items[max(int(self.number) - 1, 0)])
+                except IndexError:
+                    self.number = self.number[:-1]
+                self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
+                if self.number:
+                    self._footer_start_thread("Selection: {}".format(self.number), 1)
             elif k == 'ctrl l':
                 self.draw_screen(size)
             elif k == 'j':
@@ -237,12 +248,24 @@ class URLChooser:
             else:
                 self.top.keypress(size, k)
 
-    def _loading_thread(self):
-        """Simple thread to wait 5 seconds after launching a URL,
-        clearing the screen and clearing the footer loading message.
+    def _footer_start_thread(self, text, time):
+        """Display given text in the footer. Clears after <time> seconds
 
         """
-        sleep(5)
+        footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
+        self.top.footer = footerwid
+        load_thread = Thread(target=self._loading_thread, args=(time,))
+        load_thread.daemon = True
+        load_thread.start()
+
+    def _loading_thread(self, time):
+        """Simple thread to wait <time> seconds after launching a URL or
+        displaying a URL selection number, clearing the screen and clearing the
+        footer loading message.
+
+        """
+        sleep(time)
+        self.number = ""  # Clear URL selection number
         footerwid = urwid.AttrMap(urwid.Text(""), "default")
         self.top.footer = footerwid
         size = self.ui.get_cols_rows()

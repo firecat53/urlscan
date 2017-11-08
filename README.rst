@@ -30,6 +30,8 @@ Relative to urlview, urlscan has the following additional features:
 
 - URLs are shortened by default to fit on one line. Viewing full URL (for one or all) is toggled with `s` or `S`.
 
+- Jump to a URL by typing the number.
+
 Installation and setup
 ----------------------
 
