@@ -1,0 +1,4 @@
+# Add these macros to your ~/.muttrc file to use urlscan instead of urlview
+
+macro index,pager \cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+macro attach,compose \cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs out of a message"

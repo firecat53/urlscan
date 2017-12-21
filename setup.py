@@ -12,7 +12,7 @@ setup(name="urlscan",
       packages=['urlscan'],
       scripts=['bin/urlscan'],
       package_data={'urlscan': ['assets/*']},
-      data_files=[('share/doc/urlscan', ['README.rst', 'COPYING']),
+      data_files=[('share/doc/urlscan', ['README.rst', 'COPYING', 'muttrc']),
                   ('share/man/man1', ['urlscan.1'])],
       license="GPLv2",
       install_requires=["urwid"]
