@@ -39,7 +39,7 @@ To install urlscan, install from your distribution repositories, from Pypi, inst
 
 .. NOTE::
 
-    To work with Python 3.x the minimum required version of urwid is 1.2.1. Python 2.x works fine with urwid >= 1.0.1
+    To work with Python 3.x the minimum required version of urwid is 1.2.1. Python 2.x needs urwid >= 1.1.0
 
 Once urlscan is installed, add the following lines to your .muttrc:
 
