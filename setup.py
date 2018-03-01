@@ -15,5 +15,5 @@ setup(name="urlscan",
       data_files=[('share/doc/urlscan', ['README.rst', 'COPYING']),
                   ('share/man/man1', ['urlscan.1'])],
       license="GPLv2",
-      install_requires=["urwid"]
+      install_requires=["urwid>=1.2.1"]
       )
