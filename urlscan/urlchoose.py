@@ -144,6 +144,7 @@ class URLChooser:
                                    "c - context :: "
                                    "s - URL short :: "
                                    "S - all URL short :: "
+                                   "g/G - top/bottom :: "
                                    "<number> - jump to <number> :: ")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
@@ -188,8 +189,8 @@ class URLChooser:
         return [i for i in keys if i != 'backspace']
 
     def unhandled(self, keys):
-        """Add other keyboard actions (q, j, k, s, S, c) not handled by the
-        ListBox widget.
+        """Add other keyboard actions (q, j, k, s, S, c, g, G) not handled by
+        the ListBox widget.
 
         """
         size = self.ui.get_cols_rows()
@@ -218,6 +219,14 @@ class URLChooser:
                 self.top.keypress(size, "down")
             elif k == 'k':
                 self.top.keypress(size, "up")
+            elif k == 'g':
+                # Goto top of the list
+                self.top.body.focus_position = 2 if self.compact is False else 0
+                self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
+            elif k == 'G':
+                # Goto bottom of the list
+                self.top.body.focus_position = len(self.items) - 1
+                self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
             elif k == 's':
                 # Toggle shortened URL for selected item
                 fp = self.top.body.focus_position
