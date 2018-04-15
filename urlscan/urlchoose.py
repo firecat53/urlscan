@@ -18,6 +18,7 @@
 """An urwid listview-based widget that lets you choose a URL from a list of
 URLs."""
 
+import os
 import urwid
 import urwid.curses_display
 import urwid.raw_display
@@ -184,7 +185,8 @@ class URLChooser:
         """
         for k in keys:
             if (k == 'enter' or k == ' ') and self.urls:
-                self._footer_start_thread("Loading URL...", 5)
+                if os.environ['BROWSER'] not in ['elinks', 'links', 'w3m', 'lynx']:
+                    self._footer_start_thread("Loading URL...", 5)
         # filter backspace out before the widget, it has a weird interaction
         return [i for i in keys if i != 'backspace']
 
