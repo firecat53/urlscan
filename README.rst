@@ -32,6 +32,9 @@ Relative to urlview, urlscan has the following additional features:
 
 - Jump to a URL by typing the number.
 
+- Execute an arbitrary function (for example, copy URL to clipboard) instead of
+  opening URL in a browser.
+
 Installation and setup
 ----------------------
 
@@ -59,7 +62,7 @@ Command Line usage
 
 ::
 
-    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] <file>
+    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file. Calling with no flags will start the curses browser. Calling with '-n' will just output a list of URLs/email addressess to stdout. The '-c' flag removes the context from around the URLs in the curses browser, and the '-d' flag removes duplicate URLs. Files can also be piped to urlscan using normal shell pipe mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
 

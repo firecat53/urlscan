@@ -23,6 +23,7 @@ import urwid
 import urwid.curses_display
 import urwid.raw_display
 import webbrowser
+from subprocess import Popen
 from threading import Thread
 from time import sleep
 
@@ -39,9 +40,11 @@ def shorten_url(url, cols, shorten):
 
 
 class URLChooser:
-    def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True):
+    def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True,
+                 run=""):
         self.shorten = shorten
         self.compact = compact
+        self.run = run
         self.items, self.urls = self.process_urls(extractedurls,
                                                   dedupe=dedupe,
                                                   shorten=self.shorten)
@@ -99,8 +102,9 @@ class URLChooser:
         """
         for k in keys:
             if (k == 'enter' or k == ' ') and self.urls:
+                load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
                 if os.environ['BROWSER'] not in ['elinks', 'links', 'w3m', 'lynx']:
-                    self._footer_start_thread("Loading URL...", 5)
+                    self._footer_start_thread(load_text, 5)
         # filter backspace out before the widget, it has a weird interaction
         return [i for i in keys if i != 'backspace']
 
@@ -221,11 +225,15 @@ class URLChooser:
         self.ui.draw_screen(size, canvas)
 
     def mkbrowseto(self, url):
-        """Create the urwid callback function to open the web browser.
+        """Create the urwid callback function to open the web browser or call
+        another function with the URL.
 
         """
         def browse(*args):
-            webbrowser.open(url)
+            if not self.run:
+                webbrowser.open(url)
+            else:
+                Popen(self.run.format(url), shell=True).communicate()
             size = self.ui.get_cols_rows()
             self.draw_screen(size)
         return browse
