@@ -82,10 +82,11 @@ def process_urls(extractedurls, dedupe, shorten):
                 i += 1
                 if chunk.url is None:
                     markup.append(chunk.markup)
-                elif (dedupe is True and chunk.url not in urls) \
-                        or dedupe is False:
-                    urls.append(chunk.url)
-                    groupurls.append(chunk.url)
+                else:
+                    if (dedupe is True and chunk.url not in urls) \
+                            or dedupe is False:
+                        urls.append(chunk.url)
+                        groupurls.append(chunk.url)
                     # Collect all immediately adjacent
                     # chunks with the same URL.
                     tmpmarkup = []
@@ -96,9 +97,10 @@ def process_urls(extractedurls, dedupe, shorten):
                         if chunks[i].markup:
                             tmpmarkup.append(chunks[i].markup)
                         i += 1
+                    url_idx = urls.index(chunk.url) + 1 if dedupe is True else len(urls)
                     markup += [tmpmarkup or '<URL>',
                                ('urlref:number:braces', ' ['),
-                               ('urlref:number', repr(len(urls))),
+                               ('urlref:number', repr(url_idx)),
                                ('urlref:number:braces', ']')]
             markup += '\n'
         if not usedlast:
