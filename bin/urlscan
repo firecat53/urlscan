@@ -49,6 +49,11 @@ def parse_arguments():
     arg_parse.add_argument('--dedupe', '-d', dest="dedupe",
                            action='store_true', default=False,
                            help="Remove duplicate URLs from list")
+    arg_parse.add_argument('--run', '-r',
+                           help="Alternate command to run on selected URL "
+                           "instead of opening URL in browser. Use {} to "
+                           "represent the URL value in the expression. "
+                           "For example: --run 'echo {} | xclip -i'")
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     args = arg_parse.parse_args()
@@ -166,7 +171,8 @@ if __name__ == "__main__":
     if args.nobrowser is False:
         ui = urlchoose.URLChooser(urlscan.msgurls(msg),
                                   compact=args.compact,
-                                  dedupe=args.dedupe)
+                                  dedupe=args.dedupe,
+                                  run=args.run)
         ui.main()
     else:
         out = urlchoose.URLChooser(urlscan.msgurls(msg),
