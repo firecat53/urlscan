@@ -27,15 +27,6 @@ from threading import Thread
 from time import sleep
 
 
-def mkbrowseto(url):
-    """Create the urwid callback function to open the web browser.
-
-    """
-    def browse(*args):
-        webbrowser.open(url)
-    return browse
-
-
 def shorten_url(url, cols, shorten):
     """Shorten long URLs to fit on one line.
 
@@ -47,91 +38,13 @@ def shorten_url(url, cols, shorten):
     return url[:split] + "..." + url[-split:]
 
 
-def process_urls(extractedurls, dedupe, shorten):
-    """Process the 'extractedurls' and ready them for either the curses browser
-    or non-interactive output
-
-    Args: extractedurls
-          dedupe - Remove duplicate URLs from list
-
-    Returns: items - List of widgets for the ListBox
-             urls - List of all URLs
-
-    """
-    cols, _ = urwid.raw_display.Screen().get_cols_rows()
-    items = []
-    urls = []
-    first = True
-    for group, usedfirst, usedlast in extractedurls:
-        if first:
-            first = False
-        items.append(urwid.Divider(div_char='-', top=1, bottom=1))
-        if dedupe is True:
-            # If no unique URLs exist, then skip the group completely
-            if not [chunk for chunks in group for chunk in chunks
-                    if chunk.url is not None and chunk.url not in urls]:
-                continue
-        groupurls = []
-        markup = []
-        if not usedfirst:
-            markup.append(('msgtext:ellipses', '...\n'))
-        for chunks in group:
-            i = 0
-            while i < len(chunks):
-                chunk = chunks[i]
-                i += 1
-                if chunk.url is None:
-                    markup.append(chunk.markup)
-                else:
-                    if (dedupe is True and chunk.url not in urls) \
-                            or dedupe is False:
-                        urls.append(chunk.url)
-                        groupurls.append(chunk.url)
-                    # Collect all immediately adjacent
-                    # chunks with the same URL.
-                    tmpmarkup = []
-                    if chunk.markup:
-                        tmpmarkup.append(chunk.markup)
-                    while i < len(chunks) and \
-                            chunks[i].url == chunk.url:
-                        if chunks[i].markup:
-                            tmpmarkup.append(chunks[i].markup)
-                        i += 1
-                    url_idx = urls.index(chunk.url) + 1 if dedupe is True else len(urls)
-                    markup += [tmpmarkup or '<URL>',
-                               ('urlref:number:braces', ' ['),
-                               ('urlref:number', repr(url_idx)),
-                               ('urlref:number:braces', ']')]
-            markup += '\n'
-        if not usedlast:
-            markup += [('msgtext:ellipses', '...\n\n')]
-        items.append(urwid.Text(markup))
-
-        i = len(urls) - len(groupurls)
-        for url in groupurls:
-            i += 1
-            markup = [(6, urwid.Text([('urlref:number:braces', '['),
-                                      ('urlref:number', repr(i)),
-                                      ('urlref:number:braces', ']'),
-                                      ' '])),
-                      urwid.AttrMap(urwid.Button(shorten_url(url,
-                                                             cols,
-                                                             shorten),
-                                                 mkbrowseto(url),
-                                                 user_data=url),
-                                    'urlref:url', 'url:sel')]
-            items.append(urwid.Columns(markup))
-
-    return items, urls
-
-
 class URLChooser:
     def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True):
         self.shorten = shorten
         self.compact = compact
-        self.items, self.urls = process_urls(extractedurls,
-                                             dedupe=dedupe,
-                                             shorten=self.shorten)
+        self.items, self.urls = self.process_urls(extractedurls,
+                                                  dedupe=dedupe,
+                                                  shorten=self.shorten)
         # Store 'compact' mode items
         self.items_com = [i for i in self.items if
                           isinstance(i, urwid.Columns) is True]
@@ -296,7 +209,7 @@ class URLChooser:
         # Return correct focus when toggling 'show context'
         if self.compact is False:
             idx = len([i for i in self.items_com[:fp + 1]
-                      if isinstance(i, urwid.Columns)]) - 1
+                       if isinstance(i, urwid.Columns)]) - 1
         elif self.compact is True:
             idx = [i for i in enumerate(self.items)
                    if isinstance(i[1], urwid.Columns)][fp][0]
@@ -306,3 +219,90 @@ class URLChooser:
         self.ui.clear()
         canvas = self.top.render(size, focus=True)
         self.ui.draw_screen(size, canvas)
+
+    def mkbrowseto(self, url):
+        """Create the urwid callback function to open the web browser.
+
+        """
+        def browse(*args):
+            webbrowser.open(url)
+            size = self.ui.get_cols_rows()
+            self.draw_screen(size)
+        return browse
+
+    def process_urls(self, extractedurls, dedupe, shorten):
+        """Process the 'extractedurls' and ready them for either the curses browser
+        or non-interactive output
+
+        Args: extractedurls
+              dedupe - Remove duplicate URLs from list
+
+        Returns: items - List of widgets for the ListBox
+                 urls - List of all URLs
+
+        """
+        cols, _ = urwid.raw_display.Screen().get_cols_rows()
+        items = []
+        urls = []
+        first = True
+        for group, usedfirst, usedlast in extractedurls:
+            if first:
+                first = False
+            items.append(urwid.Divider(div_char='-', top=1, bottom=1))
+            if dedupe is True:
+                # If no unique URLs exist, then skip the group completely
+                if not [chunk for chunks in group for chunk in chunks
+                        if chunk.url is not None and chunk.url not in urls]:
+                    continue
+            groupurls = []
+            markup = []
+            if not usedfirst:
+                markup.append(('msgtext:ellipses', '...\n'))
+            for chunks in group:
+                i = 0
+                while i < len(chunks):
+                    chunk = chunks[i]
+                    i += 1
+                    if chunk.url is None:
+                        markup.append(chunk.markup)
+                    else:
+                        if (dedupe is True and chunk.url not in urls) \
+                                or dedupe is False:
+                            urls.append(chunk.url)
+                            groupurls.append(chunk.url)
+                        # Collect all immediately adjacent
+                        # chunks with the same URL.
+                        tmpmarkup = []
+                        if chunk.markup:
+                            tmpmarkup.append(chunk.markup)
+                        while i < len(chunks) and \
+                                chunks[i].url == chunk.url:
+                            if chunks[i].markup:
+                                tmpmarkup.append(chunks[i].markup)
+                            i += 1
+                        url_idx = urls.index(chunk.url) + 1 if dedupe is True else len(urls)
+                        markup += [tmpmarkup or '<URL>',
+                                   ('urlref:number:braces', ' ['),
+                                   ('urlref:number', repr(url_idx)),
+                                   ('urlref:number:braces', ']')]
+                markup += '\n'
+            if not usedlast:
+                markup += [('msgtext:ellipses', '...\n\n')]
+            items.append(urwid.Text(markup))
+
+            i = len(urls) - len(groupurls)
+            for url in groupurls:
+                i += 1
+                markup = [(6, urwid.Text([('urlref:number:braces', '['),
+                                          ('urlref:number', repr(i)),
+                                          ('urlref:number:braces', ']'),
+                                          ' '])),
+                          urwid.AttrMap(urwid.Button(shorten_url(url,
+                                                                 cols,
+                                                                 shorten),
+                                                     self.mkbrowseto(url),
+                                                     user_data=url),
+                                        'urlref:url', 'url:sel')]
+                items.append(urwid.Columns(markup))
+
+        return items, urls
