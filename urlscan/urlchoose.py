@@ -53,18 +53,17 @@ class URLChooser:
                           isinstance(i, urwid.Columns) is True]
         if self.compact is True:
             self.items, self.items_com = self.items_com, self.items
+        self.urls_unesc = [i.replace('\\', '') for i in self.urls]
+        self.unesc = False
         self.contents = urwid.SimpleFocusListWalker(self.items)
         listbox = urwid.ListBox(self.contents)
-        if len(self.urls) == 1:
-            header = 'Found 1 url.'
-        else:
-            header = 'Found %d urls.' % len(self.urls)
-        header = "{} :: {}".format(header, "q - Quit :: "
-                                   "c - context :: "
-                                   "s - URL short :: "
-                                   "S - all URL short :: "
-                                   "g/G - top/bottom :: "
-                                   "<number> - jump to <number> :: ")
+        header = (":: q - Quit :: "
+                  "c - context :: "
+                  "s - URL short :: "
+                  "S - all URL short :: "
+                  "g/G - top/bottom :: "
+                  "<num> - jump to <num> :: "
+                  "u - unescape URL ::")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
         if self.urls:
@@ -175,6 +174,15 @@ class URLChooser:
                 self.top.body = urwid.ListBox(self.items)
                 self.top.body.focus_position = self._cur_focus(fp)
                 self.compact = False if self.compact is True else True
+            elif k == 'u':
+                # Toggle removing escape characters from URL
+                self.unesc = False if self.compact is True else True
+                self.urls, self.urls_unesc = self.urls_unesc, self.urls
+                urls = iter(self.urls)
+                for item in self.items:
+                    # Each Column has (Text, Button). Update the Button label
+                    if isinstance(item, urwid.Columns):
+                        item[1].set_label(next(urls))
             else:
                 self.top.keypress(size, k)
 
