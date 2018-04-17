@@ -159,14 +159,12 @@ class URLChooser:
                 # Toggle all shortened URLs
                 self.shorten = False if self.shorten is True else True
                 urls = iter(self.urls)
-                columns_idx = 1
                 for item in self.items:
                     # Each Column has (Text, Button). Update the Button label
                     if isinstance(item, urwid.Columns):
                         item[1].set_label(shorten_url(next(urls),
                                                       size[0],
                                                       self.shorten))
-                        columns_idx += 1
             elif k == 'c':
                 # Show/hide context
                 fp = self.top.body.focus_position
