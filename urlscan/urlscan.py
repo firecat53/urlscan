@@ -83,6 +83,9 @@ class HTMLChunker(HTMLParser):
         self.list_stack = []
         # either 'ul' or 'ol' entries.
 
+        # Ignore everything inside <style> and <script> elements
+        self.in_style_or_script = False
+
     # Styled text uses the named attribute
     # msgtext:style1style2... where the styles
     # are always sorted in alphabetic order.
@@ -172,6 +175,8 @@ class HTMLChunker(HTMLParser):
                 self.handle_data(alt)
         elif tag == 'li':
             self.end_list_para()
+        elif tag in ('style', 'script'):
+            self.in_style_or_script = True
 
     def handle_startendtag(self, tag, attrs):
         if tag in set(['p', 'br', 'li', 'img']):
@@ -188,8 +193,12 @@ class HTMLChunker(HTMLParser):
         elif isheadertag(tag):
             del self.style_stack[-1]
             self.end_para()
+        elif tag in ('style', 'script'):
+            self.in_style_or_script = False
 
     def handle_data(self, data):
+        if self.in_style_or_script:
+            return
         future_trailing_space = False
         if len(data) > 0:
             if data[0].isspace():
