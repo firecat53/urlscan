@@ -161,7 +161,7 @@ class HTMLChunker(HTMLParser):
             if alt is None:
                 alt = '[IMG]'
             src = self.findattr(attrs, 'src')
-            if src is not None and src[:7] != 'http://':
+            if src is not None and not src.startswith(('http://', 'https://')):
                 src = None
 
             if src is not None:
