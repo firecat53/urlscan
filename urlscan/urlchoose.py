@@ -92,7 +92,7 @@ class URLChooser:
 
     def main(self):
         loop = urwid.MainLoop(self.top, self.palette, screen=self.ui,
-                              input_filter=self.handle_keys,
+                              handle_mouse=False, input_filter=self.handle_keys,
                               unhandled_input=self.unhandled)
         loop.run()
 
