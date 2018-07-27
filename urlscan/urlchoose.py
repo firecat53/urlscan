@@ -103,7 +103,7 @@ class URLChooser:
         for k in keys:
             if (k == 'enter' or k == ' ') and self.urls:
                 load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
-                if os.environ['BROWSER'] not in ['elinks', 'links', 'w3m', 'lynx']:
+                if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
                     self._footer_start_thread(load_text, 5)
         # filter backspace out before the widget, it has a weird interaction
         return [i for i in keys if i != 'backspace']
