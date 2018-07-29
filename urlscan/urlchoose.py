@@ -40,41 +40,28 @@ def shorten_url(url, cols, shorten):
 
 
 class URLChooser:
-    defaultColorPalette = [('header', 'white', 'dark blue', 'standout'),
-                           ('footer', 'white', 'dark red', 'standout'),
-                           ('msgtext', 'light gray', 'black'),
-                           ('msgtext:bullet', 'white', 'black', 'standout'),
-                           ('msgtext:bold', 'white', 'black', 'standout'),
-                           ('msgtext:italic', 'dark cyan', 'black', 'standout'),
-                           ('msgtext:bolditalic', 'light cyan', 'black', 'standout'),
-                           ('anchor', 'yellow', 'black', 'standout'),
-                           ('anchor:bold', 'yellow', 'black', 'standout'),
-                           ('anchor:italic', 'yellow', 'black', 'standout'),
-                           ('anchor:bolditalic', 'yellow', 'black', 'standout'),
-                           ('msgtext:ellipses', 'light gray', 'black'),
-                           ('urlref:number:braces', 'light gray', 'black'),
-                           ('urlref:number', 'yellow', 'black', 'standout'),
-                           ('urlref:url', 'white', 'black', 'standout'),
-                           ('url:sel', 'white', 'dark blue', 'bold')
-                          ]
+    palette = []
+    palette.append([('header', 'white', 'dark blue', 'standout'),
+                    ('footer', 'white', 'dark red', 'standout'),
+                    ('msgtext', '', ''),
+                    ('msgtext:ellipses', 'light gray', 'black'),
+                    ('urlref:number:braces', 'light gray', 'black'),
+                    ('urlref:number', 'yellow', 'black', 'standout'),
+                    ('urlref:url', 'white', 'black', 'standout'),
+                    ('url:sel', 'white', 'dark blue', 'bold')
+                   ]
+                  )
 
-    defaultBnWPalette = [('header', 'black', 'light gray', 'standout'),
-                         ('footer', 'black', 'dark red', 'standout'),
-                         ('msgtext', 'white', 'black'),
-                         ('msgtext:bullet', 'white', 'black', 'standout'),
-                         ('msgtext:bold', 'white', 'black', 'standout'),
-                         ('msgtext:italic', 'white', 'black', 'standout'),
-                         ('msgtext:bolditalic', 'white', 'black', 'standout'),
-                         ('anchor', 'black', 'light gray', 'standout'),
-                         ('anchor:bold', 'white', 'black', 'standout'),
-                         ('anchor:italic', 'white', 'black', 'standout'),
-                         ('anchor:bolditalic', 'white', 'black', 'standout'),
-                         ('msgtext:ellipses', 'white', 'black'),
-                         ('urlref:number:braces', 'white', 'black'),
-                         ('urlref:number', 'white', 'black', 'standout'),
-                         ('urlref:url', 'white', 'black', 'standout'),
-                         ('url:sel', 'black', 'light gray', 'bold')
-                        ]
+    palette.append([('header', 'black', 'light gray', 'standout'),
+                    ('footer', 'black', 'dark red', 'standout'),
+                    ('msgtext', '', ''),
+                    ('msgtext:ellipses', 'white', 'black'),
+                    ('urlref:number:braces', 'white', 'black'),
+                    ('urlref:number', 'white', 'black', 'standout'),
+                    ('urlref:url', 'white', 'black', 'standout'),
+                    ('url:sel', 'black', 'light gray', 'bold')
+                   ]
+                  )
 
     def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True,
                  run=""):
@@ -99,7 +86,7 @@ class URLChooser:
                   "S - all URL short :: "
                   "g/G - top/bottom :: "
                   "<num> - jump to <num> :: "
-                  "b - color/B&W :: "
+                  "p - cycle palettes :: "
                   "u - unescape URL ::")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
@@ -107,8 +94,8 @@ class URLChooser:
             self.top.body.focus_position = \
                 (2 if self.compact is False else 0)
         self.ui = urwid.curses_display.Screen()
-        self.isBnW = False
-        self.palette = URLChooser.defaultColorPalette
+        self.palette = URLChooser.palette[0]
+        self.palette_idx = 0
         self.number = ""
 
     def main(self):
@@ -202,10 +189,13 @@ class URLChooser:
                     # Each Column has (Text, Button). Update the Button label
                     if isinstance(item, urwid.Columns):
                         item[1].set_label(next(urls))
-            elif k == 'b':
-                self.isBnW = not self.isBnW
-                self.loop.screen.register_palette(
-                        URLChooser.defaultBnWPalette if self.isBnW else URLChooser.defaultColorPalette)
+            elif k == 'p':
+                self.palette_idx += 1
+                try:
+                    self.loop.screen.register_palette(URLChooser.palette[self.palette_idx])
+                except IndexError:
+                    self.loop.screen.register_palette(URLChooser.palette[0])
+                    self.palette_idx = 0
                 self.loop.screen.clear()
             else:
                 self.top.keypress(size, k)
@@ -296,7 +286,7 @@ class URLChooser:
                     chunk = chunks[i]
                     i += 1
                     if chunk.url is None:
-                        markup.append(chunk.markup)
+                        markup.append(('msgtext', chunk.markup))
                     else:
                         if (dedupe is True and chunk.url not in urls) \
                                 or dedupe is False:
@@ -306,7 +296,7 @@ class URLChooser:
                         # chunks with the same URL.
                         tmpmarkup = []
                         if chunk.markup:
-                            tmpmarkup.append(chunk.markup)
+                            tmpmarkup.append(('msgtext', chunk.markup))
                         while i < len(chunks) and \
                                 chunks[i].url == chunk.url:
                             if chunks[i].markup:
