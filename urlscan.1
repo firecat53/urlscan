@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "April 16, 2018"
+.TH URLSCAN 1 "July 29, 2018"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -34,6 +34,16 @@ context view on/off with `c`.
 
 \fB3.\fR URLs are shortened by default to fit on one line. Toggle one or all
 shortened URLs with `s` or `S`.
+
+\fB4.\fR Cycle through all available palettes (color and black & white available
+by default) using `p`. `P` will generate a ~/.config/urlscan/config.json file
+for editing or adding additional pallettes. See
+
+http://urwid.org/manual/displayattributes.html#display-attributes
+
+for options and allowed values.
+
+\fB5.\fR `u` will unescape the highlighted URL if necessary.
 
 .SH OPTIONS
 .TP
@@ -73,6 +83,12 @@ selected message.
 
 Alternately, you can pipe a message into urlscan using the '|' operator. This
 can be useful for applying a different flag (such as the '-d' or '-c' options).
+
+.SH FILES
+
+$HOME/.config/urlscan/config.json
+
+Only required if additional or modified palettes are desired.
 
 .SH SEE ALSO
 \fI/usr/share/doc/urlscan/README\fR,

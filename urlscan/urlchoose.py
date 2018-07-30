@@ -18,15 +18,23 @@
 """An urwid listview-based widget that lets you choose a URL from a list of
 URLs."""
 
+import errno
+import json
 import os
 import urwid
 import urwid.curses_display
 import urwid.raw_display
 import webbrowser
+from os.path import dirname, exists, expanduser
 from subprocess import Popen
 from threading import Thread
 from time import sleep
 
+# Python 2 compatibility
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 def shorten_url(url, cols, shorten):
     """Shorten long URLs to fit on one line.
@@ -40,31 +48,37 @@ def shorten_url(url, cols, shorten):
 
 
 class URLChooser:
-    palette = []
-    palette.append([('header', 'white', 'dark blue', 'standout'),
-                    ('footer', 'white', 'dark red', 'standout'),
-                    ('msgtext', '', ''),
-                    ('msgtext:ellipses', 'light gray', 'black'),
-                    ('urlref:number:braces', 'light gray', 'black'),
-                    ('urlref:number', 'yellow', 'black', 'standout'),
-                    ('urlref:url', 'white', 'black', 'standout'),
-                    ('url:sel', 'white', 'dark blue', 'bold')
-                   ]
-                  )
-
-    palette.append([('header', 'black', 'light gray', 'standout'),
-                    ('footer', 'black', 'dark red', 'standout'),
-                    ('msgtext', '', ''),
-                    ('msgtext:ellipses', 'white', 'black'),
-                    ('urlref:number:braces', 'white', 'black'),
-                    ('urlref:number', 'white', 'black', 'standout'),
-                    ('urlref:url', 'white', 'black', 'standout'),
-                    ('url:sel', 'black', 'light gray', 'bold')
-                   ]
-                  )
 
     def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True,
                  run=""):
+        self.conf = expanduser("~/.config/urlscan/config.json")
+        self.palettes = []
+        try:
+            with open(self.conf, 'r') as conf_file:
+                data = json.load(conf_file)
+                for pal in data.values():
+                    self.palettes.append([tuple(i) for i in pal])
+        except FileNotFoundError:
+            pass
+        # Default color palette
+        self.palettes.append([('header', 'white', 'dark blue', 'standout'),
+                              ('footer', 'white', 'dark red', 'standout'),
+                              ('msgtext', '', ''),
+                              ('msgtext:ellipses', 'light gray', 'black'),
+                              ('urlref:number:braces', 'light gray', 'black'),
+                              ('urlref:number', 'yellow', 'black', 'standout'),
+                              ('urlref:url', 'white', 'black', 'standout'),
+                              ('url:sel', 'white', 'dark blue', 'bold')])
+        # Default black & white palette
+        self.palettes.append([('header', 'black', 'light gray', 'standout'),
+                              ('footer', 'black', 'light gray', 'standout'),
+                              ('msgtext', '', ''),
+                              ('msgtext:ellipses', 'white', 'black'),
+                              ('urlref:number:braces', 'white', 'black'),
+                              ('urlref:number', 'white', 'black', 'standout'),
+                              ('urlref:url', 'white', 'black', 'standout'),
+                              ('url:sel', 'black', 'light gray', 'bold')])
+
         self.shorten = shorten
         self.compact = compact
         self.run = run
@@ -87,6 +101,7 @@ class URLChooser:
                   "g/G - top/bottom :: "
                   "<num> - jump to <num> :: "
                   "p - cycle palettes :: "
+                  "P - create config file ::"
                   "u - unescape URL ::")
         headerwid = urwid.AttrMap(urwid.Text(header), 'header')
         self.top = urwid.Frame(listbox, headerwid)
@@ -94,12 +109,11 @@ class URLChooser:
             self.top.body.focus_position = \
                 (2 if self.compact is False else 0)
         self.ui = urwid.curses_display.Screen()
-        self.palette = URLChooser.palette[0]
         self.palette_idx = 0
         self.number = ""
 
     def main(self):
-        self.loop = urwid.MainLoop(self.top, self.palette, screen=self.ui,
+        self.loop = urwid.MainLoop(self.top, self.palettes[0], screen=self.ui,
                                    handle_mouse=False, input_filter=self.handle_keys,
                                    unhandled_input=self.unhandled)
         self.loop.run()
@@ -190,13 +204,31 @@ class URLChooser:
                     if isinstance(item, urwid.Columns):
                         item[1].set_label(next(urls))
             elif k == 'p':
+                # Loop through available palettes
                 self.palette_idx += 1
                 try:
-                    self.loop.screen.register_palette(URLChooser.palette[self.palette_idx])
+                    self.loop.screen.register_palette(self.palettes[self.palette_idx])
                 except IndexError:
-                    self.loop.screen.register_palette(URLChooser.palette[0])
+                    self.loop.screen.register_palette(self.palettes[0])
                     self.palette_idx = 0
                 self.loop.screen.clear()
+            elif k == 'P':
+                # Create ~/.config/urlscan/config.json if if doesn't exist
+                if not exists(self.conf):
+                    try:
+                        # Python 2/3 compatible recursive directory creation
+                        os.makedirs(dirname(expanduser(self.conf)))
+                    except OSError as e:
+                        if errno.EEXIST != e.errno:
+                            raise
+                    names = ["default", "bw"]
+                    with open(expanduser(self.conf), 'w') as pals:
+                        pals.writelines(json.dumps(dict(zip(names,
+                                                            self.palettes)),
+                                                   indent=4))
+                    self._footer_start_thread("Created ~/.config/urlscan/config.json", 5)
+                else:
+                    self._footer_start_thread("Config.json already exists", 5)
             else:
                 self.top.keypress(size, k)
 

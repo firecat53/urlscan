@@ -35,6 +35,9 @@ Relative to urlview, urlscan has the following additional features:
 - Execute an arbitrary function (for example, copy URL to clipboard) instead of
   opening URL in a browser.
 
+- Configure colors via ~/.config/urlscan/config.json. Generate default config
+  file for editing with `P`. Cycle through available palettes with `p`.
+
 Installation and setup
 ----------------------
 
@@ -66,6 +69,14 @@ Command Line usage
 
 Urlscan can extract URLs and email addresses from emails or any text file. Calling with no flags will start the curses browser. Calling with '-n' will just output a list of URLs/email addressess to stdout. The '-c' flag removes the context from around the URLs in the curses browser, and the '-d' flag removes duplicate URLs. Files can also be piped to urlscan using normal shell pipe mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
 
+Theming
+-------
+
+Press 'P' from urlscan to generate ~/.config/urlscan/config.json with the
+default color and black & white palettes. This can be edited or added to, as
+desired. The first palette in the list will be the default. Configure the
+palettes according to the `Urwid display attributes`_.
+
 Known bugs and limitations
 --------------------------
 
@@ -77,6 +88,5 @@ Known bugs and limitations
 
 - multipart/alternative sections are handled by descending into all the sub-parts, rather than just picking one, which may lead to URLs and context appearing twice. (Bypass this by selecting the '--dedupe' option)
 
-- Configurability is more than a little bit lacking.
-
 .. _Archlinux Package: https://aur.archlinux.org/packages/urlscan-git/
+.. _Urwid display attributes: http://urwid.org/manual/displayattributes.html#display-attributes
