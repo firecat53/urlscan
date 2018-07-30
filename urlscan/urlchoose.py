@@ -122,11 +122,20 @@ class URLChooser:
         """Handle the enter or space key to trigger the 'loading' footer
 
         """
-        for k in keys:
+        for j, k in enumerate(keys):
             if (k == 'enter' or k == ' ') and self.urls:
                 load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
                 if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
                     self._footer_start_thread(load_text, 5)
+            if k == 'up':
+                # Works around bug where the up arrow goes higher than the top list
+                # item and unintentionally triggers context and palette switches.
+                # Remaps 'up' to 'k'
+                keys[j] = 'k'
+            if k == 'home':
+                # Remap 'home' to 'g'. Works around small bug where 'home' takes the cursor
+                # above the top list item.
+                keys[j] = 'g'
         # filter backspace out before the widget, it has a weird interaction
         return [i for i in keys if i != 'backspace']
 
