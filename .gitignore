@@ -7,3 +7,4 @@ build
 dist
 test_emails/
 MANIFEST
+Pipfile.lock
