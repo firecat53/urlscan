@@ -1,0 +1,9 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+urwid = ">=1.2.1"
+
+[dev-packages]
