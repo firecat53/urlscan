@@ -21,14 +21,15 @@ URLs."""
 import errno
 import json
 import os
-import urwid
-import urwid.curses_display
-import urwid.raw_display
-import webbrowser
 from os.path import dirname, exists, expanduser
 from subprocess import Popen
 from threading import Thread
 from time import sleep
+import webbrowser
+
+import urwid
+import urwid.curses_display
+import urwid.raw_display
 
 # Python 2 compatibility
 try:
@@ -108,12 +109,15 @@ class URLChooser:
         if self.urls:
             self.top.body.focus_position = \
                 (2 if self.compact is False else 0)
-        self.ui = urwid.curses_display.Screen()
+        self.tui = urwid.curses_display.Screen()
         self.palette_idx = 0
         self.number = ""
 
     def main(self):
-        self.loop = urwid.MainLoop(self.top, self.palettes[0], screen=self.ui,
+        """Urwid main event loop
+
+        """
+        self.loop = urwid.MainLoop(self.top, self.palettes[0], screen=self.tui,
                                    handle_mouse=False, input_filter=self.handle_keys,
                                    unhandled_input=self.unhandled)
         self.loop.run()
@@ -123,7 +127,7 @@ class URLChooser:
 
         """
         for j, k in enumerate(keys):
-            if (k == 'enter' or k == ' ') and self.urls:
+            if k in ('enter', ' ') and self.urls:
                 load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
                 if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
                     self._footer_start_thread(load_text, 5)
@@ -144,9 +148,9 @@ class URLChooser:
         the ListBox widget.
 
         """
-        size = self.ui.get_cols_rows()
+        size = self.tui.get_cols_rows()
         for k in keys:
-            if k == 'q' or k == 'Q':
+            if k in ('q', 'Q'):
                 raise urwid.ExitMainLoop()
             elif not self.urls:
                 continue  # No other actions are useful with no URLs
@@ -180,12 +184,12 @@ class URLChooser:
                 self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
             elif k == 's':
                 # Toggle shortened URL for selected item
-                fp = self.top.body.focus_position
-                url_idx = len([i for i in self.items[:fp + 1]
+                fpo = self.top.body.focus_position
+                url_idx = len([i for i in self.items[:fpo + 1]
                                if isinstance(i, urwid.Columns)]) - 1
                 url = self.urls[url_idx]
-                short = False if "..." in self.items[fp][1].label else True
-                self.items[fp][1].set_label(shorten_url(url, size[0], short))
+                short = False if "..." in self.items[fpo][1].label else True
+                self.items[fpo][1].set_label(shorten_url(url, size[0], short))
             elif k == 'S':
                 # Toggle all shortened URLs
                 self.shorten = False if self.shorten is True else True
@@ -198,10 +202,10 @@ class URLChooser:
                                                       self.shorten))
             elif k == 'c':
                 # Show/hide context
-                fp = self.top.body.focus_position
+                fpo = self.top.body.focus_position
                 self.items, self.items_com = self.items_com, self.items
                 self.top.body = urwid.ListBox(self.items)
-                self.top.body.focus_position = self._cur_focus(fp)
+                self.top.body.focus_position = self._cur_focus(fpo)
                 self.compact = False if self.compact is True else True
             elif k == 'u':
                 # Toggle removing escape characters from URL
@@ -227,8 +231,8 @@ class URLChooser:
                     try:
                         # Python 2/3 compatible recursive directory creation
                         os.makedirs(dirname(expanduser(self.conf)))
-                    except OSError as e:
-                        if errno.EEXIST != e.errno:
+                    except OSError as err:
+                        if errno.EEXIST != err.errno:
                             raise
                     names = ["default", "bw"]
                     with open(expanduser(self.conf), 'w') as pals:
@@ -261,23 +265,26 @@ class URLChooser:
         self.number = ""  # Clear URL selection number
         footerwid = urwid.AttrMap(urwid.Text(""), "default")
         self.top.footer = footerwid
-        size = self.ui.get_cols_rows()
+        size = self.tui.get_cols_rows()
         self.draw_screen(size)
 
-    def _cur_focus(self, fp=0):
+    def _cur_focus(self, fpo=0):
         # Return correct focus when toggling 'show context'
         if self.compact is False:
-            idx = len([i for i in self.items_com[:fp + 1]
+            idx = len([i for i in self.items_com[:fpo + 1]
                        if isinstance(i, urwid.Columns)]) - 1
         elif self.compact is True:
             idx = [i for i in enumerate(self.items)
-                   if isinstance(i[1], urwid.Columns)][fp][0]
+                   if isinstance(i[1], urwid.Columns)][fpo][0]
         return idx
 
     def draw_screen(self, size):
-        self.ui.clear()
+        """Render curses screen
+
+        """
+        self.tui.clear()
         canvas = self.top.render(size, focus=True)
-        self.ui.draw_screen(size, canvas)
+        self.tui.draw_screen(size, canvas)
 
     def mkbrowseto(self, url):
         """Create the urwid callback function to open the web browser or call
@@ -289,7 +296,7 @@ class URLChooser:
                 webbrowser.open(url)
             else:
                 Popen(self.run.format(url), shell=True).communicate()
-            size = self.ui.get_cols_rows()
+            size = self.tui.get_cols_rows()
             self.draw_screen(size)
         return browse
 

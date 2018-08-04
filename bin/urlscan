@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-#
-# A simple urlview replacement that handles things like quoted-printable
-# properly.  aka "urlview minus teh suck"
+""" A simple urlview replacement that handles things like quoted-printable
+properly.  aka "urlview minus teh suck"
+
+"""
 #
 #   Copyright (C) 2006-2007 Daniel Burrows
 #   Copyright (C) 2018 Scott Hansen
@@ -56,8 +57,7 @@ def parse_arguments():
                            "For example: --run 'echo {} | xclip -i'")
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
-    args = arg_parse.parse_args()
-    return args
+    return arg_parse.parse_args()
 
 
 def close_stdin():
@@ -66,21 +66,21 @@ def close_stdin():
 
     """
     if not os.isatty(0):
-        fd = os.open('/dev/tty', os.O_RDONLY)
-        if fd < 0:
+        fdesc = os.open('/dev/tty', os.O_RDONLY)
+        if fdesc < 0:
             sys.stderr.write('Unable to open an input tty.\n')
             sys.exit(-1)
         else:
-            os.dup2(fd, 0)
-            os.close(fd)
+            os.dup2(fdesc, 0)
+            os.close(fdesc)
 
 
-def process_input(fn):
+def process_input(fname):
     """Return the parsed text of stdin or the message. Accounts for possible
     file encoding differences.
 
-        Args: fn - filename or sys.stdin
-        Returns: msg - parsed (email parser) text of the message with the
+        Args: fname - filename or sys.stdin
+        Returns: mesg - parsed (email parser) text of the message with the
             correct encoding set
 
     """
@@ -90,27 +90,27 @@ def process_input(fn):
     code = locale.getpreferredencoding()
     if code not in enc_list:
         enc_list.insert(0, code)
-    if fn is sys.stdin:
+    if fname is sys.stdin:
         try:
-            stdin_file = fn.buffer.read()
+            stdin_file = fname.buffer.read()
         except AttributeError:
-            stdin_file = fn.read()
+            stdin_file = fname.read()
     else:
         stdin_file = None
-    for c in enc_list:
+    for enc in enc_list:
         try:
             if stdin_file is not None:
-                f = io.StringIO(stdin_file.decode(c))
+                fobj = io.StringIO(stdin_file.decode(enc))
             else:
-                f = io.open(fn, mode='r', encoding=(c))
-            f_keep = f
-            msg = parser().parse(f)
-            if 'From' not in msg.keys() and 'Date' not in msg.keys():
+                fobj = io.open(fname, mode='r', encoding=(enc))
+            f_keep = fobj
+            mesg = parser().parse(fobj)
+            if 'From' not in mesg.keys() and 'Date' not in mesg.keys():
                 # If it's not an email message, don't let the email parser
                 # delete the first line. If it is, let the parser do its job so
                 # we don't get mailto: links for all the To and From addresses
-                f = _fix_first_line(f_keep)
-                msg = parser().parse(f)
+                fobj = _fix_first_line(f_keep)
+                mesg = parser().parse(fobj)
 
         except (UnicodeDecodeError, UnicodeError):
             continue
@@ -118,18 +118,17 @@ def process_input(fn):
             break
         finally:
             try:
-                fi.close()
+                fobj.close()
             except NameError:
                 pass
-        print("Encoding not detected. Please pass encoding value manually")
-        raise
+        raise Exception("Encoding not detected. Please pass encoding value manually")
     close_stdin()
     # Handle multiple nested message parts
-    _msg_set_charset(msg, c)
-    return msg
+    _msg_set_charset(mesg, enc)
+    return mesg
 
 
-def _fix_first_line(f):
+def _fix_first_line(fline):
     """If the first line starts with http* or [ or other non-text characters,
     the URLs on that line will not be parsed by email.Parser. Add a blank line
     at the top of the file to ensure everything is read in a non-email file.
@@ -140,23 +139,23 @@ def _fix_first_line(f):
       3. Return 'f'
 
     """
-    f.seek(0)
+    fline.seek(0)
     new = io.StringIO()
-    new.write("\n{}".format(f.read()))
-    f.close()
+    new.write("\n{}".format(fline.read()))
+    fline.close()
     new.seek(0)
     return new
 
 
-def _msg_set_charset(msg, encoding):
+def _msg_set_charset(mesg, encoding):
     """Recursive function to set the charset of nested message parts.
 
     """
-    encoding = msg.get_content_charset() or encoding
+    encoding = mesg.get_content_charset() or encoding
     try:
-        msg.set_charset(encoding)
+        mesg.set_charset(encoding)
     except (AttributeError, TypeError):
-        for part in msg.get_payload():
+        for part in mesg.get_payload():
             try:
                 # Try once to set correct encoding on the message part, then
                 # continue without crashing if it fails
@@ -165,17 +164,24 @@ def _msg_set_charset(msg, encoding):
                 continue
 
 
-if __name__ == "__main__":
+def main():
+    """Entrypoint function for urlscan
+
+    """
     args = parse_arguments()
     msg = process_input(args.message)
     if args.nobrowser is False:
-        ui = urlchoose.URLChooser(urlscan.msgurls(msg),
-                                  compact=args.compact,
-                                  dedupe=args.dedupe,
-                                  run=args.run)
-        ui.main()
+        tui = urlchoose.URLChooser(urlscan.msgurls(msg),
+                                   compact=args.compact,
+                                   dedupe=args.dedupe,
+                                   run=args.run)
+        tui.main()
     else:
         out = urlchoose.URLChooser(urlscan.msgurls(msg),
                                    dedupe=args.dedupe,
                                    shorten=False)
         print("\n".join(out.urls))
+
+
+if __name__ == "__main__":
+    main()

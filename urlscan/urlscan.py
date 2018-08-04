@@ -19,8 +19,8 @@
 """Contains the backend logic that scans messages for URLs and context."""
 
 from __future__ import unicode_literals
-import re
 import os
+import re
 try:
     from HTMLParser import HTMLParser
 except ImportError:
@@ -59,8 +59,9 @@ class Chunk:
         return self.__str__()
 
 
-def isheadertag(t):
-    return len(t) == 2 and t[0] == 'h' and t[1].isdigit()
+def isheadertag(tag):
+    """Determine if tag is a header """
+    return len(tag) == 2 and tag[0] == 'h' and tag[1].isdigit()
 
 
 class HTMLChunker(HTMLParser):
@@ -111,23 +112,23 @@ class HTMLChunker(HTMLParser):
         else:
             self.at_para_start = True
         self.trailing_space = False
-        if len(self.list_stack) > 0:
+        if self.list_stack:
             self.add_chunk(Chunk(' ' * 3 * len(self.list_stack),
                                  self.cur_url()))
 
     def end_list_para(self):
         if self.at_para_start:
             self.rval.append([])
-        if len(self.list_stack) > 0:
-            tp = self.list_stack[-1][0]
-            if tp == 'ul':
-                depth = len([t for t in self.list_stack if t[0] == tp])
+        if self.list_stack:
+            tag = self.list_stack[-1][0]
+            if tag == 'ul':
+                depth = len([t for t in self.list_stack if t[0] == tag])
                 ul_tags = HTMLChunker.ul_tags
                 chunk = Chunk('%s  ' % (ul_tags[depth % len(ul_tags)]),
                               self.cur_url())
             else:
                 counter = self.list_stack[-1][1]
-                self.list_stack[-1] = (tp, counter + 1)
+                self.list_stack[-1] = (tag, counter + 1)
                 chunk = Chunk("%2d." % counter, self.cur_url())
             self.add_chunk(chunk)
         else:
@@ -140,11 +141,10 @@ class HTMLChunker(HTMLParser):
 
         return None
 
-    # TODO: should have better formatting.
     def handle_starttag(self, tag, attrs):
         if tag == 'a':
             self.anchor_stack.append(self.findattr(attrs, 'href'))
-        elif tag == 'ul' or tag == 'ol':
+        elif tag in ('ul', 'ol'):
             self.list_stack.append((tag, 1))
             self.end_para()
         elif tag in HTMLChunker.tag_styles:
@@ -152,7 +152,7 @@ class HTMLChunker(HTMLParser):
                                     set([HTMLChunker.tag_styles[tag]]))
         elif isheadertag(tag):
             self.style_stack.append(self.style_stack[-1] | set(['bold']))
-        elif tag == 'p' or tag == 'br':
+        elif tag in ('p', 'br'):
             self.end_para()
         elif tag == 'img':
             # Since we expect HTML *email*, image links
@@ -182,7 +182,7 @@ class HTMLChunker(HTMLParser):
             del self.anchor_stack[-1]
         elif tag in HTMLChunker.tag_styles:
             del self.style_stack[-1]
-        elif tag == 'ul' or tag == 'ol':
+        elif tag in ('ul', 'ol'):
             del self.list_stack[-1]
             self.end_para()
         elif isheadertag(tag):
@@ -191,7 +191,7 @@ class HTMLChunker(HTMLParser):
 
     def handle_data(self, data):
         future_trailing_space = False
-        if len(data) > 0:
+        if data:
             if data[0].isspace():
                 self.trailing_space = True
             if data[-1].isspace():
@@ -201,7 +201,7 @@ class HTMLChunker(HTMLParser):
             style = 'msgtext'
         else:
             style = 'anchor'
-        if len(self.style_stack[-1]) > 0:
+        if self.style_stack[-1]:
             stylelist = list(self.style_stack[-1])
             stylelist.sort()
             style = style + ':' + ''.join(stylelist)
@@ -217,13 +217,13 @@ class HTMLChunker(HTMLParser):
 
     def handle_charref(self, name):
         if name[0] == 'x':
-            n = int(name[1:], 16)
+            char = int(name[1:], 16)
         else:
-            n = int(name)
-        if n < 128:
-            name = chr(n)
-        elif n in HTMLChunker.extrachars:
-            name = HTMLChunker.extrachars[n]
+            char = int(name)
+        if char < 128:
+            name = chr(char)
+        elif char in HTMLChunker.extrachars:
+            name = HTMLChunker.extrachars[char]
         else:
             name = '&#%s;' % name
         self.handle_data(name)
@@ -245,52 +245,55 @@ class HTMLChunker(HTMLParser):
             self.handle_data('&%s;' % name)
 
 
-urlinternalpattern = r'[{}()@\w/\\\-%?!&.=:;+,#~]'
-urltrailingpattern = r'[{}(@\w/\-%&=+#]'
-httpurlpattern = (r'(?:(https?|file|ftps?)://' + urlinternalpattern +
-                  r'*' + urltrailingpattern + r')')
+URLINTERNALPATTERN = r'[{}()@\w/\\\-%?!&.=:;+,#~]'
+URLTRAILINGPATTERN = r'[{}(@\w/\-%&=+#]'
+HTTPURLPATTERN = (r'(?:(https?|file|ftps?)://' + URLINTERNALPATTERN +
+                  r'*' + URLTRAILINGPATTERN + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
 
 
 def load_tlds():
+    """Load all legal TLD extensions from assets
+
+    """
     file = os.path.join(os.path.dirname(__file__),
                         'assets',
                         'tlds-alpha-by-domain.txt')
-    with open(file) as f:
-        return [elem for elem in f.read().lower().splitlines()[1:]
+    with open(file) as fobj:
+        return [elem for elem in fobj.read().lower().splitlines()[1:]
                 if "--" not in elem]
 
 
-tlds = load_tlds()
-guessedurlpattern = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
-                     '|'.join(tlds) + ')$)')
-urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' +
-                   guessedurlpattern +
-                   '|(?P<email>(mailto:)?[\w\-.]+@[\w\-.]*[\w\-]))>?',
+TLDS = load_tlds()
+GUESSEDURLPATTERN = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
+                     '|'.join(TLDS) + ')$)')
+URLRE = re.compile(r'(?:<(?:URL:)?)?(' + HTTPURLPATTERN + '|' +
+                   GUESSEDURLPATTERN +
+                   r'|(?P<email>(mailto:)?[\w\-.]+@[\w\-.]*[\w\-]))>?',
                    flags=re.U)
 
 # Poor man's test cases.
-assert(urlre.match('<URL:http://linuxtoday.com>'))
-assert(urlre.match('http://linuxtoday.com'))
-assert(re.compile(guessedurlpattern).match('example.biz'))
-assert(urlre.match('example.biz'))
-assert(urlre.match('linuxtoday.com'))
-assert(urlre.match('master.wizard.edu'))
-assert(urlre.match('blah.bar.info'))
-assert(urlre.match('goodpr.org'))
-assert(urlre.match('http://github.com/firecat53/ürlscan'))
-assert(urlre.match('https://Schöne_Grüße.es/test'))
-assert(urlre.match('http://www.pantherhouse.com/newshelton/my-wife-thinks-i’m-a-swan/'))
-assert(not urlre.match('blah..org'))
-assert(urlre.match('http://www.testurl.zw'))
-assert(urlre.match('http://www.testurl.smile'))
-assert(urlre.match('testurl.smile.smile'))
-assert(urlre.match('testurl.biz.smile.zw'))
-assert(not urlre.match('example..biz'))
-assert(not urlre.match('blah.baz.obviouslynotarealdomain'))
+assert URLRE.match('<URL:http://linuxtoday.com>')
+assert URLRE.match('http://linuxtoday.com')
+assert re.compile(GUESSEDURLPATTERN).match('example.biz')
+assert URLRE.match('example.biz')
+assert URLRE.match('linuxtoday.com')
+assert URLRE.match('master.wizard.edu')
+assert URLRE.match('blah.bar.info')
+assert URLRE.match('goodpr.org')
+assert URLRE.match('http://github.com/firecat53/ürlscan')
+assert URLRE.match('https://Schöne_Grüße.es/test')
+assert URLRE.match('http://www.pantherhouse.com/newshelton/my-wife-thinks-i’m-a-swan/')
+assert not URLRE.match('blah..org')
+assert URLRE.match('http://www.testurl.zw')
+assert URLRE.match('http://www.testurl.smile')
+assert URLRE.match('testurl.smile.smile')
+assert URLRE.match('testurl.biz.smile.zw')
+assert not URLRE.match('example..biz')
+assert not URLRE.match('blah.baz.obviouslynotarealdomain')
 
 
-def parse_text_urls(s):
+def parse_text_urls(mesg):
     """Parse a block of text, splitting it into its url and non-url
     components."""
 
@@ -298,25 +301,28 @@ def parse_text_urls(s):
 
     loc = 0
 
-    for match in urlre.finditer(s):
+    for match in URLRE.finditer(mesg):
         if loc < match.start():
-            rval.append(Chunk(s[loc:match.start()], None))
+            rval.append(Chunk(mesg[loc:match.start()], None))
         # Turn email addresses into mailto: links
         email = match.group("email")
         if email and "mailto" not in email:
-            m = "mailto:{}".format(email)
+            mailto = "mailto:{}".format(email)
         else:
-            m = match.group(1)
-        rval.append(Chunk(None, m))
+            mailto = match.group(1)
+        rval.append(Chunk(None, mailto))
         loc = match.end()
 
-    if loc < len(s):
-        rval.append(Chunk(s[loc:], None))
+    if loc < len(mesg):
+        rval.append(Chunk(mesg[loc:], None))
 
     return rval
 
 
 def extract_with_context(lst, pred, before_context, after_context):
+    """Extract URL and context from a given chunk.
+
+    """
     rval = []
 
     start = 0
@@ -375,16 +381,16 @@ def extract_with_context(lst, pred, before_context, after_context):
     return rval
 
 
-nlre = re.compile('\r\n|\n|\r')
+NLRE = re.compile('\r\n|\n|\r')
 
 
-def extracturls(s):
+def extracturls(mesg):
     """Given a text message, extract all the URLs found in the message, along
     with their surrounding context.  The output is a list of sequences of Chunk
     objects, corresponding to the contextual regions extracted from the string.
 
     """
-    lines = nlre.split(s)
+    lines = NLRE.split(mesg)
 
     # The number of lines of context above to provide.
     # above_context = 1
@@ -405,23 +411,46 @@ def extracturls(s):
                                 1, 1)
 
 
-def extracthtmlurls(s):
-    c = HTMLChunker()
-    c.feed(s)
-    c.close()
+def extracthtmlurls(mesg):
+    """Extract URLs with context from html type message. Similar to extracturls.
+
+    """
+    chunk = HTMLChunker()
+    chunk.feed(mesg)
+    chunk.close()
     # above_context = 1
     # below_context = 1
 
     def somechunkisurl(chunks):
-        for chunk in chunks:
-            if chunk.url is not None:
+        for chnk in chunks:
+            if chnk.url is not None:
                 return True
         return False
 
-    return extract_with_context(c.rval, somechunkisurl, 1, 1)
+    return extract_with_context(chunk.rval, somechunkisurl, 1, 1)
+
+
+def decode_bytes(byt, enc='utf-8'):
+    """Given a string or bytes input, return a string.
+
+        Args: bytes - bytes or string
+              enc - encoding to use for decoding the byte string.
+
+    """
+    try:
+        strg = byt.decode(enc)
+    except UnicodeDecodeError as err:
+        strg = "Unable to decode message:\n{}\n{}".format(str(byt), err)
+    except (AttributeError, UnicodeEncodeError):
+        # If byt is already a string, just return it
+        return byt
+    return strg
 
 
 def msgurls(msg, urlidx=1):
+    """Main entry function for urlscan.py
+
+    """
     # Written as a generator so I can easily choose only
     # one subpart in the future (e.g., for
     # multipart/alternative).  Actually, I might even add
@@ -442,20 +471,3 @@ def msgurls(msg, urlidx=1):
         for chunk in extracthtmlurls(msg):
             urlidx += 1
             yield chunk
-
-
-def decode_bytes(b, enc='utf-8'):
-    """Given a string or bytes input, return a string.
-
-        Args: b - bytes or string
-              enc - encoding to use for decoding the byte string.
-
-    """
-    try:
-        s = b.decode(enc)
-    except UnicodeDecodeError as e:
-        s = "Unable to decode message:\n{}\n{}".format(str(b), e)
-    except (AttributeError, UnicodeEncodeError):
-        # If b is already a string, just return it
-        return b
-    return s
