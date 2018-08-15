@@ -300,7 +300,8 @@ class URLChooser:
         else:
             del os.environ['BROWSER']
             webbrowser.register(browser, None, webbrowser.GenericBrowser(browser))
-            webbrowser._tryorder.insert(0, webbrowser._tryorder.pop())
+            try_idx = webbrowser._tryorder.index(browser)
+            webbrowser._tryorder.insert(0, webbrowser._tryorder.pop(try_idx))
 
         def browse(*args):
             if not self.run:
