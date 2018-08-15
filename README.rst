@@ -13,22 +13,31 @@ Maxime Chatelle <xakz@rxsoft.eu> (Debian Maintainer)
 Purpose and Requirements
 ------------------------
 
-Urlscan is a small program that is designed to integrate with the "mutt" mailreader to allow you to easily launch a Web browser for URLs contained in email messages. It is a replacement for the "urlview" program.
+Urlscan is a small program that is designed to integrate with the "mutt"
+mailreader to allow you to easily launch a Web browser for URLs contained in
+email messages. It is a replacement for the "urlview" program.
 
 Requires: Python 2.6+ (including Python 3.x) and the python-urwid library
 
 Features
 --------
 
-Urlscan parses an email message or file and scans it for URLs and email addresses. It then displays the URLs and their context within the message, and allows you to choose one or more URLs to send to your Web browser. Alternatively, it send a list of all URLs to stdout.
+Urlscan parses an email message or file and scans it for URLs and email
+addresses. It then displays the URLs and their context within the message, and
+allows you to choose one or more URLs to send to your Web browser.
+Alternatively, it send a list of all URLs to stdout.
 
 Relative to urlview, urlscan has the following additional features:
 
-- Support for emails in quoted-printable and base64 encodings. No more stripping out =40D from URLs by hand!
+- Support for emails in quoted-printable and base64 encodings. No more stripping
+  out =40D from URLs by hand!
 
-- The context of each URL is provided along with the URL. For HTML mails, a crude parser is used to render the HTML into text. Context view can be toggled on/off with `c`.
+- The context of each URL is provided along with the URL. For HTML mails, a
+  crude parser is used to render the HTML into text. Context view can be toggled
+  on/off with `c`.
 
-- URLs are shortened by default to fit on one line. Viewing full URL (for one or all) is toggled with `s` or `S`.
+- URLs are shortened by default to fit on one line. Viewing full URL (for one or
+  all) is toggled with `s` or `S`.
 
 - Jump to a URL by typing the number.
 
@@ -41,21 +50,27 @@ Relative to urlview, urlscan has the following additional features:
 Installation and setup
 ----------------------
 
-To install urlscan, install from your distribution repositories, from Pypi, install the `Archlinux Package`_ , or install from source using setup.py.
+To install urlscan, install from your distribution repositories, from Pypi,
+install the `Archlinux Package`_ , or install from source using setup.py.
 
 .. NOTE::
 
-    To work with Python 3.x the minimum required version of urwid is 1.2.1. Python 2.x needs urwid >= 1.1.0
+    To work with Python 3.x the minimum required version of urwid is 1.2.1.
+    Python 2.x needs urwid >= 1.1.0
 
 Once urlscan is installed, add the following lines to your .muttrc:
 
-    macro index,pager \\cb "<pipe-message> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+    macro index,pager \\cb "<pipe-message> urlscan<Enter>" "call urlscan to
+    extract URLs out of a message"
 
-    macro attach,compose \\cb "<pipe-entry> urlscan<Enter>" "call urlscan to extract URLs out of a message"
+    macro attach,compose \\cb "<pipe-entry> urlscan<Enter>" "call urlscan to
+    extract URLs out of a message"
 
-Once this is done, Control-b while reading mail in mutt will automatically invoke urlscan on the message.
+Once this is done, Control-b while reading mail in mutt will automatically
+invoke urlscan on the message.
 
-To choose a particular browser, set the environment variable BROWSER:
+To choose a particular browser, set the environment variable BROWSER. If BROWSER
+is not set, xdg-open will control which browser is used, if it's available.:
 
     export BROWSER=/usr/bin/epiphany
 
@@ -67,7 +82,12 @@ Command Line usage
 
     urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] <file>
 
-Urlscan can extract URLs and email addresses from emails or any text file. Calling with no flags will start the curses browser. Calling with '-n' will just output a list of URLs/email addressess to stdout. The '-c' flag removes the context from around the URLs in the curses browser, and the '-d' flag removes duplicate URLs. Files can also be piped to urlscan using normal shell pipe mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
+Urlscan can extract URLs and email addresses from emails or any text file.
+Calling with no flags will start the curses browser. Calling with '-n' will just
+output a list of URLs/email addressess to stdout. The '-c' flag removes the
+context from around the URLs in the curses browser, and the '-d' flag removes
+duplicate URLs. Files can also be piped to urlscan using normal shell pipe
+mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
 
 Theming
 -------
@@ -80,13 +100,18 @@ palettes according to the `Urwid display attributes`_.
 Known bugs and limitations
 --------------------------
 
-- Running urlscan sometimes "messes up" the terminal background. This seems to be an urwid bug, but I haven't tracked down just what's going on.
+- Running urlscan sometimes "messes up" the terminal background. This seems to
+  be an urwid bug, but I haven't tracked down just what's going on.
 
-- Extraction of context from HTML messages leaves something to be desired. Probably the ideal solution would be to extract context on a word basis rather than on a paragraph basis.
+- Extraction of context from HTML messages leaves something to be desired.
+  Probably the ideal solution would be to extract context on a word basis rather
+  than on a paragraph basis.
 
 - The HTML message handling is a bit kludgy in general.
 
-- multipart/alternative sections are handled by descending into all the sub-parts, rather than just picking one, which may lead to URLs and context appearing twice. (Bypass this by selecting the '--dedupe' option)
+- multipart/alternative sections are handled by descending into all the
+  sub-parts, rather than just picking one, which may lead to URLs and context
+  appearing twice. (Bypass this by selecting the '--dedupe' option)
 
 .. _Archlinux Package: https://aur.archlinux.org/packages/urlscan-git/
 .. _Urwid display attributes: http://urwid.org/manual/displayattributes.html#display-attributes
