@@ -187,6 +187,8 @@ class URLChooser:
                 fpo = self.top.body.focus_position
                 url_idx = len([i for i in self.items[:fpo + 1]
                                if isinstance(i, urwid.Columns)]) - 1
+                if self.compact is False and fpo <= 1:
+                    break
                 url = self.urls[url_idx]
                 short = False if "..." in self.items[fpo][1].label else True
                 self.items[fpo][1].set_label(shorten_url(url, size[0], short))
@@ -268,6 +270,7 @@ class URLChooser:
         if self.compact is False:
             idx = len([i for i in self.items_com[:fpo + 1]
                        if isinstance(i, urwid.Columns)]) - 1
+            idx = max(idx, 0)
         elif self.compact is True:
             idx = [i for i in enumerate(self.items)
                    if isinstance(i[1], urwid.Columns)][fpo][0]
