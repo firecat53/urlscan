@@ -190,9 +190,13 @@ class URLChooser:
                 url = self.urls[url_idx]
                 short = False if "..." in self.items[fpo][1].label else True
                 self.items[fpo][1].set_label(shorten_url(url, size[0], short))
-            elif k == 'S':
-                # Toggle all shortened URLs
-                self.shorten = False if self.shorten is True else True
+            elif k in ('S', 'u'):
+                # Toggle all shortened or escaped URLs
+                if k == 'S':
+                    self.shorten = False if self.shorten is True else True
+                if k == 'u':
+                    self.unesc = False if self.unesc is True else True
+                    self.urls, self.urls_unesc = self.urls_unesc, self.urls
                 urls = iter(self.urls)
                 for item in self.items:
                     # Each Column has (Text, Button). Update the Button label
@@ -207,15 +211,6 @@ class URLChooser:
                 self.top.body = urwid.ListBox(self.items)
                 self.top.body.focus_position = self._cur_focus(fpo)
                 self.compact = False if self.compact is True else True
-            elif k == 'u':
-                # Toggle removing escape characters from URL
-                self.unesc = False if self.compact is True else True
-                self.urls, self.urls_unesc = self.urls_unesc, self.urls
-                urls = iter(self.urls)
-                for item in self.items:
-                    # Each Column has (Text, Button). Update the Button label
-                    if isinstance(item, urwid.Columns):
-                        item[1].set_label(next(urls))
             elif k == 'p':
                 # Loop through available palettes
                 self.palette_idx += 1
