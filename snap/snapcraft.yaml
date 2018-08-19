@@ -1,0 +1,28 @@
+name: urlscan
+version: git
+summary: Extract and browse the URLs contained in an email (urlview replacement)
+description: |
+  urlscan searches for URLs in email messages, then displays a list of
+  them in the current terminal.  It is primarily meant as a replacement
+  for urlview, which it improves upon in the following ways:
+    * urlscan understands email encodings such as quoted-printable;
+      urlview does not.
+    * urlscan extracts and displays the context surrounding each URL.
+
+grade: stable
+confinement: classic
+
+apps:
+  urlscan:
+    command: bin/urlscan-wrapper
+
+parts:
+  urlscan:
+    source: .
+    plugin: python
+    python-version: python3
+  urlscan-wrapper:
+    source: snap/
+    plugin: dump
+    organize:
+      urlscan-wrapper: bin/urlscan-wrapper
