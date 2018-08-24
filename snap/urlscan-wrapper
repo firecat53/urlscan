@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# HACK: `locale.Error: unsupported locale setting` workaround
-
-exec "$SNAP/bin/urlscan" "$@"
