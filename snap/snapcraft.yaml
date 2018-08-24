@@ -14,15 +14,10 @@ confinement: classic
 
 apps:
   urlscan:
-    command: bin/urlscan-wrapper
+    command: env LC_ALL=C.UTF-8 $SNAP/bin/urlscan
 
 parts:
   urlscan:
     source: .
     plugin: python
     python-version: python3
-  urlscan-wrapper:
-    source: snap/
-    plugin: dump
-    organize:
-      urlscan-wrapper: bin/urlscan-wrapper
