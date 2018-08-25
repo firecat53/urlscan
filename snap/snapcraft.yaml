@@ -10,11 +10,12 @@ description: |
     * urlscan extracts and displays the context surrounding each URL.
 
 grade: stable
-confinement: classic
+confinement: strict
 
 apps:
   urlscan:
-    command: env LC_ALL=C.UTF-8 $SNAP/bin/urlscan
+    command: env LC_ALL=C.UTF-8 urlscan
+    plugs: [home]
 
 parts:
   urlscan:
