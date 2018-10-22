@@ -184,14 +184,18 @@ class HTMLChunker(HTMLParser):
 
     def handle_endtag(self, tag):
         if tag == 'a':
-            del self.anchor_stack[-1]
+            if len(self.anchor_stack) > 1:
+                del self.anchor_stack[-1]
         elif tag in HTMLChunker.tag_styles:
-            del self.style_stack[-1]
+            if len(self.style_stack) > 1:
+                del self.style_stack[-1]
         elif tag in ('ul', 'ol'):
-            del self.list_stack[-1]
+            if len(self.list_stack) > 0:
+                del self.list_stack[-1]
             self.end_para()
         elif isheadertag(tag):
-            del self.style_stack[-1]
+            if len(self.style_stack) > 1:
+                del self.style_stack[-1]
             self.end_para()
         elif tag in ('style', 'script'):
             self.in_style_or_script = False
