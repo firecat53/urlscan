@@ -469,7 +469,7 @@ def decode_msg(msg, enc='utf-8'):
     """
     # We avoid the get_payload decoding machinery for raw
     # content-transfer-encodings potentially containing non-ascii characters,
-    # such as 8bit or binary, as these are encoded using raw-decode-escape which
+    # such as 8bit or binary, as these are encoded using raw-unicode-escape which
     # seems to prevent subsequent utf-8 decoding.
     cte = str(msg.get('content-transfer-encoding', '')).lower()
     decode = cte != "8bit" and cte != "binary"
