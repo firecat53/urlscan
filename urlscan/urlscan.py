@@ -472,7 +472,7 @@ def decode_msg(msg, enc='utf-8'):
     # such as 8bit or binary, as these are encoded using raw-unicode-escape which
     # seems to prevent subsequent utf-8 decoding.
     cte = str(msg.get('content-transfer-encoding', '')).lower()
-    decode = cte != "8bit" and cte != "binary"
+    decode = cte not in ("8bit", "7bit", "binary")
     res = msg.get_payload(decode=decode)
     return decode_bytes(res, enc)
 
