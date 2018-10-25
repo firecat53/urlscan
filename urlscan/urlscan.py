@@ -184,14 +184,18 @@ class HTMLChunker(HTMLParser):
 
     def handle_endtag(self, tag):
         if tag == 'a':
-            del self.anchor_stack[-1]
+            if len(self.anchor_stack) > 1:
+                del self.anchor_stack[-1]
         elif tag in HTMLChunker.tag_styles:
-            del self.style_stack[-1]
+            if len(self.style_stack) > 1:
+                del self.style_stack[-1]
         elif tag in ('ul', 'ol'):
-            del self.list_stack[-1]
+            if len(self.list_stack) > 0:
+                del self.list_stack[-1]
             self.end_para()
         elif isheadertag(tag):
-            del self.style_stack[-1]
+            if len(self.style_stack) > 1:
+                del self.style_stack[-1]
             self.end_para()
         elif tag in ('style', 'script'):
             self.in_style_or_script = False
@@ -456,6 +460,23 @@ def decode_bytes(byt, enc='utf-8'):
     return strg
 
 
+def decode_msg(msg, enc='utf-8'):
+    """
+    Decodes a message fragment.
+
+    Args: msg - A Message object representing the fragment
+          enc - The encoding to use for decoding the message
+    """
+    # We avoid the get_payload decoding machinery for raw
+    # content-transfer-encodings potentially containing non-ascii characters,
+    # such as 8bit or binary, as these are encoded using raw-unicode-escape which
+    # seems to prevent subsequent utf-8 decoding.
+    cte = str(msg.get('content-transfer-encoding', '')).lower()
+    decode = cte not in ("8bit", "7bit", "binary")
+    res = msg.get_payload(decode=decode)
+    return decode_bytes(res, enc)
+
+
 def msgurls(msg, urlidx=1):
     """Main entry function for urlscan.py
 
@@ -470,13 +491,13 @@ def msgurls(msg, urlidx=1):
             for chunk in msgurls(part, urlidx):
                 urlidx += 1
                 yield chunk
-    elif msg.get_content_type() == 'text/plain':
-        msg = decode_bytes(msg.get_payload(decode=True), enc)
-        for chunk in extracturls(msg):
+    elif msg.get_content_type() == "text/plain":
+        decoded = decode_msg(msg, enc)
+        for chunk in extracturls(decoded):
             urlidx += 1
             yield chunk
-    elif msg.get_content_type() == 'text/html':
-        msg = decode_bytes(msg.get_payload(decode=True), enc)
-        for chunk in extracthtmlurls(msg):
+    elif msg.get_content_type() == "text/html":
+        decoded = decode_msg(msg, enc)
+        for chunk in extracthtmlurls(decoded):
             urlidx += 1
             yield chunk
