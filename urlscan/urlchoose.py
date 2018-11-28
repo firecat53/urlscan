@@ -48,6 +48,23 @@ def shorten_url(url, cols, shorten):
     return url[:split] + "..." + url[-split:]
 
 
+def grp_list(items):
+    """Organize list of items [a,2,3,4,a,4,2,a,1, etc...] like:
+        [[a,2,3,4], [a,4,2], [a,1]], where 'a' is a urwid.Divider
+
+    """
+    grp = []
+    res = []
+    for item in items:
+        if isinstance(item, urwid.Divider):
+            res.append(grp)
+            grp = [items[0]]
+        else:
+            grp.append(item)
+    res.append(grp)
+    return res[1:]
+
+
 class URLChooser:
 
     def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True,
@@ -64,6 +81,7 @@ class URLChooser:
         # Default color palette
         self.palettes.append([('header', 'white', 'dark blue', 'standout'),
                               ('footer', 'white', 'dark red', 'standout'),
+                              ('search', 'white', 'dark green', 'standout'),
                               ('msgtext', '', ''),
                               ('msgtext:ellipses', 'light gray', 'black'),
                               ('urlref:number:braces', 'light gray', 'black'),
@@ -73,6 +91,7 @@ class URLChooser:
         # Default black & white palette
         self.palettes.append([('header', 'black', 'light gray', 'standout'),
                               ('footer', 'black', 'light gray', 'standout'),
+                              ('search', 'white', 'black', 'standout'),
                               ('msgtext', '', ''),
                               ('msgtext:ellipses', 'white', 'black'),
                               ('urlref:number:braces', 'white', 'black'),
@@ -83,6 +102,10 @@ class URLChooser:
         self.shorten = shorten
         self.compact = compact
         self.run = run
+        self.search = False
+        self.search_string = ""
+        self.no_matches = False
+        self.enter = False
         self.items, self.urls = self.process_urls(extractedurls,
                                                   dedupe=dedupe,
                                                   shorten=self.shorten)
@@ -93,9 +116,13 @@ class URLChooser:
             self.items, self.items_com = self.items_com, self.items
         self.urls_unesc = [i.replace('\\', '') for i in self.urls]
         self.unesc = False
-        self.contents = urwid.SimpleFocusListWalker(self.items)
-        listbox = urwid.ListBox(self.contents)
+        # Original version of all items
+        self.items_orig = self.items
+        # Store items grouped into sections
+        self.items_org = grp_list(self.items)
+        listbox = urwid.ListBox(self.items)
         header = (":: q - Quit :: "
+                  "/ - search :: "
                   "c - context :: "
                   "s - URL short :: "
                   "S - all URL short :: "
@@ -123,11 +150,38 @@ class URLChooser:
         self.loop.run()
 
     def handle_keys(self, keys, raw):
-        """Handle the enter or space key to trigger the 'loading' footer
+        """Handle widget default keys
+
+            - 'Enter' or 'space' to load URL
+            - 'Enter' to end search mode
+            - add 'space' to search string in search mode
+            - Workaround some small positioning bugs
 
         """
         for j, k in enumerate(keys):
-            if k in ('enter', ' ') and self.urls:
+            if self.search is True:
+                text = "Search: {}".format(self.search_string)
+                if k == 'enter':
+                    # Catch 'enter' key to prevent opening URL in mkbrowseto
+                    self.enter = True
+                    if not self.items:
+                        self.search = False
+                        self.enter = False
+                    if self.search_string:
+                        footer = 'search'
+                    else:
+                        footer = 'default'
+                        text = ""
+                    footerwid = urwid.AttrMap(urwid.Text(text), footer)
+                    self.top.footer = footerwid
+                elif k == ' ':
+                    self.search_string += " "
+                    footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
+                    self.top.footer = footerwid
+                elif k == 'backspace':
+                    self.search_string = self.search_string[:-1]
+                    self._search()
+            elif k in ('enter', ' ') and self.urls and self.search is False:
                 load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
                 if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
                     self._footer_start_thread(load_text, 5)
@@ -143,104 +197,127 @@ class URLChooser:
         # filter backspace out before the widget, it has a weird interaction
         return [i for i in keys if i != 'backspace']
 
-    def unhandled(self, keys):
+    def unhandled(self, key):
         """Add other keyboard actions (q, j, k, s, S, c, g, G) not handled by
         the ListBox widget.
 
         """
         size = self.tui.get_cols_rows()
-        for k in keys:
-            if k in ('q', 'Q'):
-                raise urwid.ExitMainLoop()
-            elif not self.urls:
-                continue  # No other actions are useful with no URLs
-            elif k.isdigit():
-                self.number += k
-                try:
-                    if self.compact is False:
-                        self.top.body.focus_position = \
-                            self.items.index(self.items_com[max(int(self.number) - 1, 0)])
-                    else:
-                        self.top.body.focus_position = \
-                            self.items.index(self.items[max(int(self.number) - 1, 0)])
-                except IndexError:
-                    self.number = self.number[:-1]
-                self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
-                if self.number:
-                    self._footer_start_thread("Selection: {}".format(self.number), 1)
-            elif k == 'ctrl l':
-                self.draw_screen(size)
-            elif k == 'j':
-                self.top.keypress(size, "down")
-            elif k == 'k':
-                self.top.keypress(size, "up")
-            elif k == 'g':
-                # Goto top of the list
-                self.top.body.focus_position = 2 if self.compact is False else 0
-                self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
-            elif k == 'G':
-                # Goto bottom of the list
-                self.top.body.focus_position = len(self.items) - 1
-                self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
-            elif k == 's':
-                # Toggle shortened URL for selected item
-                fpo = self.top.body.focus_position
-                url_idx = len([i for i in self.items[:fpo + 1]
-                               if isinstance(i, urwid.Columns)]) - 1
-                if self.compact is False and fpo <= 1:
-                    break
-                url = self.urls[url_idx]
-                short = False if "..." in self.items[fpo][1].label else True
-                self.items[fpo][1].set_label(shorten_url(url, size[0], short))
-            elif k in ('S', 'u'):
-                # Toggle all shortened or escaped URLs
-                if k == 'S':
-                    self.shorten = False if self.shorten is True else True
-                if k == 'u':
-                    self.unesc = False if self.unesc is True else True
-                    self.urls, self.urls_unesc = self.urls_unesc, self.urls
-                urls = iter(self.urls)
-                for item in self.items:
-                    # Each Column has (Text, Button). Update the Button label
-                    if isinstance(item, urwid.Columns):
-                        item[1].set_label(shorten_url(next(urls),
-                                                      size[0],
-                                                      self.shorten))
-            elif k == 'c':
-                # Show/hide context
-                fpo = self.top.body.focus_position
-                self.items, self.items_com = self.items_com, self.items
-                self.top.body = urwid.ListBox(self.items)
-                self.top.body.focus_position = self._cur_focus(fpo)
-                self.compact = False if self.compact is True else True
-            elif k == 'p':
-                # Loop through available palettes
-                self.palette_idx += 1
-                try:
-                    self.loop.screen.register_palette(self.palettes[self.palette_idx])
-                except IndexError:
-                    self.loop.screen.register_palette(self.palettes[0])
-                    self.palette_idx = 0
-                self.loop.screen.clear()
-            elif k == 'P':
-                # Create ~/.config/urlscan/config.json if if doesn't exist
-                if not exists(self.conf):
-                    try:
-                        # Python 2/3 compatible recursive directory creation
-                        os.makedirs(dirname(expanduser(self.conf)))
-                    except OSError as err:
-                        if errno.EEXIST != err.errno:
-                            raise
-                    names = ["default", "bw"]
-                    with open(expanduser(self.conf), 'w') as pals:
-                        pals.writelines(json.dumps(dict(zip(names,
-                                                            self.palettes)),
-                                                   indent=4))
-                    self._footer_start_thread("Created ~/.config/urlscan/config.json", 5)
-                else:
-                    self._footer_start_thread("Config.json already exists", 5)
+        if self.search is True:
+            if self.enter is False and self.no_matches is False:
+                if len(key) == 1 and key.isprintable():
+                    self.search_string += key
+                self._search()
+            return
+        if key in ('q', 'Q'):
+            raise urwid.ExitMainLoop()
+        elif not self.urls:
+            pass  # No other actions are useful with no URLs
+        elif key == '/':
+            if self.urls:
+                self.search = True
+                if self.compact is True:
+                    self.compact = False
+                    self.items, self.items_com = self.items_com, self.items
             else:
-                self.top.keypress(size, k)
+                return
+            self.no_matches = False
+            self.search_string = ""
+            footerwid = urwid.AttrMap(urwid.Text("Search: "), 'footer')
+            self.top.footer = footerwid
+            self.items = self.items_orig
+            self.top.body = urwid.ListBox(self.items)
+        elif key.isdigit():
+            self.number += key
+            try:
+                if self.compact is False:
+                    self.top.body.focus_position = \
+                        self.items.index(self.items_com[max(int(self.number) - 1, 0)])
+                else:
+                    self.top.body.focus_position = \
+                        self.items.index(self.items[max(int(self.number) - 1, 0)])
+            except IndexError:
+                self.number = self.number[:-1]
+            self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
+            if self.number:
+                self._footer_start_thread("Selection: {}".format(self.number), 1)
+        elif key == 'ctrl l':
+            self.draw_screen(size)
+        elif key == 'j':
+            self.top.keypress(size, "down")
+        elif key == 'k':
+            self.top.keypress(size, "up")
+        elif key == 'g':
+            # Goto top of the list
+            self.top.body.focus_position = 2 if self.compact is False else 0
+            self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
+        elif key == 'G':
+            # Goto bottom of the list
+            self.top.body.focus_position = len(self.items) - 1
+            self.top.keypress(size, "")  # Trick urwid into redisplaying the cursor
+        elif key == 's':
+            # Toggle shortened URL for selected item
+            fpo = self.top.body.focus_position
+            url_idx = len([i for i in self.items[:fpo + 1]
+                           if isinstance(i, urwid.Columns)]) - 1
+            if self.compact is False and fpo <= 1:
+                return
+            url = self.urls[url_idx]
+            short = False if "..." in self.items[fpo][1].label else True
+            self.items[fpo][1].set_label(shorten_url(url, size[0], short))
+        elif key in ('S', 'u'):
+            # Toggle all shortened or escaped URLs
+            if key == 'S':
+                self.shorten = False if self.shorten is True else True
+            if key == 'u':
+                self.unesc = False if self.unesc is True else True
+                self.urls, self.urls_unesc = self.urls_unesc, self.urls
+            urls = iter(self.urls)
+            for item in self.items:
+                # Each Column has (Text, Button). Update the Button label
+                if isinstance(item, urwid.Columns):
+                    item[1].set_label(shorten_url(next(urls),
+                                                  size[0],
+                                                  self.shorten))
+        elif key == 'c':
+            # Show/hide context
+            if self.search_string:
+                # Reset search when toggling compact mode
+                footerwid = urwid.AttrMap(urwid.Text(""), 'default')
+                self.top.footer = footerwid
+                self.search_string = ""
+                self.items = self.items_orig
+            fpo = self.top.body.focus_position
+            self.items, self.items_com = self.items_com, self.items
+            self.top.body = urwid.ListBox(self.items)
+            self.top.body.focus_position = self._cur_focus(fpo)
+            self.compact = False if self.compact is True else True
+        elif key == 'p':
+            # Loop through available palettes
+            self.palette_idx += 1
+            try:
+                self.loop.screen.register_palette(self.palettes[self.palette_idx])
+            except IndexError:
+                self.loop.screen.register_palette(self.palettes[0])
+                self.palette_idx = 0
+            self.loop.screen.clear()
+        elif key == 'P':
+            # Create ~/.config/urlscan/config.json if if doesn't exist
+            if not exists(self.conf):
+                try:
+                    # Python 2/3 compatible recursive directory creation
+                    os.makedirs(dirname(expanduser(self.conf)))
+                except OSError as err:
+                    if errno.EEXIST != err.errno:
+                        raise
+                names = ["default", "bw"]
+                with open(expanduser(self.conf), 'w') as pals:
+                    pals.writelines(json.dumps(dict(zip(names,
+                                                        self.palettes)),
+                                               indent=4))
+                self._footer_start_thread("Created ~/.config/urlscan/config.json", 5)
+            else:
+                self._footer_start_thread("Config.json already exists", 5)
 
     def _footer_start_thread(self, text, time):
         """Display given text in the footer. Clears after <time> seconds
@@ -260,7 +337,13 @@ class URLChooser:
         """
         sleep(time)
         self.number = ""  # Clear URL selection number
-        footerwid = urwid.AttrMap(urwid.Text(""), "default")
+        text = "Search: {}".format(self.search_string)
+        if self.search_string:
+            footer = 'search'
+        else:
+            footer = 'default'
+            text = ""
+        footerwid = urwid.AttrMap(urwid.Text(text), footer)
         self.top.footer = footerwid
         size = self.tui.get_cols_rows()
         self.draw_screen(size)
@@ -276,6 +359,39 @@ class URLChooser:
                    if isinstance(i[1], urwid.Columns)][fpo][0]
         return idx
 
+    def _search(self):
+        """ Search - search URLs and text.
+
+        """
+        text = "Search: {}".format(self.search_string)
+        footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
+        self.top.footer = footerwid
+        search_items = []
+        for grp in self.items_org:
+            done = False
+            for item in grp:
+                if isinstance(item, urwid.Columns):
+                    if self.search_string.lower() in item[1].label.lower():
+                        search_items.extend(grp)
+                        done = True
+                elif isinstance(item, urwid.Text):
+                    if self.search_string.lower() in item.text.lower():
+                        search_items.extend(grp)
+                        done = True
+                if done is True:
+                    break
+        self.items = search_items
+        self.top.body = urwid.ListBox(self.items)
+        if self.items:
+            self.top.body.focus_position = 2 if self.compact is False else 0
+            # Trick urwid into redisplaying the cursor
+            self.top.keypress(self.tui.get_cols_rows(), "")
+            self.no_matches = False
+        else:
+            self.no_matches = True
+            footerwid = urwid.AttrMap(urwid.Text(text + "  No Matches"), 'footer')
+            self.top.footer = footerwid
+
     def draw_screen(self, size):
         """Render curses screen
 
@@ -283,6 +399,9 @@ class URLChooser:
         self.tui.clear()
         canvas = self.top.render(size, focus=True)
         self.tui.draw_screen(size, canvas)
+
+    def _get_search(self):
+        return lambda: self.search, lambda: self.enter
 
     def mkbrowseto(self, url):
         """Create the urwid callback function to open the web browser or call
@@ -302,7 +421,14 @@ class URLChooser:
             webbrowser._tryorder.insert(0, webbrowser._tryorder.pop(try_idx))
 
         def browse(*args):
-            if not self.run:
+            # double ()() to ensure self.search evaluated at runtime, not when
+            # browse() is _created_. [0] is self.search, [1] is self.enter
+            # self.enter prevents opening URL when in search mode
+            if self._get_search()[0]() is True:
+                if self._get_search()[1]() is True:
+                    self.search = False
+                    self.enter = False
+            elif not self.run:
                 webbrowser.open(url)
             else:
                 Popen(self.run.format(url), shell=True).communicate()

@@ -41,6 +41,8 @@ Relative to urlview, urlscan has the following additional features:
 
 - Jump to a URL by typing the number.
 
+- Incremental case-insensitive search with `/`.
+
 - Execute an arbitrary function (for example, copy URL to clipboard) instead of
   opening URL in a browser.
 
