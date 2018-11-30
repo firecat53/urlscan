@@ -22,6 +22,7 @@ import errno
 import json
 import os
 from os.path import dirname, exists, expanduser
+import re
 from subprocess import Popen
 from threading import Thread
 from time import sleep
@@ -65,6 +66,27 @@ def grp_list(items):
     return res[1:]
 
 
+def splittext(text, search, attr):
+    """Split a text string by search string and add Urwid display attribute to
+    the search term.
+
+    Args: text - string
+          search - search string
+          attr - attribute string to add
+
+    Returns: urwid markup list ["string", ("default", " mo"), "re string"]
+             for search="mo", text="string more string" and attr="default"
+
+    """
+    if search:
+        pat = re.compile("({})".format(re.escape(search)), re.IGNORECASE)
+    else:
+        return text
+    final = pat.split(text)
+    final = [(attr, i) if i.lower() == search.lower() else i for i in final]
+    return final
+
+
 class URLChooser:
 
     def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True,
@@ -91,7 +113,7 @@ class URLChooser:
         # Default black & white palette
         self.palettes.append([('header', 'black', 'light gray', 'standout'),
                               ('footer', 'black', 'light gray', 'standout'),
-                              ('search', 'white', 'black', 'standout'),
+                              ('search', 'black', 'light gray', 'standout'),
                               ('msgtext', '', ''),
                               ('msgtext:ellipses', 'white', 'black'),
                               ('urlref:number:braces', 'white', 'black'),
@@ -223,6 +245,8 @@ class URLChooser:
                 return
             self.no_matches = False
             self.search_string = ""
+            # Reset the search highlighting
+            self._search()
             footerwid = urwid.AttrMap(urwid.Text("Search: "), 'footer')
             self.top.footer = footerwid
             self.items = self.items_orig
@@ -369,17 +393,25 @@ class URLChooser:
         search_items = []
         for grp in self.items_org:
             done = False
-            for item in grp:
+            for idx, item in enumerate(grp):
                 if isinstance(item, urwid.Columns):
-                    if self.search_string.lower() in item[1].label.lower():
-                        search_items.extend(grp)
-                        done = True
+                    for col_idx, col in enumerate(item.contents):
+                        if isinstance(col[0], urwid.decoration.AttrMap):
+                            grp[idx][col_idx].set_label(splittext(col[0].base_widget.label,
+                                                                  self.search_string,
+                                                                  ''))
+                            if self.search_string.lower() in col[0].base_widget.label.lower():
+                                grp[idx][col_idx].set_label(splittext(col[0].base_widget.label,
+                                                                      self.search_string,
+                                                                      'search'))
+                                done = True
                 elif isinstance(item, urwid.Text):
+                    grp[idx].set_text(splittext(item.text, self.search_string, ''))
                     if self.search_string.lower() in item.text.lower():
-                        search_items.extend(grp)
+                        grp[idx].set_text(splittext(item.text, self.search_string, 'search'))
                         done = True
-                if done is True:
-                    break
+            if done is True:
+                search_items.extend(grp)
         self.items = search_items
         self.top.body = urwid.ListBox(self.items)
         if self.items:
