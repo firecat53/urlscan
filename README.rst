@@ -49,6 +49,9 @@ Relative to urlview, urlscan has the following additional features:
 - Configure colors via ~/.config/urlscan/config.json. Generate default config
   file for editing with `P`. Cycle through available palettes with `p`.
 
+- Run a command with the selected URL as the argument or pipe the selected
+  URL to a command.
+
 Installation and setup
 ----------------------
 
@@ -82,7 +85,7 @@ Command Line usage
 
 ::
 
-    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] <file>
+    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-p, --pipe] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
@@ -90,6 +93,10 @@ output a list of URLs/email addressess to stdout. The '-c' flag removes the
 context from around the URLs in the curses browser, and the '-d' flag removes
 duplicate URLs. Files can also be piped to urlscan using normal shell pipe
 mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
+
+Instead of opening a web browser, the selected URL can be passed as the
+argument to a command using `--run <command>`. Alternatively, the URL can be
+piped to the command using `--run <command> --pipe`.
 
 Theming
 -------

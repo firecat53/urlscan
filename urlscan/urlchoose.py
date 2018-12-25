@@ -23,7 +23,9 @@ import json
 import os
 from os.path import dirname, exists, expanduser
 import re
-from subprocess import Popen
+import shlex
+from subprocess import Popen, PIPE
+import sys
 from threading import Thread
 from time import sleep
 import webbrowser
@@ -90,7 +92,7 @@ def splittext(text, search, attr):
 class URLChooser:
 
     def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True,
-                 run=""):
+                 run="", pipe=False):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.palettes = []
         try:
@@ -124,6 +126,7 @@ class URLChooser:
         self.shorten = shorten
         self.compact = compact
         self.run = run
+        self.pipe = pipe
         self.search = False
         self.search_string = ""
         self.no_matches = False
@@ -462,8 +465,12 @@ class URLChooser:
                     self.enter = False
             elif not self.run:
                 webbrowser.open(url)
+            elif self.run and self.pipe:
+                process = Popen(shlex.split(self.run), stdout=PIPE, stdin=PIPE)
+                process.communicate(input=url.encode(sys.getdefaultencoding()))
             else:
                 Popen(self.run.format(url), shell=True).communicate()
+
             size = self.tui.get_cols_rows()
             self.draw_screen(size)
         return browse

@@ -55,6 +55,9 @@ def parse_arguments():
                            "instead of opening URL in browser. Use {} to "
                            "represent the URL value in the expression. "
                            "For example: --run 'echo {} | xclip -i'")
+    arg_parse.add_argument('--pipe', '-p', dest='pipe',
+                           action='store_true', default=False,
+                           help='Pipe URL into the command specified by --run')
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     return arg_parse.parse_args()
@@ -174,7 +177,8 @@ def main():
         tui = urlchoose.URLChooser(urlscan.msgurls(msg),
                                    compact=args.compact,
                                    dedupe=args.dedupe,
-                                   run=args.run)
+                                   run=args.run,
+                                   pipe=args.pipe)
         tui.main()
     else:
         out = urlchoose.URLChooser(urlscan.msgurls(msg),
