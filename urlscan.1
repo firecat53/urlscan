@@ -71,7 +71,9 @@ Execute \<expression\> in place of opening URL with a browser. Use {} in
     $ urlscan --run 'echo {} | xclip -i' file.txt
 .TP
 .B \-p, \-\-pipe
-Pipe the selected URL to the command specified by `--run`. Example:
+Pipe the selected URL to the command specified by `--run`. This is preferred
+when the command supports it, as it is more secure and tolerant of special
+characters in the URL. Example:
 
     $ urlscan --run 'xclip -i' --pipe file.txt
 

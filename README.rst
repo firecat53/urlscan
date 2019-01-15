@@ -96,7 +96,9 @@ mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
 
 Instead of opening a web browser, the selected URL can be passed as the
 argument to a command using `--run <command>`. Alternatively, the URL can be
-piped to the command using `--run <command> --pipe`.
+piped to the command using `--run <command> --pipe`. Using --run with --pipe is
+preferred if the command supports it, as it is marginally more secure and
+tolerant of special characters in the URL.
 
 Theming
 -------
