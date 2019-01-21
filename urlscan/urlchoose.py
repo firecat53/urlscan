@@ -149,6 +149,7 @@ class URLChooser:
         header = (":: q - Quit :: "
                   "/ - search :: "
                   "c - context :: "
+                  "C - copy to clipboard :: "
                   "s - URL short :: "
                   "S - all URL short :: "
                   "g/G - top/bottom :: "
@@ -223,7 +224,7 @@ class URLChooser:
         return [i for i in keys if i != 'backspace']
 
     def unhandled(self, key):
-        """Add other keyboard actions (q, j, k, s, S, c, g, G) not handled by
+        """Add other keyboard actions (q, j, k, s, S, c, C, g, G) not handled by
         the ListBox widget.
 
         """
@@ -319,6 +320,23 @@ class URLChooser:
             self.top.body = urwid.ListBox(self.items)
             self.top.body.focus_position = self._cur_focus(fpo)
             self.compact = not self.compact
+        elif key == 'C':
+            # Copy highlighted url to clipboard
+            fpo = self.top.body.focus_position
+            url_idx = len([i for i in self.items[:fpo + 1]
+                           if isinstance(i, urwid.Columns)]) - 1
+            if self.compact is False and fpo <= 1:
+                return
+            url = self.urls[url_idx]
+            cmds = ("xsel -i", "xclip -i")
+            for cmd in cmds:
+                try:
+                    proc = Popen(shlex.split(cmd), stdin=PIPE)
+                    proc.communicate(input=url.encode(sys.getdefaultencoding()))
+                    self._footer_start_thread("Copied url to primary selection", 5)
+                except OSError:
+                    continue
+                break
         elif key == 'p':
             # Loop through available palettes
             self.palette_idx += 1

@@ -49,6 +49,8 @@ Relative to urlview, urlscan has the following additional features:
 - Configure colors via ~/.config/urlscan/config.json. Generate default config
   file for editing with `P`. Cycle through available palettes with `p`.
 
+- Copy URL to clipboard (primary) with `C`. Requires xsel or xclip.
+
 - Run a command with the selected URL as the argument or pipe the selected
   URL to a command.
 
