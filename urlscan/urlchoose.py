@@ -295,9 +295,9 @@ class URLChooser:
         elif key in ('S', 'u'):
             # Toggle all shortened or escaped URLs
             if key == 'S':
-                self.shorten = False if self.shorten is True else True
+                self.shorten = not self.shorten
             if key == 'u':
-                self.unesc = False if self.unesc is True else True
+                self.unesc = not self.unesc
                 self.urls, self.urls_unesc = self.urls_unesc, self.urls
             urls = iter(self.urls)
             for item in self.items:
@@ -318,7 +318,7 @@ class URLChooser:
             self.items, self.items_com = self.items_com, self.items
             self.top.body = urwid.ListBox(self.items)
             self.top.body.focus_position = self._cur_focus(fpo)
-            self.compact = False if self.compact is True else True
+            self.compact = not self.compact
         elif key == 'p':
             # Loop through available palettes
             self.palette_idx += 1
