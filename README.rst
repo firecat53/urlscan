@@ -57,8 +57,8 @@ Relative to urlview, urlscan has the following additional features:
 Installation and setup
 ----------------------
 
-To install urlscan, install from your distribution repositories, from Pypi,
-install the `Archlinux Package`_ , or install from source using setup.py.
+To install urlscan, install from your distribution repositories (Archlinux),
+from Pypi, or install from source using setup.py.
 
 .. NOTE::
 
@@ -126,5 +126,4 @@ Known bugs and limitations
   sub-parts, rather than just picking one, which may lead to URLs and context
   appearing twice. (Bypass this by selecting the '--dedupe' option)
 
-.. _Archlinux Package: https://aur.archlinux.org/packages/urlscan-git/
 .. _Urwid display attributes: http://urwid.org/manual/displayattributes.html#display-attributes
