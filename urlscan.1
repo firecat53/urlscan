@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "January 14, 2019"
+.TH URLSCAN 1 "February 7, 2019"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -53,11 +53,16 @@ for options and allowed values.
 \fB8.\fR Run a command with the selected URL as the argument or pipe the selected
   URL to a command using the `--run` and `--pipe` arguments.
 
+\fB9.\fR `F1` shows/hides the help menu.
+
 .SH OPTIONS
 .TP
 .B \-c, \-\-compact
 Display a simple list of the extracted URLs, instead of showing the
 context of each URL. Also toggle with `c` from within the viewer.
+.TP
+.B \-H, \-\-nohelp
+Start with help menu hidden.
 .TP
 .B \-d, \-\-dedupe
 Remove duplicated URLs from the list of URLs.

@@ -58,6 +58,9 @@ def parse_arguments():
     arg_parse.add_argument('--pipe', '-p', dest='pipe',
                            action='store_true', default=False,
                            help='Pipe URL into the command specified by --run')
+    arg_parse.add_argument('--nohelp', '-H', dest='nohelp',
+                           action='store_true', default=False,
+                           help='Hide help menu by default')
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     return arg_parse.parse_args()
@@ -176,6 +179,7 @@ def main():
     if args.nobrowser is False:
         tui = urlchoose.URLChooser(urlscan.msgurls(msg),
                                    compact=args.compact,
+                                   nohelp=args.nohelp,
                                    dedupe=args.dedupe,
                                    run=args.run,
                                    pipe=args.pipe)

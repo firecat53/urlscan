@@ -54,6 +54,8 @@ Relative to urlview, urlscan has the following additional features:
 - Run a command with the selected URL as the argument or pipe the selected
   URL to a command.
 
+- Show/hide help with `F1`.
+
 Installation and setup
 ----------------------
 

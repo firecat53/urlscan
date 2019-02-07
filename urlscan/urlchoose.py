@@ -91,8 +91,8 @@ def splittext(text, search, attr):
 
 class URLChooser:
 
-    def __init__(self, extractedurls, compact=False, dedupe=False, shorten=True,
-                 run="", pipe=False):
+    def __init__(self, extractedurls, compact=False, nohelp=False, dedupe=False,
+                 shorten=True, run="", pipe=False):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.palettes = []
         try:
@@ -146,19 +146,23 @@ class URLChooser:
         # Store items grouped into sections
         self.items_org = grp_list(self.items)
         listbox = urwid.ListBox(self.items)
-        header = (":: q - Quit :: "
-                  "/ - search :: "
-                  "c - context :: "
-                  "C - copy to clipboard :: "
-                  "s - URL short :: "
-                  "S - all URL short :: "
-                  "g/G - top/bottom :: "
-                  "<num> - jump to <num> :: "
-                  "p - cycle palettes :: "
-                  "P - create config file ::"
-                  "u - unescape URL ::")
-        headerwid = urwid.AttrMap(urwid.Text(header), 'header')
-        self.top = urwid.Frame(listbox, headerwid)
+        self.header = (":: q - Quit :: "
+                       "/ - search :: "
+                       "F1 - show/hide help :: "
+                       "c - context :: "
+                       "C - copy to clipboard :: "
+                       "s - URL short :: "
+                       "S - all URL short :: "
+                       "g/G - top/bottom :: "
+                       "<num> - jump to <num> :: "
+                       "p - cycle palettes :: "
+                       "P - create config file ::"
+                       "u - unescape URL ::")
+        if nohelp is False:
+            self.headerwid = urwid.AttrMap(urwid.Text(self.header), 'header')
+        else:
+            self.headerwid = None
+        self.top = urwid.Frame(listbox, self.headerwid)
         if self.urls:
             self.top.body.focus_position = \
                 (2 if self.compact is False else 0)
@@ -239,6 +243,12 @@ class URLChooser:
             raise urwid.ExitMainLoop()
         elif not self.urls:
             pass  # No other actions are useful with no URLs
+        elif key == 'f1':
+            if self.headerwid is None:
+                self.headerwid = urwid.AttrMap(urwid.Text(self.header), 'header')
+            else:
+                self.headerwid = None
+            self.top.header = self.headerwid
         elif key == '/':
             if self.urls:
                 self.search = True
