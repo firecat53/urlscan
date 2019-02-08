@@ -121,35 +121,49 @@ class URLChooser:
                      's': self._shorten,
                      'u': self._all_escape
                      }
-        self.palettes = []
+        self.palettes = {}
+        # Default color palette
+        default = [('header', 'white', 'dark blue', 'standout'),
+                   ('footer', 'white', 'dark red', 'standout'),
+                   ('search', 'white', 'dark green', 'standout'),
+                   ('msgtext', '', ''),
+                   ('msgtext:ellipses', 'light gray', 'black'),
+                   ('urlref:number:braces', 'light gray', 'black'),
+                   ('urlref:number', 'yellow', 'black', 'standout'),
+                   ('urlref:url', 'white', 'black', 'standout'),
+                   ('url:sel', 'white', 'dark blue', 'bold')]
+        # Default black & white palette
+        blw = [('header', 'black', 'light gray', 'standout'),
+               ('footer', 'black', 'light gray', 'standout'),
+               ('search', 'black', 'light gray', 'standout'),
+               ('msgtext', '', ''),
+               ('msgtext:ellipses', 'white', 'black'),
+               ('urlref:number:braces', 'white', 'black'),
+               ('urlref:number', 'white', 'black', 'standout'),
+               ('urlref:url', 'white', 'black', 'standout'),
+               ('url:sel', 'black', 'light gray', 'bold')]
+        self.palettes.update([("default", default), ("bw", blw)])
         try:
             with open(self.conf, 'r') as conf_file:
                 data = json.load(conf_file)
-                for pal in data.values():
-                    self.palettes.append([tuple(i) for i in pal])
+                try:
+                    for pal_name, pal in data['palettes'].items():
+                        self.palettes.update([(pal_name, [tuple(i) for i in pal])])
+                except KeyError:
+                    pass
+                try:
+                    items = data['keys'].items()
+                    for key, value in items:
+                        if value:
+                            value = getattr(self, "_{}".format(value))
+                        else:
+                            del self.keys[key]
+                            continue
+                        self.keys.update([(key, value)])
+                except KeyError:
+                    pass
         except FileNotFoundError:
             pass
-        # Default color palette
-        self.palettes.append([('header', 'white', 'dark blue', 'standout'),
-                              ('footer', 'white', 'dark red', 'standout'),
-                              ('search', 'white', 'dark green', 'standout'),
-                              ('msgtext', '', ''),
-                              ('msgtext:ellipses', 'light gray', 'black'),
-                              ('urlref:number:braces', 'light gray', 'black'),
-                              ('urlref:number', 'yellow', 'black', 'standout'),
-                              ('urlref:url', 'white', 'black', 'standout'),
-                              ('url:sel', 'white', 'dark blue', 'bold')])
-        # Default black & white palette
-        self.palettes.append([('header', 'black', 'light gray', 'standout'),
-                              ('footer', 'black', 'light gray', 'standout'),
-                              ('search', 'black', 'light gray', 'standout'),
-                              ('msgtext', '', ''),
-                              ('msgtext:ellipses', 'white', 'black'),
-                              ('urlref:number:braces', 'white', 'black'),
-                              ('urlref:number', 'white', 'black', 'standout'),
-                              ('urlref:url', 'white', 'black', 'standout'),
-                              ('url:sel', 'black', 'light gray', 'bold')])
-
         self.shorten = shorten
         self.compact = compact
         self.run = run
@@ -194,6 +208,7 @@ class URLChooser:
             self.top.body.focus_position = \
                 (2 if self.compact is False else 0)
         self.tui = urwid.curses_display.Screen()
+        self.palette_names = list(self.palettes.keys())
         self.palette_idx = 0
         self.number = ""
 
@@ -201,7 +216,7 @@ class URLChooser:
         """Urwid main event loop
 
         """
-        self.loop = urwid.MainLoop(self.top, self.palettes[0], screen=self.tui,
+        self.loop = urwid.MainLoop(self.top, self.palettes[self.palette_names[0]], screen=self.tui,
                                    handle_mouse=False, input_filter=self.handle_keys,
                                    unhandled_input=self.unhandled)
         self.loop.run()
@@ -419,9 +434,9 @@ class URLChooser:
         # Loop through available palettes
         self.palette_idx += 1
         try:
-            self.loop.screen.register_palette(self.palettes[self.palette_idx])
+            self.loop.screen.register_palette(self.palettes[self.palette_names[self.palette_idx]])
         except IndexError:
-            self.loop.screen.register_palette(self.palettes[0])
+            self.loop.screen.register_palette(self.palettes[self.palette_names[0]])
             self.palette_idx = 0
         self.loop.screen.clear()
 
@@ -435,10 +450,10 @@ class URLChooser:
             except OSError as err:
                 if errno.EEXIST != err.errno:
                     raise
-            names = ["default", "bw"]
+            keys = dict(zip(self.keys.keys(),
+                            [i.__name__.strip('_') for i in self.keys.values()]))
             with open(expanduser(self.conf), 'w') as pals:
-                pals.writelines(json.dumps(dict(zip(names,
-                                                    self.palettes)),
+                pals.writelines(json.dumps({"palettes": self.palettes, "keys": keys},
                                            indent=4))
             self._footer_start_thread("Created ~/.config/urlscan/config.json", 5)
         else:
