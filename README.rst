@@ -46,8 +46,9 @@ Relative to urlview, urlscan has the following additional features:
 - Execute an arbitrary function (for example, copy URL to clipboard) instead of
   opening URL in a browser.
 
-- Configure colors via ~/.config/urlscan/config.json. Generate default config
-  file for editing with `P`. Cycle through available palettes with `p`.
+- Configure colors and keybindings via ~/.config/urlscan/config.json. Generate
+  default config file for editing with `P`. Cycle through available palettes
+  with `p`.
 
 - Copy URL to clipboard (primary) with `C`. Requires xsel or xclip.
 
@@ -61,6 +62,12 @@ Installation and setup
 
 To install urlscan, install from your distribution repositories (Archlinux),
 from Pypi, or install from source using setup.py.
+
+    pip install --user urlscan
+
+    OR
+
+    python setup.py install --user
 
 .. NOTE::
 
@@ -89,7 +96,7 @@ Command Line usage
 
 ::
 
-    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-p, --pipe] <file>
+    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-p, --pipe] [-H, --nohelp] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
@@ -111,6 +118,30 @@ Press 'P' from urlscan to generate ~/.config/urlscan/config.json with the
 default color and black & white palettes. This can be edited or added to, as
 desired. The first palette in the list will be the default. Configure the
 palettes according to the `Urwid display attributes`_.
+
+Keybindings
+-----------
+
+Press `P` in urlscan to generate ~/.config/urlscan/config.json. All of the keys
+will be listed. You can either leave them, or delete any that will not be
+altered. To unset a binding, set it equal to "". The follow actions are
+supported:
+
+- "all_escape" -- toggle unescape all URLs
+- "all_shorten" -- toggle shorten all URLs
+- "bottom" -- move cursor to last item
+- "clear_screen" -- redraw screen
+- "clipboard" -- copy highlighted URL to clipboard using xsel/xclip
+- "config_create" -- create ~/.config/urlscan/config.json
+- "context" -- show/hide context
+- "digits" -- just the list numbers to jump to. Not really for use.
+- "down" -- cursor down
+- "help_menu" -- show/hide help menu
+- "palette" -- cycle through palettes
+- "quit" -- quit
+- "shorten" -- toggle shorten highlighted URL
+- "top" -- move to first list item
+- "up" -- cursor up
 
 Known bugs and limitations
 --------------------------

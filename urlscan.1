@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "February 7, 2019"
+.TH URLSCAN 1 "February 9, 2019"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -42,11 +42,11 @@ search term. `/` again resets search.
 
 \fB6.\fR Cycle through all available palettes (color and black & white available
 by default) using `p`. `P` will generate a ~/.config/urlscan/config.json file
-for editing or adding additional pallettes. See
+for editing or adding additional pallettes and keybindings. See
 
 http://urwid.org/manual/displayattributes.html#display-attributes
 
-for options and allowed values.
+for color options and allowed values.
 
 \fB7.\fR `u` will unescape the highlighted URL if necessary.
 
@@ -103,6 +103,44 @@ selected message.
 
 Alternately, you can pipe a message into urlscan using the '|' operator. This
 can be useful for applying a different flag (such as the '-d' or '-c' options).
+
+.SH KEYBINDINGS
+
+Press `P` in urlscan to generate ~/.config/urlscan/config.json. All of the keys
+will be listed. You can either leave them, or delete any that will not be
+altered. To unset a binding, set it equal to "". The follow actions are
+supported:
+
+.TP
+\fBall_escape\fR \-\- toggle unescape all URLs
+.TP
+\fBall_shorten\fR \-\- toggle shorten all URLs
+.TP
+\fBbottom\fR \-\- move cursor to last item
+.TP
+\fBclear_screen\fR \-\- redraw screen
+.TP
+\fBclipboard\fR \-\- copy highlighted URL to clipboard using xsel/xclip
+.TP
+\fBconfig_create\fR \-\- create ~/.config/urlscan/config.json
+.TP
+\fBcontext\fR \-\- show/hide context
+.TP
+\fBdigits\fR \-\- just the list numbers to jump to. Not really for use.
+.TP
+\fBdown\fR \-\- cursor down
+.TP
+\fBhelp_menu\fR \-\- show/hide help menu
+.TP
+\fBpalette\fR \-\- cycle through palettes
+.TP
+\fBquit\fR \-\- quit
+.TP
+\fBshorten\fR \-\- toggle shorten highlighted URL
+.TP
+\fBtop\fR \-\- move to first list item
+.TP
+\fBup\fR \-\- cursor up
 
 .SH FILES
 
