@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "February 9, 2019"
+.TH URLSCAN 1 "February 10, 2019"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -30,30 +30,30 @@ additional features:
 and base64.
 
 \fB2.\fR Extraction and display of the context surrounding each URL. Toggle
-context view on/off with `c`.
+context view on/off with \fBc\fR.
 
-\fB3.\fR Copy current URL to clipboard primary selection with `C`.
+\fB3.\fR Copy current URL to clipboard primary selection with \fBC\fR.
 
 \fB4.\fR URLs are shortened by default to fit on one line. Toggle one or all
-shortened URLs with `s` or `S`.
+shortened URLs with \fBs\fR or \fBS\fR.
 
-\fB5.\fR Incremental case-insensitive search using `/`. Footer shows current
-search term. `/` again resets search.
+\fB5.\fR Incremental case-insensitive search using \fB/\fR. Footer shows current
+search term. \fB/\fR again resets search.
 
 \fB6.\fR Cycle through all available palettes (color and black & white available
-by default) using `p`. `P` will generate a ~/.config/urlscan/config.json file
-for editing or adding additional pallettes and keybindings. See
+by default) using \fBp\fR. \fBP\fR will generate a ~/.config/urlscan/config.json
+file for editing or adding additional pallettes and keybindings. See
 
 http://urwid.org/manual/displayattributes.html#display-attributes
 
 for color options and allowed values.
 
-\fB7.\fR `u` will unescape the highlighted URL if necessary.
+\fB7.\fR \fBu\fR will unescape the highlighted URL if necessary.
 
 \fB8.\fR Run a command with the selected URL as the argument or pipe the selected
-  URL to a command using the `--run` and `--pipe` arguments.
+  URL to a command using the \fB--run\fR and \fB--pipe\fR arguments.
 
-\fB9.\fR `F1` shows the help menu.
+\fB9.\fR \fBF1\fR shows the help menu.
 
 .SH OPTIONS
 .TP
@@ -106,11 +106,13 @@ can be useful for applying a different flag (such as the '-d' or '-c' options).
 
 .SH KEYBINDINGS
 
-Press `P` in urlscan to generate ~/.config/urlscan/config.json. All of the keys
-will be listed. You can either leave them, or delete any that will not be
-altered. To unset a binding, set it equal to "". The follow actions are
-supported:
+Press \fBP\fR in urlscan to generate ~/.config/urlscan/config.json. All of the
+keys will be listed. You can either leave in place or delete any that will not be
+altered.
 
+To unset a binding, set it equal to "". For example: \fB"P": ""\fR
+
+The follow actions are supported:
 .TP
 \fBall_escape\fR \-\- toggle unescape all URLs (Default: \fBu\fR)
 .TP
