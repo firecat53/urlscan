@@ -187,18 +187,9 @@ class URLChooser:
         # Store items grouped into sections
         self.items_org = grp_list(self.items)
         listbox = urwid.ListBox(self.items)
-        self.header = (":: q - Quit :: "
-                       "/ - search :: "
-                       "F1 - show/hide help :: "
-                       "c - context :: "
-                       "C - copy to clipboard :: "
-                       "s - URL short :: "
-                       "S - all URL short :: "
-                       "g/G - top/bottom :: "
-                       "<num> - jump to <num> :: "
-                       "p - cycle palettes :: "
-                       "P - create config file ::"
-                       "u - unescape URLs ::")
+        self.header = (":: F1 - help/keybindings :: "
+                       ":: q - quit :: "
+                       "/ - search :: ")
         if nohelp is False:
             self.headerwid = urwid.AttrMap(urwid.Text(self.header), 'header')
         else:
@@ -211,6 +202,7 @@ class URLChooser:
         self.palette_names = list(self.palettes.keys())
         self.palette_idx = 0
         self.number = ""
+        self.help_menu = False
 
     def main(self):
         """Urwid main event loop
@@ -253,10 +245,16 @@ class URLChooser:
                 elif k == 'backspace':
                     self.search_string = self.search_string[:-1]
                     self._search()
-            elif k in ('enter', ' ') and self.urls and self.search is False:
+            elif k in ('enter', ' ') and \
+                    self.urls and \
+                    self.search is False and \
+                    self.help_menu is False:
                 load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
                 if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
                     self._footer_start_thread(load_text, 5)
+            elif self.help_menu is True:
+                self._help_menu()
+                return []
             if k == 'up':
                 # Works around bug where the up arrow goes higher than the top list
                 # item and unintentionally triggers context and palette switches.
@@ -283,11 +281,11 @@ class URLChooser:
             return
         if not self.urls and key not in "Qq":
             return  # No other actions are useful with no URLs
-        try:
-            self.keys[key]()
-        except KeyError:
-            pass
-
+        if self.help_menu is False:
+            try:
+                self.keys[key]()
+            except KeyError:
+                pass
 
     def _quit(self):
         """q/Q"""
@@ -295,11 +293,34 @@ class URLChooser:
 
     def _help_menu(self):
         """F1"""
-        if self.headerwid is None:
-            self.headerwid = urwid.AttrMap(urwid.Text(self.header), 'header')
+        if self.help_menu is False:
+            self.focus_pos_saved = self.top.body.focus_position
+            help_men = "\n".join(["{} - {}".format(i, j.__name__.strip('_'))
+                                  for i, j in self.keys.items() if j.__name__ !=
+                                  '_digits'])
+            help_men = "KEYBINDINGS\n" + help_men + "\n<0-9> - Jump to item"
+            docs = ("OPTIONS\n"
+                    "all_escape -- toggle unescape all URLs\n"
+                    "all_shorten -- toggle shorten all URLs\n"
+                    "bottom -- move cursor to last item\n"
+                    "clear_screen -- redraw screen\n"
+                    "clipboard -- copy highlighted URL to clipboard using xsel/xclip\n"
+                    "config_create -- create ~/.config/urlscan/config.json\n"
+                    "context -- show/hide context\n"
+                    "down -- cursor down\n"
+                    "help_menu -- show/hide help menu\n"
+                    "palette -- cycle through palettes\n"
+                    "quit -- quit\n"
+                    "shorten -- toggle shorten highlighted URL\n"
+                    "top -- move to first list item\n"
+                    "up -- cursor up\n")
+            self.top.body = \
+                    urwid.ListBox(urwid.SimpleListWalker([urwid.Columns([(30, urwid.Text(help_men)),
+                                                                         urwid.Text(docs)])]))
         else:
-            self.headerwid = None
-        self.top.header = self.headerwid
+            self.top.body = urwid.ListBox(self.items)
+            self.top.body.focus_position = self.focus_pos_saved
+        self.help_menu = not self.help_menu
 
     def _search_key(self):
         """ / """

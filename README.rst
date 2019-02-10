@@ -55,7 +55,7 @@ Relative to urlview, urlscan has the following additional features:
 - Run a command with the selected URL as the argument or pipe the selected
   URL to a command.
 
-- Show/hide help with `F1`.
+- Show complete help menu with `F1`. Hide header on startup with `--nohelp`.
 
 Installation and setup
 ----------------------
@@ -134,7 +134,6 @@ supported:
 - "clipboard" -- copy highlighted URL to clipboard using xsel/xclip
 - "config_create" -- create ~/.config/urlscan/config.json
 - "context" -- show/hide context
-- "digits" -- just the list numbers to jump to. Not really for use.
 - "down" -- cursor down
 - "help_menu" -- show/hide help menu
 - "palette" -- cycle through palettes
