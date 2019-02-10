@@ -127,20 +127,21 @@ will be listed. You can either leave them, or delete any that will not be
 altered. To unset a binding, set it equal to "". The follow actions are
 supported:
 
-- "all_escape" -- toggle unescape all URLs
-- "all_shorten" -- toggle shorten all URLs
-- "bottom" -- move cursor to last item
-- "clear_screen" -- redraw screen
-- "clipboard" -- copy highlighted URL to clipboard using xsel/xclip
-- "config_create" -- create ~/.config/urlscan/config.json
-- "context" -- show/hide context
-- "down" -- cursor down
-- "help_menu" -- show/hide help menu
-- "palette" -- cycle through palettes
-- "quit" -- quit
-- "shorten" -- toggle shorten highlighted URL
-- "top" -- move to first list item
-- "up" -- cursor up
+- "all_escape" -- toggle unescape all URLs (default: `u`)
+- "all_shorten" -- toggle shorten all URLs (default: `S`)
+- "bottom" -- move cursor to last item (default: `G`)
+- "clear_screen" -- redraw screen (default: `Ctrl-l`)
+- "clipboard" -- copy highlighted URL to clipboard using xsel/xclip (default: `C`)
+- "config_create" -- create ~/.config/urlscan/config.json (default: `P`)
+- "context" -- show/hide context (default: `c`)
+- "down" -- cursor down (default: `j`)
+- "help_menu" -- show/hide help menu (default: `F1`)
+- "open_url" -- open selected URL (default: `space` or `enter`)
+- "palette" -- cycle through palettes (default: `p`)
+- "quit" -- quit (default: `q` or `Q`)
+- "shorten" -- toggle shorten highlighted URL (default: `s`)
+- "top" -- move to first list item (default: `g`)
+- "up" -- cursor up (default: `k`)
 
 Known bugs and limitations
 --------------------------

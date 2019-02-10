@@ -155,6 +155,8 @@ class URLChooser:
                     items = data['keys'].items()
                     for key, value in items:
                         if value:
+                            if value == "open_url":
+                                urwid.Button._command_map._command[key] = 'activate'
                             value = getattr(self, "_{}".format(value))
                         else:
                             del self.keys[key]
@@ -172,6 +174,8 @@ class URLChooser:
         self.search_string = ""
         self.no_matches = False
         self.enter = False
+        self.activate_keys = [i for i, j in urwid.Button._command_map._command.items()
+                              if j == 'activate']
         self.items, self.urls = self.process_urls(extractedurls,
                                                   dedupe=dedupe,
                                                   shorten=self.shorten)
@@ -238,20 +242,17 @@ class URLChooser:
                         text = ""
                     footerwid = urwid.AttrMap(urwid.Text(text), footer)
                     self.top.footer = footerwid
-                elif k == ' ':
-                    self.search_string += " "
-                    footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
-                    self.top.footer = footerwid
+                elif k in self.activate_keys:
+                    self.search_string += k
+                    self._search()
                 elif k == 'backspace':
                     self.search_string = self.search_string[:-1]
                     self._search()
-            elif k in ('enter', ' ') and \
+            elif k in self.activate_keys and \
                     self.urls and \
                     self.search is False and \
                     self.help_menu is False:
-                load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
-                if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
-                    self._footer_start_thread(load_text, 5)
+                self._open_url()
             elif self.help_menu is True:
                 self._help_menu()
                 return []
@@ -291,6 +292,12 @@ class URLChooser:
         """q/Q"""
         raise urwid.ExitMainLoop()
 
+    def _open_url(self):
+        """<Enter> or <space>"""
+        load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
+        if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
+            self._footer_start_thread(load_text, 5)
+
     def _help_menu(self):
         """F1"""
         if self.help_menu is False:
@@ -309,6 +316,7 @@ class URLChooser:
                     "context -- show/hide context\n"
                     "down -- cursor down\n"
                     "help_menu -- show/hide help menu\n"
+                    "open_url -- open selected URL\n"
                     "palette -- cycle through palettes\n"
                     "quit -- quit\n"
                     "shorten -- toggle shorten highlighted URL\n"
