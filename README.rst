@@ -146,6 +146,11 @@ The follow actions are supported:
 - `top` -- move to first list item (default: `g`)
 - `up` -- cursor up (default: `k`)
 
+Update TLD list (for developers, not users)
+-------------------------------------------
+
+`wget https://data.iana.org/TLD/tlds-alpha-by-domain.txt`
+
 Known bugs and limitations
 --------------------------
 
