@@ -279,6 +279,9 @@ class URLChooser:
                 if len(key) == 1 and key.isprintable():
                     self.search_string += key
                 self._search()
+            elif self.enter is True and not self.search_string:
+                self.search = False
+                self.enter = False
             return
         if not self.urls and key not in "Qq":
             return  # No other actions are useful with no URLs
