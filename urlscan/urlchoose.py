@@ -400,7 +400,7 @@ class URLChooser:
         if self.compact is False and fpo <= 1:
             return
         url = self.urls[url_idx]
-        short = False if "..." in self.items[fpo][1].label else True
+        short = not "..." in self.items[fpo][1].label
         self.items[fpo][1].set_label(shorten_url(url, self.size[0], short))
 
     def _all_shorten(self):
