@@ -24,7 +24,7 @@ import os
 from os.path import dirname, exists, expanduser
 import re
 import shlex
-from subprocess import Popen, PIPE
+from subprocess import call, Popen, PIPE, DEVNULL
 import sys
 from threading import Thread
 from time import sleep
@@ -114,6 +114,7 @@ class URLChooser:
                      'j': self._down,
                      'k': self._up,
                      'P': self._clipboard_pri,
+                     'l': self._link_handler,
                      'p': self._palette,
                      'Q': self._quit,
                      'q': self._quit,
@@ -168,6 +169,11 @@ class URLChooser:
                     pass
         except FileNotFoundError:
             pass
+        try:
+            call(['xdg-open'], stdout=DEVNULL)
+            self.xdg = True
+        except OSError:
+            self.xdg = False
         self.shorten = shorten
         self.compact = compact
         self.run = run
@@ -194,10 +200,16 @@ class URLChooser:
         self.items_org = grp_list(self.items)
         listbox = urwid.ListBox(self.items)
         self.header = (":: F1 - help/keybindings :: "
-                       ":: q - quit :: "
-                       "/ - search :: ")
+                       "q - quit :: "
+                       "/ - search :: "
+                       "URL opening mode - {}")
+        self.link_open_modes = ["Web Browser", "Xdg-Open"] if self.xdg is True else ["Web Browser"]
+        if self.run:
+            self.link_open_modes.insert(0, self.run)
+        self.nohelp = nohelp
         if nohelp is False:
-            self.headerwid = urwid.AttrMap(urwid.Text(self.header), 'header')
+            self.headerwid = urwid.AttrMap(urwid.Text(
+                self.header.format(self.link_open_modes[0])), 'header')
         else:
             self.headerwid = None
         self.top = urwid.Frame(listbox, self.headerwid)
@@ -299,7 +311,8 @@ class URLChooser:
 
     def _open_url(self):
         """<Enter> or <space>"""
-        load_text = "Loading URL..." if not self.run else "Executing: {}".format(self.run)
+        load_text = "Loading URL..." if self.link_open_modes[0] != self.run \
+                else "Executing: {}".format(self.run)
         if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
             self._footer_start_thread(load_text, 5)
 
@@ -322,6 +335,7 @@ class URLChooser:
                     "context -- show/hide context\n"
                     "down -- cursor down\n"
                     "help_menu -- show/hide help menu\n"
+                    "link_handler -- cycle through xdg-open, webbrowser and user-defined function\n"
                     "open_url -- open selected URL\n"
                     "palette -- cycle through palettes\n"
                     "quit -- quit\n"
@@ -596,6 +610,18 @@ class URLChooser:
     def _get_search(self):
         return lambda: self.search, lambda: self.enter
 
+    def _link_handler(self):
+        """Function to cycle through opening links via webbrowser module,
+        xdg-open or custom expression passed with --run.
+
+        """
+        mode = self.link_open_modes.pop()
+        self.link_open_modes.insert(0, mode)
+        if self.nohelp is False:
+            self.headerwid = urwid.AttrMap(urwid.Text(
+                self.header.format(self.link_open_modes[0])), 'header')
+            self.top.header = self.headerwid
+
     def mkbrowseto(self, url):
         """Create the urwid callback function to open the web browser or call
         another function with the URL.
@@ -621,9 +647,12 @@ class URLChooser:
                 if self._get_search()[1]() is True:
                     self.search = False
                     self.enter = False
-            elif not self.run:
+            elif self.link_open_modes[0] == "Web Browser":
                 webbrowser.open(url)
-            elif self.run and self.pipe:
+            elif self.link_open_modes[0] == "Xdg-Open":
+                run = 'xdg-open "{}"'.format(url)
+                process = Popen(shlex.split(run), stdout=PIPE, stdin=PIPE)
+            elif self.link_open_modes[0] == self.run and self.pipe:
                 process = Popen(shlex.split(self.run), stdout=PIPE, stdin=PIPE)
                 process.communicate(input=url.encode(sys.getdefaultencoding()))
             else:
