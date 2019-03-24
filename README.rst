@@ -61,13 +61,13 @@ Installation and setup
 ----------------------
 
 To install urlscan, install from your distribution repositories (Archlinux),
-from Pypi, or install from source using setup.py.
+from Pypi, or do a local development install with pip -e::
 
     pip install --user urlscan
 
     OR
 
-    python setup.py install --user
+    cd <path/to/urlscan> && pip install --user -e .
 
 .. NOTE::
 
