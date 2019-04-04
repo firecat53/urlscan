@@ -113,6 +113,7 @@ class URLChooser:
                      'g': self._top,
                      'j': self._down,
                      'k': self._up,
+                     'P': self._clipboard_pri,
                      'p': self._palette,
                      'Q': self._quit,
                      'q': self._quit,
@@ -316,6 +317,7 @@ class URLChooser:
                     "bottom -- move cursor to last item\n"
                     "clear_screen -- redraw screen\n"
                     "clipboard -- copy highlighted URL to clipboard using xsel/xclip\n"
+                    "clipboard_pri -- copy highlighted URL to primary selection using xsel/xclip\n"
                     "config_create -- create ~/.config/urlscan/config.json\n"
                     "context -- show/hide context\n"
                     "down -- cursor down\n"
@@ -443,7 +445,7 @@ class URLChooser:
         self.top.body.focus_position = self._cur_focus(fpo)
         self.compact = not self.compact
 
-    def _clipboard(self):
+    def _clipboard(self, pri=False):
         """ C """
         # Copy highlighted url to clipboard
         fpo = self.top.body.focus_position
@@ -452,15 +454,24 @@ class URLChooser:
         if self.compact is False and fpo <= 1:
             return
         url = self.urls[url_idx]
-        cmds = ("xsel -i", "xclip -i")
+        if pri is True:
+            cmds = ("xsel -i", "xclip -i")
+        else:
+            cmds = ("xsel -ib", "xclip -i -selection clipboard")
         for cmd in cmds:
             try:
                 proc = Popen(shlex.split(cmd), stdin=PIPE)
                 proc.communicate(input=url.encode(sys.getdefaultencoding()))
-                self._footer_start_thread("Copied url to primary selection", 5)
+                self._footer_start_thread("Copied url to {} selection".format(
+                    "primary" if pri is True else "clipboard"), 5)
             except OSError:
                 continue
             break
+
+    def _clipboard_pri(self):
+        """ P """
+        # Copy highlighted url to primary selection
+        self._clipboard(pri=True)
 
     def _palette(self):
         """ p """

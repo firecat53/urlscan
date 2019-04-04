@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "February 10, 2019"
+.TH URLSCAN 1 "April 4, 2019"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -32,7 +32,8 @@ and base64.
 \fB2.\fR Extraction and display of the context surrounding each URL. Toggle
 context view on/off with \fBc\fR.
 
-\fB3.\fR Copy current URL to clipboard primary selection with \fBC\fR.
+\fB3.\fR Copy current URL to primary selection with \fBP\fR or to clipboard with
+\fBC\fR.
 
 \fB4.\fR URLs are shortened by default to fit on one line. Toggle one or all
 shortened URLs with \fBs\fR or \fBS\fR.
@@ -127,6 +128,8 @@ The follow actions are supported:
 \fBclear_screen\fR \-\- redraw screen (Default: \fBCtrl-l\fR)
 .TP
 \fBclipboard\fR \-\- copy highlighted URL to clipboard using xsel/xclip (Default: \fBC\fR)
+.TP
+\fBclipboard_pri\fR \-\- copy highlighted URL to primary selection using xsel/xclip (Default: \fBP\fR)
 .TP
 \fBcontext\fR \-\- show/hide context (Default: \fBc\fR)
 .TP

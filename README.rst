@@ -50,7 +50,8 @@ Relative to urlview, urlscan has the following additional features:
   default config file for editing by running `urlscan -g`. Cycle through
   available palettes with `p`.
 
-- Copy URL to clipboard (primary) with `C`. Requires xsel or xclip.
+- Copy URL to clipboard with `C` or to primary selection with `P`.  Requires
+  xsel or xclip.
 
 - Run a command with the selected URL as the argument or pipe the selected
   URL to a command.
@@ -134,6 +135,7 @@ The follow actions are supported:
 - `bottom` -- move cursor to last item (default: `G`)
 - `clear_screen` -- redraw screen (default: `Ctrl-l`)
 - `clipboard` -- copy highlighted URL to clipboard using xsel/xclip (default: `C`)
+- `clipboard_pri` -- copy highlighted URL to primary selection using xsel/xclip (default: `P`)
 - `context` -- show/hide context (default: `c`)
 - `down` -- cursor down (default: `j`)
 - `help_menu` -- show/hide help menu (default: `F1`)
