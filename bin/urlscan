@@ -41,6 +41,9 @@ def parse_arguments():
 
     """
     arg_parse = argparse.ArgumentParser(description="Parse and display URLs")
+    arg_parse.add_argument('--genconf', '-g',
+                           action='store_true', default=False,
+                           help="Generate config file and exit.")
     arg_parse.add_argument('--compact', '-c',
                            action='store_true', default=False,
                            help="Don't display the context of each URL.")
@@ -175,6 +178,9 @@ def main():
 
     """
     args = parse_arguments()
+    if args.genconf is True:
+        urlchoose.URLChooser([], genconf=True)
+        return
     msg = process_input(args.message)
     if args.nobrowser is False:
         tui = urlchoose.URLChooser(urlscan.msgurls(msg),

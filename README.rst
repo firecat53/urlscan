@@ -47,8 +47,8 @@ Relative to urlview, urlscan has the following additional features:
   opening URL in a browser.
 
 - Configure colors and keybindings via ~/.config/urlscan/config.json. Generate
-  default config file for editing with `P`. Cycle through available palettes
-  with `p`.
+  default config file for editing by running `urlscan -g`. Cycle through
+  available palettes with `p`.
 
 - Copy URL to clipboard (primary) with `C`. Requires xsel or xclip.
 
@@ -96,7 +96,7 @@ Command Line usage
 
 ::
 
-    urlscan [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-p, --pipe] [-H, --nohelp] <file>
+    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-p, --pipe] [-H, --nohelp] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
@@ -114,17 +114,16 @@ tolerant of special characters in the URL.
 Theming
 -------
 
-Press 'P' from urlscan to generate ~/.config/urlscan/config.json with the
-default color and black & white palettes. This can be edited or added to, as
-desired. The first palette in the list will be the default. Configure the
-palettes according to the `Urwid display attributes`_.
+Run `urlscan -g` to generate ~/.config/urlscan/config.json with the default
+color and black & white palettes. This can be edited or added to, as desired.
+The first palette in the list will be the default. Configure the palettes
+according to the `Urwid display attributes`_.
 
 Keybindings
 -----------
 
-Press `P` in urlscan to generate ~/.config/urlscan/config.json. All of the keys
-will be listed. You can either leave in place or delete any that will not be
-altered.
+Run `urlscan -g` to generate ~/.config/urlscan/config.json. All of the keys will
+be listed. You can either leave in place or delete any that will not be altered.
 
 To unset a binding, set it equal to "".  For example: `"P": ""`
 
@@ -135,7 +134,6 @@ The follow actions are supported:
 - `bottom` -- move cursor to last item (default: `G`)
 - `clear_screen` -- redraw screen (default: `Ctrl-l`)
 - `clipboard` -- copy highlighted URL to clipboard using xsel/xclip (default: `C`)
-- `config_create` -- create ~/.config/urlscan/config.json (default: `P`)
 - `context` -- show/hide context (default: `c`)
 - `down` -- cursor down (default: `j`)
 - `help_menu` -- show/hide help menu (default: `F1`)

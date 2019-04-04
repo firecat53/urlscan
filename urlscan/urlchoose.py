@@ -92,7 +92,7 @@ def splittext(text, search, attr):
 class URLChooser:
 
     def __init__(self, extractedurls, compact=False, nohelp=False, dedupe=False,
-                 shorten=True, run="", pipe=False):
+                 shorten=True, run="", pipe=False, genconf=False):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.keys = {'/': self._search_key,
                      '0': self._digits,
@@ -113,7 +113,6 @@ class URLChooser:
                      'g': self._top,
                      'j': self._down,
                      'k': self._up,
-                     'P': self._config_create,
                      'p': self._palette,
                      'Q': self._quit,
                      'q': self._quit,
@@ -143,6 +142,8 @@ class URLChooser:
                ('urlref:url', 'white', 'black', 'standout'),
                ('url:sel', 'black', 'light gray', 'bold')]
         self.palettes.update([("default", default), ("bw", blw)])
+        if genconf is True:
+            self._config_create()
         try:
             with open(self.conf, 'r') as conf_file:
                 data = json.load(conf_file)
@@ -473,7 +474,7 @@ class URLChooser:
         self.loop.screen.clear()
 
     def _config_create(self):
-        """ P """
+        """ --genconf """
         # Create ~/.config/urlscan/config.json if if doesn't exist
         if not exists(self.conf):
             try:
@@ -487,9 +488,9 @@ class URLChooser:
             with open(expanduser(self.conf), 'w') as pals:
                 pals.writelines(json.dumps({"palettes": self.palettes, "keys": keys},
                                            indent=4))
-            self._footer_start_thread("Created ~/.config/urlscan/config.json", 5)
+            print("Created ~/.config/urlscan/config.json")
         else:
-            self._footer_start_thread("Config.json already exists", 5)
+            print("~/.config/urlscan/config.json already exists")
 
 
     def _footer_start_thread(self, text, time):

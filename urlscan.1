@@ -41,8 +41,9 @@ shortened URLs with \fBs\fR or \fBS\fR.
 search term. \fB/\fR again resets search.
 
 \fB6.\fR Cycle through all available palettes (color and black & white available
-by default) using \fBp\fR. \fBP\fR will generate a ~/.config/urlscan/config.json
-file for editing or adding additional pallettes and keybindings. See
+by default) using \fBp\fR. Running \fBurlscan \-g\fR will generate a
+~/.config/urlscan/config.json file for editing or adding additional pallettes
+and keybindings. See
 
 http://urwid.org/manual/displayattributes.html#display-attributes
 
@@ -56,6 +57,9 @@ for color options and allowed values.
 \fB9.\fR \fBF1\fR shows the help menu.
 
 .SH OPTIONS
+.TP
+.B \-g, \-\-genconf
+Generate ~/.config/urlscan/config.json with default options.
 .TP
 .B \-c, \-\-compact
 Display a simple list of the extracted URLs, instead of showing the
@@ -106,8 +110,8 @@ can be useful for applying a different flag (such as the '-d' or '-c' options).
 
 .SH KEYBINDINGS
 
-Press \fBP\fR in urlscan to generate ~/.config/urlscan/config.json. All of the
-keys will be listed. You can either leave in place or delete any that will not be
+Run \fBurlscan \-g\fR to generate ~/.config/urlscan/config.json. All of the keys
+will be listed. You can either leave in place or delete any that will not be
 altered.
 
 To unset a binding, set it equal to "". For example: \fB"P": ""\fR
@@ -123,8 +127,6 @@ The follow actions are supported:
 \fBclear_screen\fR \-\- redraw screen (Default: \fBCtrl-l\fR)
 .TP
 \fBclipboard\fR \-\- copy highlighted URL to clipboard using xsel/xclip (Default: \fBC\fR)
-.TP
-\fBconfig_create\fR \-\- create ~/.config/urlscan/config.json (Default: \fBP\fR)
 .TP
 \fBcontext\fR \-\- show/hide context (Default: \fBc\fR)
 .TP
