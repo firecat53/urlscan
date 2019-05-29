@@ -3,12 +3,12 @@
 from setuptools import setup
 
 setup(name="urlscan",
-      version="0.9.2",
+      version="0.9.3",
       description="View/select the URLs in an email message or file",
       author="Scott Hansen",
       author_email="firecat4153@gmail.com",
       url="https://github.com/firecat53/urlscan",
-      download_url="https://github.com/firecat53/urlscan/archive/0.9.2.zip",
+      download_url="https://github.com/firecat53/urlscan/archive/0.9.3.zip",
       packages=['urlscan'],
       scripts=['bin/urlscan'],
       package_data={'urlscan': ['assets/*']},
