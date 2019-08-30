@@ -34,11 +34,6 @@ import urwid
 import urwid.curses_display
 import urwid.raw_display
 
-# Python 2 compatibility
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
 
 def shorten_url(url, cols, shorten):
     """Shorten long URLs to fit on one line.
@@ -502,12 +497,7 @@ class URLChooser:
         """ --genconf """
         # Create ~/.config/urlscan/config.json if if doesn't exist
         if not exists(self.conf):
-            try:
-                # Python 2/3 compatible recursive directory creation
-                os.makedirs(dirname(expanduser(self.conf)))
-            except OSError as err:
-                if errno.EEXIST != err.errno:
-                    raise
+            os.makedirs(dirname(expanduser(self.conf)), exist_ok=True)
             keys = dict(zip(self.keys.keys(),
                             [i.__name__.strip('_') for i in self.keys.values()]))
             with open(expanduser(self.conf), 'w') as pals:

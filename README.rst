@@ -17,7 +17,9 @@ Urlscan is a small program that is designed to integrate with the "mutt"
 mailreader to allow you to easily launch a Web browser for URLs contained in
 email messages. It is a replacement for the "urlview" program.
 
-Requires: Python 2.6+ (including Python 3.x) and the python-urwid library
+*NOTE* The last version that is Python 2 compatible is 0.9.3.
+
+Requires: Python 3.3+ and the python-urwid library
 
 Features
 --------
@@ -76,8 +78,7 @@ from Pypi, or do a local development install with pip -e::
 
 .. NOTE::
 
-    To work with Python 3.x the minimum required version of urwid is 1.2.1.
-    Python 2.x needs urwid >= 1.1.0
+    The minimum required version of urwid is 1.2.1.
 
 Once urlscan is installed, add the following lines to your .muttrc:
 

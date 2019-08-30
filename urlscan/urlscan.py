@@ -18,13 +18,9 @@
 
 """Contains the backend logic that scans messages for URLs and context."""
 
-from __future__ import unicode_literals
 import os
 import re
-try:
-    from HTMLParser import HTMLParser
-except ImportError:
-    from html.parser import HTMLParser
+from html.parser import HTMLParser
 
 
 def get_charset(message, default="utf-8"):
