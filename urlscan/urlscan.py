@@ -423,7 +423,7 @@ def extract_with_context(lst, pred, before_context, after_context):
 NLRE = re.compile('\r\n|\n|\r')
 
 
-def extracturls(mesg):
+def extracturls(mesg, show_image_url=True):
     """Given a text message, extract all the URLs found in the message, along
     with their surrounding context.  The output is a list of sequences of Chunk
     objects, corresponding to the contextual regions extracted from the string.
@@ -450,7 +450,7 @@ def extracturls(mesg):
                                 1, 1)
 
 
-def extracthtmlurls(mesg):
+def extracthtmlurls(mesg, show_image_url=True):
     """Extract URLs with context from html type message. Similar to extracturls.
 
     """
@@ -503,7 +503,7 @@ def decode_msg(msg, enc='utf-8'):
     return decode_bytes(res, enc)
 
 
-def msgurls(msg, urlidx=1):
+def msgurls(msg, urlidx=1, show_image_url=True):
     """Main entry function for urlscan.py
 
     """
@@ -514,16 +514,16 @@ def msgurls(msg, urlidx=1):
     enc = get_charset(msg)
     if msg.is_multipart():
         for part in msg.get_payload():
-            for chunk in msgurls(part, urlidx):
+            for chunk in msgurls(part, urlidx, show_image_url):
                 urlidx += 1
                 yield chunk
     elif msg.get_content_type() == "text/plain":
         decoded = decode_msg(msg, enc)
-        for chunk in extracturls(decoded):
+        for chunk in extracturls(decoded, show_image_url):
             urlidx += 1
             yield chunk
     elif msg.get_content_type() == "text/html":
         decoded = decode_msg(msg, enc)
-        for chunk in extracthtmlurls(decoded):
+        for chunk in extracthtmlurls(decoded, show_image_url):
             urlidx += 1
             yield chunk

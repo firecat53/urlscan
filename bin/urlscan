@@ -41,6 +41,9 @@ def parse_arguments():
 
     """
     arg_parse = argparse.ArgumentParser(description="Parse and display URLs")
+    arg_parse.add_argument('--no-image', '-i', dest="show_image_url",
+                           action='store_false', default=True,
+                           help="Prevent urlscan from showing image urls (jpg, png, gif).")
     arg_parse.add_argument('--genconf', '-g',
                            action='store_true', default=False,
                            help="Generate config file and exit.")
@@ -183,7 +186,8 @@ def main():
         return
     msg = process_input(args.message)
     if args.nobrowser is False:
-        tui = urlchoose.URLChooser(urlscan.msgurls(msg),
+        tui = urlchoose.URLChooser(urlscan.msgurls(
+            msg, show_image_url=args.show_image_url),
                                    compact=args.compact,
                                    nohelp=args.nohelp,
                                    dedupe=args.dedupe,
