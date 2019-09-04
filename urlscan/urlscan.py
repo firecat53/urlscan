@@ -340,7 +340,12 @@ def parse_text_urls(mesg, show_image_url=True):
 
     loc = 0
 
-    for match in URLRE.finditer(mesg):
+    if show_image_url is True:
+        url_regex = URLRE
+    else:
+        url_regex = URLRE_NOIMAGE
+
+    for match in url_regex.finditer(mesg):
         if loc < match.start():
             rval.append(Chunk(mesg[loc:match.start()], None))
         # Turn email addresses into mailto: links
@@ -465,6 +470,12 @@ def extracthtmlurls(mesg, show_image_url=True):
             if chnk.url is not None:
                 return True
         return False
+
+    if show_image_url is False:
+        chunk.rval = [[
+            chunk_obj for chunk_obj in lst
+            if chunk_obj.url is not None and URLRE_NOIMAGE.match(chunk_obj.url) is not None
+        ] for lst in chunk.rval]
 
     return extract_with_context(chunk.rval, somechunkisurl, 1, 1)
 
