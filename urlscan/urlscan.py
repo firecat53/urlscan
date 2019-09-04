@@ -256,9 +256,13 @@ class HTMLChunker(HTMLParser):
 
 URLINTERNALPATTERN = r'[{}()@\w/\\\-%?!&.=:;+,#~]'
 URLTRAILINGPATTERN = r'[{}(@\w/\-%&=+#]'
+URLINSIDE = URLINTERNALPATTERN + r'*' + URLTRAILINGPATTERN
+# Used to guess that blah.blah.blah.TLD is a URL.
+
 HTTPURLPATTERN = (r'(?:(https?|file|ftps?)://' + URLINTERNALPATTERN +
                   r'*' + URLTRAILINGPATTERN + r')')
-# Used to guess that blah.blah.blah.TLD is a URL.
+HTTPURLPATTERN_NOIMAGE = (r'(https?|file|ftps?):\/\/(?!' + URLINSIDE +
+                  r'(?:\.jpg|\.png|\.gif))' + URLINSIDE)
 
 
 def load_tlds():
@@ -276,10 +280,16 @@ def load_tlds():
 TLDS = load_tlds()
 GUESSEDURLPATTERN = (r'(?:[\w\-%]+(?:\.[\w\-%]+)*\.(?:' +
                      '|'.join(TLDS) + ')$)')
+
 URLRE = re.compile(r'(?:<(?:URL:)?)?(' + HTTPURLPATTERN + '|' +
                    GUESSEDURLPATTERN +
                    r'|(?P<email>(mailto:)?[\w\-.]+@[\w\-.]*[\w\-]))>?',
                    flags=re.U)
+URLRE_NOIMAGE = re.compile(r'(?:<(?:URL:)?)?(' + HTTPURLPATTERN_NOIMAGE + '|' +
+                   GUESSEDURLPATTERN +
+                   r'|(?P<email>(mailto:)?[\w\-.]+@[\w\-.]*[\w\-]))>?',
+                   flags=re.U)
+
 
 # Poor man's test cases.
 assert URLRE.match('<URL:http://linuxtoday.com>')
@@ -302,7 +312,27 @@ assert not URLRE.match('example..biz')
 assert not URLRE.match('blah.baz.obviouslynotarealdomain')
 
 
-def parse_text_urls(mesg):
+assert URLRE_NOIMAGE.match('<URL:http://linuxtoday.com>')
+assert URLRE_NOIMAGE.match('http://linuxtoday.com')
+assert re.compile(GUESSEDURLPATTERN).match('example.biz')
+assert URLRE_NOIMAGE.match('example.biz')
+assert URLRE_NOIMAGE.match('linuxtoday.com')
+assert URLRE_NOIMAGE.match('master.wizard.edu')
+assert URLRE_NOIMAGE.match('blah.bar.info')
+assert URLRE_NOIMAGE.match('goodpr.org')
+assert URLRE_NOIMAGE.match('http://github.com/firecat53/ürlscan')
+assert URLRE_NOIMAGE.match('https://Schöne_Grüße.es/test')
+assert URLRE_NOIMAGE.match('http://www.pantherhouse.com/newshelton/my-wife-thinks-i’m-a-swan/')
+assert not URLRE_NOIMAGE.match('blah..org')
+assert URLRE_NOIMAGE.match('http://www.testurl.zw')
+assert URLRE_NOIMAGE.match('http://www.testurl.smile')
+assert URLRE_NOIMAGE.match('testurl.smile.smile')
+assert URLRE_NOIMAGE.match('testurl.biz.smile.zw')
+assert not URLRE_NOIMAGE.match('example..biz')
+assert not URLRE_NOIMAGE.match('blah.baz.obviouslynotarealdomain')
+
+
+def parse_text_urls(mesg, show_image_url=True):
     """Parse a block of text, splitting it into its url and non-url
     components."""
 
