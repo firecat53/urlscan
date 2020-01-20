@@ -18,7 +18,6 @@
 """An urwid listview-based widget that lets you choose a URL from a list of
 URLs."""
 
-import errno
 import json
 import os
 from os.path import dirname, exists, expanduser
@@ -26,8 +25,6 @@ import re
 import shlex
 from subprocess import call, Popen, PIPE, DEVNULL
 import sys
-from threading import Thread
-from time import sleep
 import webbrowser
 
 import urwid
@@ -94,8 +91,8 @@ def splittext(text, search, attr):
 
 class URLChooser:
 
-    def __init__(self, extractedurls, compact=False, reverse=False, nohelp=False,
-                 dedupe=False, shorten=True, run="", single=False, pipe=False, genconf=False):
+    def __init__(self, extractedurls, compact=False, reverse=False, nohelp=False, dedupe=False,
+                 shorten=True, run="", single=False, pipe=False, genconf=False, width=0):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.keys = {'/': self._search_key,
                      '0': self._digits,
@@ -187,6 +184,8 @@ class URLChooser:
         self.search_string = ""
         self.no_matches = False
         self.enter = False
+        self.term_width, _ = urwid.raw_display.Screen().get_cols_rows()
+        self.width = min(self.term_width, width or self.term_width)
         self.activate_keys = [i for i, j in urwid.Button._command_map._command.items()
                               if j == 'activate']
         self.items, self.urls = self.process_urls(extractedurls,
@@ -218,8 +217,10 @@ class URLChooser:
         else:
             self.headerwid = None
         self.top = urwid.Frame(listbox, self.headerwid)
+        self.pad = self.term_width - self.width
+        self.top = urwid.Padding(self.top, left=0, right=self.pad)
         if self.urls:
-            self.top.body.focus_position = \
+            self.top.base_widget.body.focus_position = \
                 (2 if self.compact is False else 0)
         if reverse is True:
             self._reverse()
@@ -237,6 +238,11 @@ class URLChooser:
                                    handle_mouse=False, input_filter=self.handle_keys,
                                    unhandled_input=self.unhandled)
         self.loop.run()
+
+    @property
+    def size(self):
+        _, rows = self.tui.get_cols_rows()
+        return (self.width, rows)
 
     def handle_keys(self, keys, raw):
         """Handle widget default keys
@@ -262,7 +268,7 @@ class URLChooser:
                         footer = 'default'
                         text = ""
                     footerwid = urwid.AttrMap(urwid.Text(text), footer)
-                    self.top.footer = footerwid
+                    self.top.base_widget.footer = footerwid
                 elif k in self.activate_keys:
                     self.search_string += k
                     self._search()
@@ -294,7 +300,6 @@ class URLChooser:
 
         """
         self.key = key
-        self.size = self.tui.get_cols_rows()
         if self.search is True:
             if self.enter is False and self.no_matches is False:
                 if len(key) == 1 and key.isprintable():
@@ -319,14 +324,14 @@ class URLChooser:
     def _open_url(self):
         """<Enter> or <space>"""
         load_text = "Loading URL..." if self.link_open_modes[0] != self.run \
-                else "Executing: {}".format(self.run)
+            else "Executing: {}".format(self.run)
         if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
-            self._footer_start_thread(load_text, 5)
+            self._footer_display(load_text, 5)
 
     def _help_menu(self):
         """F1"""
         if self.help_menu is False:
-            self.focus_pos_saved = self.top.body.focus_position
+            self.focus_pos_saved = self.top.base_widget.body.focus_position
             help_men = "\n".join(["{} - {}".format(i, j.__name__.strip('_'))
                                   for i, j in self.keys.items() if j.__name__ !=
                                   '_digits'])
@@ -351,12 +356,12 @@ class URLChooser:
                     "single -- quit urlscan after opening a single link\n"
                     "top -- move to first list item\n"
                     "up -- cursor up\n")
-            self.top.body = \
-                    urwid.ListBox(urwid.SimpleListWalker([urwid.Columns([(30, urwid.Text(help_men)),
-                                                                         urwid.Text(docs)])]))
+            self.top.base_widget.body = \
+                urwid.ListBox(urwid.SimpleListWalker([urwid.Columns([(30, urwid.Text(help_men)),
+                                                                     urwid.Text(docs)])]))
         else:
-            self.top.body = urwid.ListBox(self.items)
-            self.top.body.focus_position = self.focus_pos_saved
+            self.top.base_widget.body = urwid.ListBox(self.items)
+            self.top.base_widget.body.focus_position = self.focus_pos_saved
         self.help_menu = not self.help_menu
 
     def _search_key(self):
@@ -373,54 +378,54 @@ class URLChooser:
         # Reset the search highlighting
         self._search()
         footerwid = urwid.AttrMap(urwid.Text("Search: "), 'footer')
-        self.top.footer = footerwid
+        self.top.base_widget.footer = footerwid
         self.items = self.items_orig
-        self.top.body = urwid.ListBox(self.items)
+        self.top.base_widget.body = urwid.ListBox(self.items)
 
     def _digits(self):
         """ 0-9 """
         self.number += self.key
         try:
             if self.compact is False:
-                self.top.body.focus_position = \
+                self.top.base_widget.body.focus_position = \
                     self.items.index(self.items_com[max(int(self.number) - 1, 0)])
             else:
-                self.top.body.focus_position = \
+                self.top.base_widget.body.focus_position = \
                     self.items.index(self.items[max(int(self.number) - 1, 0)])
         except IndexError:
             self.number = self.number[:-1]
-        self.top.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
         if self.number:
-            self._footer_start_thread("Selection: {}".format(self.number), 1)
+            self._footer_display("Selection: {}".format(self.number), 1)
 
     def _clear_screen(self):
         """ Ctrl-l """
-        self.draw_screen(self.size)
+        self.draw_screen()
 
     def _down(self):
         """ j """
-        self.top.keypress(self.size, "down")
+        self.top.base_widget.keypress(self.size, "down")
 
     def _up(self):
         """ k """
-        self.top.keypress(self.size, "up")
+        self.top.base_widget.keypress(self.size, "up")
 
     def _top(self):
         """ g """
         # Goto top of the list
-        self.top.body.focus_position = 2 if self.compact is False else 0
-        self.top.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+        self.top.base_widget.body.focus_position = 2 if self.compact is False else 0
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _bottom(self):
         """ G """
         # Goto bottom of the list
-        self.top.body.focus_position = len(self.items) - 1
-        self.top.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+        self.top.base_widget.body.focus_position = len(self.items) - 1
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _shorten(self):
         """ s """
         # Toggle shortened URL for selected item
-        fpo = self.top.body.focus_position
+        fpo = self.top.base_widget.body.focus_position
         url_idx = len([i for i in self.items[:fpo + 1]
                        if isinstance(i, urwid.Columns)]) - 1
         if self.compact is False and fpo <= 1:
@@ -440,6 +445,7 @@ class URLChooser:
                 item[1].set_label(shorten_url(next(urls),
                                               self.size[0],
                                               self.shorten))
+
     def _all_escape(self):
         """ u """
         # Toggle all escaped URLs
@@ -478,19 +484,19 @@ class URLChooser:
         if self.search_string:
             # Reset search when toggling compact mode
             footerwid = urwid.AttrMap(urwid.Text(""), 'default')
-            self.top.footer = footerwid
+            self.top.base_widget.footer = footerwid
             self.search_string = ""
             self.items = self.items_orig
-        fpo = self.top.body.focus_position
+        fpo = self.top.base_widget.body.focus_position
         self.items, self.items_com = self.items_com, self.items
-        self.top.body = urwid.ListBox(self.items)
-        self.top.body.focus_position = self._cur_focus(fpo)
+        self.top.base_widget.body = urwid.ListBox(self.items)
+        self.top.base_widget.body.focus_position = self._cur_focus(fpo)
         self.compact = not self.compact
 
     def _clipboard(self, pri=False):
         """ C """
         # Copy highlighted url to clipboard
-        fpo = self.top.body.focus_position
+        fpo = self.top.base_widget.body.focus_position
         url_idx = len([i for i in self.items[:fpo + 1]
                        if isinstance(i, urwid.Columns)]) - 1
         if self.compact is False and fpo <= 1:
@@ -501,7 +507,7 @@ class URLChooser:
             try:
                 proc = Popen(shlex.split(cmd), stdin=PIPE)
                 proc.communicate(input=url.encode(sys.getdefaultencoding()))
-                self._footer_start_thread("Copied url to {} selection".format(
+                self._footer_display("Copied url to {} selection".format(
                     "primary" if pri is True else "clipboard"), 5)
             except OSError:
                 continue
@@ -539,24 +545,20 @@ class URLChooser:
         else:
             print("~/.config/urlscan/config.json already exists")
 
-
-    def _footer_start_thread(self, text, time):
+    def _footer_display(self, text, time):
         """Display given text in the footer. Clears after <time> seconds
 
         """
         footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
-        self.top.footer = footerwid
-        load_thread = Thread(target=self._loading_thread, args=(time,))
-        load_thread.daemon = True
-        load_thread.start()
+        self.top.base_widget.footer = footerwid
+        self.loop.set_alarm_in(time, self._footer_callback)
 
-    def _loading_thread(self, time):
-        """Simple thread to wait <time> seconds after launching a URL or
-        displaying a URL selection number, clearing the screen and clearing the
-        footer loading message.
+    def _footer_callback(self, _loop, _data):
+        """Callback for loop set_alarm_in after launching a URL or displaying a
+        URL selection number, clearing the screen and clearing the footer
+        loading message.
 
         """
-        sleep(time)
         self.number = ""  # Clear URL selection number
         text = "Search: {}".format(self.search_string)
         if self.search_string:
@@ -565,9 +567,8 @@ class URLChooser:
             footer = 'default'
             text = ""
         footerwid = urwid.AttrMap(urwid.Text(text), footer)
-        self.top.footer = footerwid
-        size = self.tui.get_cols_rows()
-        self.draw_screen(size)
+        self.top.base_widget.footer = footerwid
+        self.draw_screen()
 
     def _cur_focus(self, fpo=0):
         # Return correct focus when toggling 'show context'
@@ -586,7 +587,7 @@ class URLChooser:
         """
         text = "Search: {}".format(self.search_string)
         footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
-        self.top.footer = footerwid
+        self.top.base_widget.footer = footerwid
         search_items = []
         for grp in self.items_org:
             done = False
@@ -610,24 +611,24 @@ class URLChooser:
             if done is True:
                 search_items.extend(grp)
         self.items = search_items
-        self.top.body = urwid.ListBox(self.items)
+        self.top.base_widget.body = urwid.ListBox(self.items)
         if self.items:
-            self.top.body.focus_position = 2 if self.compact is False else 0
+            self.top.base_widget.body.focus_position = 2 if self.compact is False else 0
             # Trick urwid into redisplaying the cursor
-            self.top.keypress(self.tui.get_cols_rows(), "")
+            self.top.base_widget.keypress(self.size, "")
             self.no_matches = False
         else:
             self.no_matches = True
             footerwid = urwid.AttrMap(urwid.Text(text + "  No Matches"), 'footer')
-            self.top.footer = footerwid
+            self.top.base_widget.footer = footerwid
 
-    def draw_screen(self, size):
+    def draw_screen(self):
         """Render curses screen
 
         """
         self.tui.clear()
-        canvas = self.top.render(size, focus=True)
-        self.tui.draw_screen(size, canvas)
+        canvas = self.top.base_widget.render(self.size, focus=True)
+        self.tui.draw_screen(self.size, canvas)
 
     def _get_search(self):
         return lambda: self.search, lambda: self.enter
@@ -642,7 +643,7 @@ class URLChooser:
         if self.nohelp is False:
             self.headerwid = urwid.AttrMap(urwid.Text(
                 self.header.format(self.link_open_modes[0])), 'header')
-            self.top.header = self.headerwid
+            self.top.base_widget.header = self.headerwid
 
     def mkbrowseto(self, url):
         """Create the urwid callback function to open the web browser or call
@@ -670,8 +671,7 @@ class URLChooser:
 
             if self.single is True:
                 self._quit()
-            size = self.tui.get_cols_rows()
-            self.draw_screen(size)
+            self.draw_screen()
         return browse
 
     def process_urls(self, extractedurls, dedupe, shorten):
@@ -685,13 +685,9 @@ class URLChooser:
                  urls - List of all URLs
 
         """
-        cols, _ = urwid.raw_display.Screen().get_cols_rows()
         items = []
         urls = []
-        first = True
         for group, usedfirst, usedlast in extractedurls:
-            if first:
-                first = False
             items.append(urwid.Divider(div_char='-', top=1, bottom=1))
             if dedupe is True:
                 # If no unique URLs exist, then skip the group completely
@@ -742,7 +738,7 @@ class URLChooser:
                                           ('urlref:number:braces', ']'),
                                           ' '])),
                           urwid.AttrMap(urwid.Button(shorten_url(url,
-                                                                 cols,
+                                                                 self.width,
                                                                  shorten),
                                                      self.mkbrowseto(url),
                                                      user_data=url),

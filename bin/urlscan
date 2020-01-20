@@ -70,6 +70,9 @@ def parse_arguments():
     arg_parse.add_argument('--single', '-s', dest='single',
                            action='store_true', default=False,
                            help='Quit urlscan after opening/copying a single link.')
+    arg_parse.add_argument('--width', '-w', dest='width',
+                           type=int, default=0,
+                           help='Set width to display')
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     return arg_parse.parse_args()
@@ -196,6 +199,7 @@ def main():
                                    dedupe=args.dedupe,
                                    run=args.run,
                                    single=args.single,
+                                   width=args.width,
                                    pipe=args.pipe)
         tui.main()
     else:

@@ -54,7 +54,7 @@ Relative to urlview, urlscan has the following additional features:
 
 - Configure colors and keybindings via ~/.config/urlscan/config.json. Generate
   default config file for editing by running `urlscan -g`. Cycle through
-  available palettes with `p`.
+  available palettes with `p`. Set display width with `--width`.
 
 - Copy URL to clipboard with `C` or to primary selection with `P`.  Requires
   xsel or xclip.
@@ -102,7 +102,7 @@ Command Line usage
 
 ::
 
-    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-H, --nohelp] <file>
+    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
@@ -126,6 +126,8 @@ Run `urlscan -g` to generate ~/.config/urlscan/config.json with the default
 color and black & white palettes. This can be edited or added to, as desired.
 The first palette in the list will be the default. Configure the palettes
 according to the `Urwid display attributes`_.
+
+Display width can be set with `--width`.
 
 Keybindings
 -----------
