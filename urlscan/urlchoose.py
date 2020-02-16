@@ -34,6 +34,13 @@ import urwid
 import urwid.curses_display
 import urwid.raw_display
 
+if 'WAYLAND_DISPLAY' in os.environ:
+    COPY_COMMANDS = ('wl-copy',)
+    COPY_COMMANDS_PRIMARY = ('wl-copy --primary',)
+else:
+    COPY_COMMANDS = ("xsel -ib", "xclip -i -selection clipboard")
+    COPY_COMMANDS_PRIMARY = ("xsel -i", "xclip -i")
+
 
 def shorten_url(url, cols, shorten):
     """Shorten long URLs to fit on one line.
@@ -463,10 +470,7 @@ class URLChooser:
         if self.compact is False and fpo <= 1:
             return
         url = self.urls[url_idx]
-        if pri is True:
-            cmds = ("xsel -i", "xclip -i")
-        else:
-            cmds = ("xsel -ib", "xclip -i -selection clipboard")
+        cmds = COPY_COMMANDS_PRIMARY if pri else COPY_COMMANDS
         for cmd in cmds:
             try:
                 proc = Popen(shlex.split(cmd), stdin=PIPE)
