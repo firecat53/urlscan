@@ -94,6 +94,11 @@ when the command supports it, as it is more secure and tolerant of special
 characters in the URL. Example:
 
     $ urlscan --run 'xclip -i' --pipe file.txt
+.TP
+.B \-s, \-\-single
+Exit urlscan after opening or copying a single browser link.
+
+    $ urlscan -s file.txt
 
 .SH MUTT INTEGRATION
 

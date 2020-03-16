@@ -64,6 +64,9 @@ def parse_arguments():
     arg_parse.add_argument('--nohelp', '-H', dest='nohelp',
                            action='store_true', default=False,
                            help='Hide help menu by default')
+    arg_parse.add_argument('--single', '-s', dest='single',
+                           action='store_true', default=False,
+                           help='Quit urlscan after opening/copying a single link.')
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     return arg_parse.parse_args()
@@ -188,6 +191,7 @@ def main():
                                    nohelp=args.nohelp,
                                    dedupe=args.dedupe,
                                    run=args.run,
+                                   single=args.single,
                                    pipe=args.pipe)
         tui.main()
     else:

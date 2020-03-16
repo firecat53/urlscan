@@ -95,7 +95,7 @@ def splittext(text, search, attr):
 class URLChooser:
 
     def __init__(self, extractedurls, compact=False, nohelp=False, dedupe=False,
-                 shorten=True, run="", pipe=False, genconf=False):
+                 shorten=True, run="", single=False, pipe=False, genconf=False):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.keys = {'/': self._search_key,
                      '0': self._digits,
@@ -180,6 +180,7 @@ class URLChooser:
         self.shorten = shorten
         self.compact = compact
         self.run = run
+        self.single = single
         self.pipe = pipe
         self.search = False
         self.search_string = ""
@@ -343,6 +344,7 @@ class URLChooser:
                     "palette -- cycle through palettes\n"
                     "quit -- quit\n"
                     "shorten -- toggle shorten highlighted URL\n"
+                    "single -- quit urlscan after opening a single link\n"
                     "top -- move to first list item\n"
                     "up -- cursor up\n")
             self.top.body = \
@@ -480,6 +482,8 @@ class URLChooser:
                     "primary" if pri is True else "clipboard"), 5)
             except OSError:
                 continue
+            if self.single is True:
+                self._quit()
             break
 
     def _clipboard_pri(self):
@@ -653,6 +657,8 @@ class URLChooser:
             else:
                 Popen(self.run.format(url), shell=True).communicate()
 
+            if self.single is True:
+                self._quit()
             size = self.tui.get_cols_rows()
             self.draw_screen(size)
         return browse
