@@ -649,18 +649,6 @@ class URLChooser:
         another function with the URL.
 
         """
-        # Try-except block to work around webbrowser module bug
-        # https://bugs.python.org/issue31014
-        try:
-            browser = os.environ['BROWSER']
-        except KeyError:
-            pass
-        else:
-            del os.environ['BROWSER']
-            webbrowser.register(browser, None, webbrowser.GenericBrowser(browser))
-            try_idx = webbrowser._tryorder.index(browser)
-            webbrowser._tryorder.insert(0, webbrowser._tryorder.pop(try_idx))
-
         def browse(*args):
             # double ()() to ensure self.search evaluated at runtime, not when
             # browse() is _created_. [0] is self.search, [1] is self.enter
