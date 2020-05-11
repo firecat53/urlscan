@@ -47,6 +47,9 @@ def parse_arguments():
     arg_parse.add_argument('--compact', '-c',
                            action='store_true', default=False,
                            help="Don't display the context of each URL.")
+    arg_parse.add_argument('--reverse', '-R', dest="reverse",
+                           action='store_true', default=False,
+                           help="Reverse order of displayed URLS/context")
     arg_parse.add_argument('--no-browser', '-n', dest="nobrowser",
                            action='store_true', default=False,
                            help="Pipe URLs to stdout")
@@ -188,6 +191,7 @@ def main():
     if args.nobrowser is False:
         tui = urlchoose.URLChooser(urlscan.msgurls(msg),
                                    compact=args.compact,
+                                   reverse=args.reverse,
                                    nohelp=args.nohelp,
                                    dedupe=args.dedupe,
                                    run=args.run,
@@ -197,7 +201,10 @@ def main():
     else:
         out = urlchoose.URLChooser(urlscan.msgurls(msg),
                                    dedupe=args.dedupe,
+                                   reverse=args.reverse,
                                    shorten=False)
+        if args.reverse is True:
+            out.urls.reverse()
         print("\n".join(out.urls))
 
 

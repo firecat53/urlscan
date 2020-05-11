@@ -30,7 +30,7 @@ additional features:
 and base64.
 
 \fB2.\fR Extraction and display of the context surrounding each URL. Toggle
-context view on/off with \fBc\fR.
+context view on/off with \fBc\fR. Reverse displayed order of URLs with \fBR\fR.
 
 \fB3.\fR Copy current URL to primary selection with \fBP\fR or to clipboard with
 \fBC\fR.
@@ -95,6 +95,9 @@ characters in the URL. Example:
 
     $ urlscan --run 'xclip -i' --pipe file.txt
 .TP
+.B \-R, \-\-reverse
+Reverse displayed order of URLs.
+.TP
 .B \-s, \-\-single
 Exit urlscan after opening or copying a single browser link.
 
@@ -155,6 +158,8 @@ The follow actions are supported:
 \fBpalette\fR \-\- cycle through palettes (Default: \fBp\fR)
 .TP
 \fBquit\fR \-\- quit (Default: \fBq\fR or \fBQ\fR)
+.TP
+\fBreverse\fR \-\- reverse display order (Default: \fBR\fR)
 .TP
 \fBshorten\fR \-\- toggle shorten highlighted URL (Default: \fBs\fR)
 .TP

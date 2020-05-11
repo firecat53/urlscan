@@ -94,8 +94,8 @@ def splittext(text, search, attr):
 
 class URLChooser:
 
-    def __init__(self, extractedurls, compact=False, nohelp=False, dedupe=False,
-                 shorten=True, run="", single=False, pipe=False, genconf=False):
+    def __init__(self, extractedurls, compact=False, reverse=False, nohelp=False,
+                 dedupe=False, shorten=True, run="", single=False, pipe=False, genconf=False):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.keys = {'/': self._search_key,
                      '0': self._digits,
@@ -121,6 +121,7 @@ class URLChooser:
                      'p': self._palette,
                      'Q': self._quit,
                      'q': self._quit,
+                     'R': self._reverse,
                      'S': self._all_shorten,
                      's': self._shorten,
                      'u': self._all_escape
@@ -220,6 +221,8 @@ class URLChooser:
         if self.urls:
             self.top.body.focus_position = \
                 (2 if self.compact is False else 0)
+        if reverse is True:
+            self._reverse()
         self.tui = urwid.curses_display.Screen()
         self.palette_names = list(self.palettes.keys())
         self.palette_idx = 0
@@ -343,6 +346,7 @@ class URLChooser:
                     "open_url -- open selected URL\n"
                     "palette -- cycle through palettes\n"
                     "quit -- quit\n"
+                    "reverse -- reverse order URLs/context\n"
                     "shorten -- toggle shorten highlighted URL\n"
                     "single -- quit urlscan after opening a single link\n"
                     "top -- move to first list item\n"
@@ -448,6 +452,25 @@ class URLChooser:
                 item[1].set_label(shorten_url(next(urls),
                                               self.size[0],
                                               self.shorten))
+
+    def _reverse(self):
+        """ R """
+        # Reverse items
+        fpo = self.top.body.focus_position
+        if self.compact is True:
+            self.items.reverse()
+        else:
+            rev = []
+            for item in self.items:
+                if isinstance(item, urwid.Divider):
+                    rev.insert(0, item)
+                elif isinstance(item, urwid.Text):
+                    rev.insert(1, item)
+                else:
+                    rev.insert(2, item)
+            self.items = rev
+        self.top.body = urwid.ListBox(self.items)
+        self.top.body.focus_position = self._cur_focus(fpo)
 
     def _context(self):
         """ c """

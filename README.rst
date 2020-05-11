@@ -102,14 +102,15 @@ Command Line usage
 
 ::
 
-    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-s, --single] [-p, --pipe] [-H, --nohelp] <file>
+    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-H, --nohelp] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
 output a list of URLs/email addressess to stdout. The '-c' flag removes the
 context from around the URLs in the curses browser, and the '-d' flag removes
-duplicate URLs. Files can also be piped to urlscan using normal shell pipe
-mechanisms: `cat <something> | urlscan` or `urlscan < <something>`
+duplicate URLs. 'R' reverses the displayed order of URLs and context. Files can
+also be piped to urlscan using normal shell pipe mechanisms: `cat <something> |
+urlscan` or `urlscan < <something>`
 
 Instead of opening a web browser, the selected URL can be passed as the argument
 to a command using `--run "<command> {}"`. Note the use of `{}` in the command
@@ -149,6 +150,7 @@ The follow actions are supported:
 - `open_url` -- open selected URL (default: `space` or `enter`)
 - `palette` -- cycle through palettes (default: `p`)
 - `quit` -- quit (default: `q` or `Q`)
+- `reverse` -- reverse display order (default: `R`)
 - `shorten` -- toggle shorten highlighted URL (default: `s`)
 - `top` -- move to first list item (default: `g`)
 - `up` -- cursor up (default: `k`)
