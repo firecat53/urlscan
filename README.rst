@@ -4,11 +4,11 @@ Urlscan
 Contributors
 ------------
 
-Daniel Burrows <dburrows@debian.org> (Original Author)
-
-Scott Hansen <firecat4153@gmail.com> (Maintainer)
+Scott Hansen <firecat4153@gmail.com> (Author and Maintainer)
 
 Maxime Chatelle <xakz@rxsoft.eu> (Debian Maintainer)
+
+Daniel Burrows <dburrows@debian.org> (Original Author)
 
 Purpose and Requirements
 ------------------------

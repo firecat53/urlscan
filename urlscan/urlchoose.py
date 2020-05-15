@@ -1,5 +1,5 @@
 #   Copyright (C) 2006-2007 Daniel Burrows
-#   Copyright (C) 2019 Scott Hansen
+#   Copyright (C) 2020 Scott Hansen
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
