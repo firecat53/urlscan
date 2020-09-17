@@ -462,7 +462,7 @@ class URLChooser:
     def _reverse(self):
         """ R """
         # Reverse items
-        fpo = self.top.body.focus_position
+        fpo = self.top.base_widget.body.focus_position
         if self.compact is True:
             self.items.reverse()
         else:
@@ -475,8 +475,8 @@ class URLChooser:
                 else:
                     rev.insert(2, item)
             self.items = rev
-        self.top.body = urwid.ListBox(self.items)
-        self.top.body.focus_position = self._cur_focus(fpo)
+        self.top.base_widget.body = urwid.ListBox(self.items)
+        self.top.base_widget.body.focus_position = self._cur_focus(fpo)
 
     def _context(self):
         """ c """
