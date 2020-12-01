@@ -255,7 +255,7 @@ class HTMLChunker(HTMLParser):
 
 
 URLINTERNALPATTERN = r'[{}()@\w/\\\-%?!&.=:;+,#~]'
-URLTRAILINGPATTERN = r'[{}(@\w/\-%&=+#]'
+URLTRAILINGPATTERN = r'[{}(@\w/\-%&=+#$]'
 HTTPURLPATTERN = (r'(?:(https?|file|ftps?)://' + URLINTERNALPATTERN +
                   r'*' + URLTRAILINGPATTERN + r')')
 # Used to guess that blah.blah.blah.TLD is a URL.
