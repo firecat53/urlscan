@@ -302,7 +302,7 @@ assert not URLRE.match('example..biz')
 assert not URLRE.match('blah.baz.obviouslynotarealdomain')
 
 
-def parse_text_urls(mesg):
+def parse_text_urls(mesg, regex=None):
     """Parse a block of text, splitting it into its url and non-url
     components."""
 
@@ -310,16 +310,24 @@ def parse_text_urls(mesg):
 
     loc = 0
 
+    global URLRE
+
+    if regex:
+        URLRE = re.compile(regex)
+
     for match in URLRE.finditer(mesg):
         if loc < match.start():
             rval.append(Chunk(mesg[loc:match.start()], None))
         # Turn email addresses into mailto: links
-        email = match.group("email")
-        if email and "mailto" not in email:
-            mailto = "mailto:{}".format(email)
+        if regex:
+            rval.append(Chunk(None, match.group(0)))
         else:
-            mailto = match.group(1)
-        rval.append(Chunk(None, mailto))
+            email = match.group("email")
+            if email and "mailto" not in email:
+                mailto = "mailto:{}".format(email)
+            else:
+                mailto = match.group(1)
+            rval.append(Chunk(None, mailto))
         loc = match.end()
 
     if loc < len(mesg):
@@ -393,7 +401,7 @@ def extract_with_context(lst, pred, before_context, after_context):
 NLRE = re.compile('\r\n|\n|\r')
 
 
-def extracturls(mesg):
+def extracturls(mesg, regex=None):
     """Given a text message, extract all the URLs found in the message, along
     with their surrounding context.  The output is a list of sequences of Chunk
     objects, corresponding to the contextual regions extracted from the string.
@@ -412,7 +420,7 @@ def extracturls(mesg):
     # lines with more than one entry or one entry that's
     # a URL are the only lines containing URLs.
 
-    linechunks = [parse_text_urls(l) for l in lines]
+    linechunks = [parse_text_urls(l, regex=regex) for l in lines]
 
     return extract_with_context(linechunks,
                                 lambda chunk: len(chunk) > 1 or
@@ -420,7 +428,7 @@ def extracturls(mesg):
                                 1, 1)
 
 
-def extracthtmlurls(mesg):
+def extracthtmlurls(mesg, regex=None):
     """Extract URLs with context from html type message. Similar to extracturls.
 
     """
@@ -473,7 +481,7 @@ def decode_msg(msg, enc='utf-8'):
     return decode_bytes(res, enc)
 
 
-def msgurls(msg, urlidx=1):
+def msgurls(msg, urlidx=1, regex=None):
     """Main entry function for urlscan.py
 
     """
@@ -484,16 +492,16 @@ def msgurls(msg, urlidx=1):
     enc = get_charset(msg)
     if msg.is_multipart():
         for part in msg.get_payload():
-            for chunk in msgurls(part, urlidx):
+            for chunk in msgurls(part, urlidx, regex=regex):
                 urlidx += 1
                 yield chunk
     elif msg.get_content_type() == "text/plain":
         decoded = decode_msg(msg, enc)
-        for chunk in extracturls(decoded):
+        for chunk in extracturls(decoded, regex=regex):
             urlidx += 1
             yield chunk
     elif msg.get_content_type() == "text/html":
         decoded = decode_msg(msg, enc)
-        for chunk in extracthtmlurls(decoded):
+        for chunk in extracthtmlurls(decoded, regex=regex):
             urlidx += 1
             yield chunk
