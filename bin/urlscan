@@ -65,9 +65,16 @@ def parse_arguments():
                            "instead of opening URL in browser. Use {} to "
                            "represent the URL value in the expression. "
                            "For example: --run 'echo {} | xclip -i'")
+    arg_parse.add_argument('--run-safe', '-f', dest="runsafe",
+                           help="Alternate command to run on selected URL "
+                           "instead of opening URL in browser. Use {} to "
+                           "represent the URL value in the expression. Safest "
+                           "run option but uses `shell=False` which does not "
+                           "allow use of shell features like | or >. Can use "
+                           "with --pipe.")
     arg_parse.add_argument('--pipe', '-p', dest='pipe',
                            action='store_true', default=False,
-                           help='Pipe URL into the command specified by --run')
+                           help="Pipe URL into the command specified by --run or --run-safe")
     arg_parse.add_argument('--nohelp', '-H', dest='nohelp',
                            action='store_true', default=False,
                            help='Hide help menu by default')
@@ -205,6 +212,7 @@ def main():
                                    nohelp=args.nohelp,
                                    dedupe=args.dedupe,
                                    run=args.run,
+                                   runsafe=args.runsafe,
                                    single=args.single,
                                    width=args.width,
                                    pipe=args.pipe)

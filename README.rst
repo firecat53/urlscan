@@ -50,7 +50,7 @@ Relative to urlview, urlscan has the following additional features:
 
 - Use `l` to cycle through whether URLs are opened using the Python webbrowser
   module (default), xdg-open (if installed) or opened by a function passed on
-  the command line with `--run`.
+  the command line with `--run` or `--run-safe`.
 
 - Configure colors and keybindings via ~/.config/urlscan/config.json. Generate
   default config file for editing by running `urlscan -g`. Cycle through
@@ -109,7 +109,7 @@ Command Line usage
 
 ::
 
-    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [--headers] [-r, --run <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] [-E, --regex <expression>] <file>
+    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [--headers] [-r, --run <expression>] [-f, --run-safe <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] [-E, --regex <expression>] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
@@ -120,11 +120,11 @@ also be piped to urlscan using normal shell pipe mechanisms: `cat <something> |
 urlscan` or `urlscan < <something>`
 
 Instead of opening a web browser, the selected URL can be passed as the argument
-to a command using `--run "<command> {}"`. Note the use of `{}` in the command
-string to denote the selected URL. Alternatively, the URL can be piped to the
-command using `--run <command> --pipe`. Using --run with --pipe is preferred if
-the command supports it, as it is marginally more secure and tolerant of special
-characters in the URL.
+to a command using `--run-safe "<command> {}"` or `--run "<command> {}"`. Note
+the use of `{}` in the command string to denote the selected URL. Alternatively,
+the URL can be piped to the command using `--run-safe <command> --pipe` (or
+`--run`). Using --run-safe with --pipe is preferred if the command supports it,
+as it is marginally more secure and tolerant of special characters in the URL.
 
 Theming
 -------
@@ -155,7 +155,7 @@ The follow actions are supported:
 - `context` -- show/hide context (default: `c`)
 - `down` -- cursor down (default: `j`)
 - `help_menu` -- show/hide help menu (default: `F1`)
-- `link_handler` -- cycle link handling (webbrowser, xdg-open or --run) (default: `l`)
+- `link_handler` -- cycle link handling (webbrowser, xdg-open, --run-safe or --run) (default: `l`)
 - `open_url` -- open selected URL (default: `space` or `enter`)
 - `palette` -- cycle through palettes (default: `p`)
 - `quit` -- quit (default: `q` or `Q`)

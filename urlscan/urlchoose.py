@@ -92,7 +92,8 @@ def splittext(text, search, attr):
 class URLChooser:
 
     def __init__(self, extractedurls, compact=False, reverse=False, nohelp=False, dedupe=False,
-                 shorten=True, run="", single=False, pipe=False, genconf=False, width=0):
+                 shorten=True, run="", runsafe="", single=False, pipe=False,
+                 genconf=False, width=0):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.keys = {'/': self._search_key,
                      '0': self._digits,
@@ -178,6 +179,7 @@ class URLChooser:
         self.shorten = shorten
         self.compact = compact
         self.run = run
+        self.runsafe = runsafe
         self.single = single
         self.pipe = pipe
         self.search = False
@@ -208,7 +210,9 @@ class URLChooser:
                        "/ - search :: "
                        "URL opening mode - {}")
         self.link_open_modes = ["Web Browser", "Xdg-Open"] if self.xdg is True else ["Web Browser"]
-        if self.run:
+        if self.runsafe:
+            self.link_open_modes.insert(0, self.runsafe)
+        elif self.run:
             self.link_open_modes.insert(0, self.run)
         self.nohelp = nohelp
         if nohelp is False:
@@ -323,8 +327,8 @@ class URLChooser:
 
     def _open_url(self):
         """<Enter> or <space>"""
-        load_text = "Loading URL..." if self.link_open_modes[0] != self.run \
-            else "Executing: {}".format(self.run)
+        load_text = "Loading URL..." if self.link_open_modes[0] != (self.run or self.runsafe) \
+            else "Executing: {}".format(self.run or self.runsafe)
         if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
             self._footer_display(load_text, 5)
 
@@ -635,7 +639,7 @@ class URLChooser:
 
     def _link_handler(self):
         """Function to cycle through opening links via webbrowser module,
-        xdg-open or custom expression passed with --run.
+        xdg-open or custom expression passed with --run-safe or --run.
 
         """
         mode = self.link_open_modes.pop()
@@ -663,6 +667,13 @@ class URLChooser:
             elif self.link_open_modes[0] == "Xdg-Open":
                 run = 'xdg-open "{}"'.format(url)
                 process = Popen(shlex.split(run), stdout=PIPE, stdin=PIPE)
+            elif self.link_open_modes[0] == self.runsafe:
+                if self.pipe:
+                    process = Popen(shlex.split(self.runsafe), stdout=PIPE, stdin=PIPE)
+                    process.communicate(input=url.encode(sys.getdefaultencoding()))
+                else:
+                    cmd = [i.format(url) for i in shlex.split(self.runsafe)]
+                    Popen(cmd).communicate()
             elif self.link_open_modes[0] == self.run and self.pipe:
                 process = Popen(shlex.split(self.run), stdout=PIPE, stdin=PIPE)
                 process.communicate(input=url.encode(sys.getdefaultencoding()))
