@@ -56,6 +56,10 @@ def parse_arguments():
     arg_parse.add_argument('--dedupe', '-d', dest="dedupe",
                            action='store_true', default=False,
                            help="Remove duplicate URLs from list")
+    arg_parse.add_argument('--regex', '-E',
+                           help="Alternate custom regex to be used for all "
+                           "kinds of matching. "
+                           "For example: --regex 'https?://.+\.\w+'")
     arg_parse.add_argument('--run', '-r',
                            help="Alternate command to run on selected URL "
                            "instead of opening URL in browser. Use {} to "
@@ -192,7 +196,7 @@ def main():
         return
     msg = process_input(args.message)
     if args.nobrowser is False:
-        tui = urlchoose.URLChooser(urlscan.msgurls(msg),
+        tui = urlchoose.URLChooser(urlscan.msgurls(msg, regex=args.regex),
                                    compact=args.compact,
                                    reverse=args.reverse,
                                    nohelp=args.nohelp,
@@ -203,7 +207,7 @@ def main():
                                    pipe=args.pipe)
         tui.main()
     else:
-        out = urlchoose.URLChooser(urlscan.msgurls(msg),
+        out = urlchoose.URLChooser(urlscan.msgurls(msg, regex=args.regex),
                                    dedupe=args.dedupe,
                                    reverse=args.reverse,
                                    shorten=False)
