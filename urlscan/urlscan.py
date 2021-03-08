@@ -428,7 +428,7 @@ def extracturls(mesg, regex=None):
                                 1, 1)
 
 
-def extracthtmlurls(mesg, regex=None):
+def extracthtmlurls(mesg):
     """Extract URLs with context from html type message. Similar to extracturls.
 
     """
@@ -502,6 +502,6 @@ def msgurls(msg, urlidx=1, regex=None):
             yield chunk
     elif msg.get_content_type() == "text/html":
         decoded = decode_msg(msg, enc)
-        for chunk in extracthtmlurls(decoded, regex=regex):
+        for chunk in extracthtmlurls(decoded):
             urlidx += 1
             yield chunk
