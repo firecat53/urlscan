@@ -14,8 +14,8 @@ urlscan \- browse the URLs in an email message from a terminal
 .SH DESCRIPTION
 \fBurlscan\fR accepts a single email message on standard
 input, then displays a terminal-based list of the URLs in the given
-message.  Selecting a URL uses the Python webbrowser module to 
-determine which browser to open. The \fBBROWSER\fR environment 
+message.  Selecting a URL uses the Python webbrowser module to
+determine which browser to open. The \fBBROWSER\fR environment
 variable will be used if it is set.
 
 \fBurlscan\fR is primarily intended to be used with the
@@ -105,6 +105,15 @@ Exit urlscan after opening or copying a single browser link.
 .TP
 .B \-w, \-\-width
 Set display width.
+.TP
+.B \-E, \-\-regex \<expression\>
+Use \<expression\> in place of the default set of regular expressions,
+to be used for any kind of matching. This is useful for example when
+selectively avoiding 'mailto:' links or any other patterns that urlscan
+could interpret as urls (such as '<filename>.<extension>'). Usage
+example:
+
+    $ urlscan --regex 'https?://.+\.\w+' file.txt
 
 .SH MUTT INTEGRATION
 
