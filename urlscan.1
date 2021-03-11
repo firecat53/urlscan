@@ -62,6 +62,9 @@ of \fB--pipe\fR.
 
 \fB10.\fR \fBF1\fR shows the help menu.
 
+\fB11.\fR Scan certain email headers for URLs. Currently \fBLink\fR,
+\fBArchived-At\fR and \fBList-*\fR are scanned when \fB--headers\fR is passed.
+
 .SH OPTIONS
 .TP
 .B \-g, \-\-genconf
@@ -114,6 +117,9 @@ could interpret as urls (such as '<filename>.<extension>'). Usage
 example:
 
     $ urlscan --regex 'https?://.+\.\w+' file.txt
+.TP
+.B \-\-headers
+Scan email headers for URLs.
 
 .SH MUTT INTEGRATION
 

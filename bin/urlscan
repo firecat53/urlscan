@@ -77,6 +77,9 @@ def parse_arguments():
     arg_parse.add_argument('--width', '-w', dest='width',
                            type=int, default=0,
                            help='Set width to display')
+    arg_parse.add_argument('--headers', dest='headers',
+                           action='store_true', default=False,
+                           help='Scan certain message headers for URLs.')
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     return arg_parse.parse_args()
@@ -196,7 +199,7 @@ def main():
         return
     msg = process_input(args.message)
     if args.nobrowser is False:
-        tui = urlchoose.URLChooser(urlscan.msgurls(msg, regex=args.regex),
+        tui = urlchoose.URLChooser(urlscan.msgurls(msg, regex=args.regex, headers=args.headers),
                                    compact=args.compact,
                                    reverse=args.reverse,
                                    nohelp=args.nohelp,
@@ -207,7 +210,7 @@ def main():
                                    pipe=args.pipe)
         tui.main()
     else:
-        out = urlchoose.URLChooser(urlscan.msgurls(msg, regex=args.regex),
+        out = urlchoose.URLChooser(urlscan.msgurls(msg, regex=args.regex, headers=args.headers),
                                    dedupe=args.dedupe,
                                    reverse=args.reverse,
                                    shorten=False)

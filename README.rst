@@ -68,6 +68,9 @@ Relative to urlview, urlscan has the following additional features:
   other pattern. In junction with `-r`, this effectively turns urlscan
   into a general purpose CLI selector-type utility.
 
+- Scan certain email headers for URLs. Currently `Link`, `Archived-At` and
+  `List-*` are scanned when `--headers` is passed.
+
 Installation and setup
 ----------------------
 
@@ -106,7 +109,7 @@ Command Line usage
 
 ::
 
-    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [-r, --run <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] [-E, --regex <expression>] <file>
+    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [--headers] [-r, --run <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] [-E, --regex <expression>] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just

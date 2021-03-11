@@ -481,7 +481,7 @@ def decode_msg(msg, enc='utf-8'):
     return decode_bytes(res, enc)
 
 
-def msgurls(msg, urlidx=1, regex=None):
+def msgurls(msg, urlidx=1, regex=None, headers=False):
     """Main entry function for urlscan.py
 
     """
@@ -490,6 +490,11 @@ def msgurls(msg, urlidx=1, regex=None):
     # multipart/alternative).  Actually, I might even add
     # a browser for the message structure?
     enc = get_charset(msg)
+    if headers is True:
+        for part in msgheaders(msg, enc):
+            for chunk in extracturls(part):
+                urlidx += 1
+                yield chunk
     if msg.is_multipart():
         for part in msg.get_payload():
             for chunk in msgurls(part, urlidx, regex=regex):
@@ -505,3 +510,28 @@ def msgurls(msg, urlidx=1, regex=None):
         for chunk in extracthtmlurls(decoded):
             urlidx += 1
             yield chunk
+
+def msgheaders(msg, enc):
+    """ Process email message headers for URLs
+
+    Args: msg - email message object
+          enc - encoding (str)
+    Returns: list
+
+    """
+    headers = ('Archived-At',
+               'Link',
+               'List-Archive',
+               'List-ID',
+               'List-Help',
+               'List-Owner',
+               'List-Post',
+               'List-Subscribe',
+               'List-Unsubscribe',
+               'List-Unsubscribe-Post')
+    res = []
+    for hdr in headers:
+        hdri = decode_bytes(msg.get(hdr), enc)
+        if hdri:
+            res.append(hdri)
+    return res
