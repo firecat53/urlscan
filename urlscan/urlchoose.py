@@ -505,7 +505,7 @@ class URLChooser:
         cmds = COPY_COMMANDS_PRIMARY if pri else COPY_COMMANDS
         for cmd in cmds:
             try:
-                proc = Popen(shlex.split(cmd), stdin=PIPE)
+                proc = Popen(shlex.split(cmd), stdin=PIPE, stdout=DEVNULL, stderr=DEVNULL)
                 proc.communicate(input=url.encode(sys.getdefaultencoding()))
                 self._footer_display("Copied url to {} selection".format(
                     "primary" if pri is True else "clipboard"), 5)
