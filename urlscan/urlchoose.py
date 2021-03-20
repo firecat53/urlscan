@@ -663,7 +663,7 @@ class URLChooser:
                     self.search = False
                     self.enter = False
             elif self.link_open_modes[0] == "Web Browser":
-                webbrowser.open(url)
+                webbrowser.open(url.replace('&', '\&'))
             elif self.link_open_modes[0] == "Xdg-Open":
                 run = 'xdg-open "{}"'.format(url)
                 process = Popen(shlex.split(run), stdout=PIPE, stdin=PIPE)
