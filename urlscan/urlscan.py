@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #   Copyright (C) 2006-2007 Daniel Burrows
-#   Copyright (C) 2020 Scott Hansen
+#   Copyright (C) 2021 Scott Hansen
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,18 +18,10 @@
 
 """Contains the backend logic that scans messages for URLs and context."""
 
+from html.parser import HTMLParser
+import locale
 import os
 import re
-from html.parser import HTMLParser
-
-
-def get_charset(message, default="utf-8"):
-    """Get the message charset"""
-    if message.get_content_charset():
-        return message.get_content_charset()
-    if message.get_charset():
-        return message.get_charset()
-    return default
 
 
 class Chunk:
@@ -447,75 +439,10 @@ def extracthtmlurls(mesg):
     return extract_with_context(chunk.rval, somechunkisurl, 1, 1)
 
 
-def decode_bytes(byt, enc='utf-8'):
-    """Given a string or bytes input, return a string.
-
-        Args: bytes - bytes or string
-              enc - encoding to use for decoding the byte string.
-
-    """
-    try:
-        strg = byt.decode(enc)
-    except UnicodeDecodeError as err:
-        strg = "Unable to decode message:\n{}\n{}".format(str(byt), err)
-    except (AttributeError, UnicodeEncodeError):
-        # If byt is already a string, just return it
-        return byt
-    return strg
-
-
-def decode_msg(msg, enc='utf-8'):
-    """
-    Decodes a message fragment.
-
-    Args: msg - A Message object representing the fragment
-          enc - The encoding to use for decoding the message
-    """
-    # We avoid the get_payload decoding machinery for raw
-    # content-transfer-encodings potentially containing non-ascii characters,
-    # such as 8bit or binary, as these are encoded using raw-unicode-escape which
-    # seems to prevent subsequent utf-8 decoding.
-    cte = str(msg.get('content-transfer-encoding', '')).lower()
-    decode = cte not in ("8bit", "7bit", "binary")
-    res = msg.get_payload(decode=decode)
-    return decode_bytes(res, enc)
-
-
-def msgurls(msg, urlidx=1, regex=None, headers=False):
-    """Main entry function for urlscan.py
-
-    """
-    # Written as a generator so I can easily choose only
-    # one subpart in the future (e.g., for
-    # multipart/alternative).  Actually, I might even add
-    # a browser for the message structure?
-    enc = get_charset(msg)
-    if headers is True:
-        for part in msgheaders(msg, enc):
-            for chunk in extracturls(part):
-                urlidx += 1
-                yield chunk
-    if msg.is_multipart():
-        for part in msg.get_payload():
-            for chunk in msgurls(part, urlidx, regex=regex):
-                urlidx += 1
-                yield chunk
-    elif msg.get_content_type() == "text/plain":
-        decoded = decode_msg(msg, enc)
-        for chunk in extracturls(decoded, regex=regex):
-            urlidx += 1
-            yield chunk
-    elif msg.get_content_type() == "text/html":
-        decoded = decode_msg(msg, enc)
-        for chunk in extracthtmlurls(decoded):
-            urlidx += 1
-            yield chunk
-
-def msgheaders(msg, enc):
+def msgheaders(msg):
     """ Process email message headers for URLs
 
     Args: msg - email message object
-          enc - encoding (str)
     Returns: list
 
     """
@@ -531,7 +458,72 @@ def msgheaders(msg, enc):
                'List-Unsubscribe-Post')
     res = []
     for hdr in headers:
-        hdri = decode_bytes(msg.get(hdr), enc)
+        hdri = msg.get(hdr)
         if hdri:
             res.append(hdri)
     return res
+
+
+def set_charset(message):
+    """Get and/or set the message or message part charset. Try the
+    content-charset or charset if it exists, or attempt to decode the message
+    with a variety of charsets to find the correct one.
+
+        Args: message - EmailMessage object
+        Returns: message - EmailMessage object
+
+    """
+    if message.get_content_charset():
+        return message
+    if message.get_charset():
+        return message
+    enc_list = ['UTF-8', 'LATIN-1', 'iso8859-1', 'iso8859-2',
+                'UTF-16', 'CP1252', 'CP720', 'CP437']
+    locale.setlocale(locale.LC_ALL, '')
+    code = locale.getpreferredencoding()
+    if code not in enc_list:
+        enc_list.insert(0, code)
+    for enc in enc_list:
+        try:
+            message.as_bytes().decode(enc)
+        except (UnicodeDecodeError, UnicodeError):
+            continue
+        else:
+            try:
+                message.set_param('charset', enc)
+            except (KeyError, UnicodeEncodeError):
+                # Try once to set correct encoding on the message part, then
+                # continue without crashing if it fails
+                continue
+            break
+        raise Exception("Encoding not detected.")
+    return message
+
+
+def msgurls(msg, urlidx=1, regex=None, headers=False):
+    """Main entry function for urlscan.py
+
+    """
+    # Written as a generator so I can easily choose only
+    # one subpart in the future (e.g., for
+    # multipart/alternative).  Actually, I might even add
+    # a browser for the message structure?
+    if headers is True:
+        for part in msgheaders(set_charset(msg)):
+            for chunk in extracturls(part):
+                urlidx += 1
+                yield chunk
+    msg = set_charset(msg)
+    if msg.is_multipart():
+        for part in msg.iter_parts():
+            for chunk in msgurls(set_charset(part), urlidx, regex=regex):
+                urlidx += 1
+                yield chunk
+    elif msg.get_content_type() == "text/plain":
+        for chunk in extracturls(msg.get_content(), regex=regex):
+            urlidx += 1
+            yield chunk
+    elif msg.get_content_type() == "text/html":
+        for chunk in extracthtmlurls(msg.get_content()):
+            urlidx += 1
+            yield chunk
