@@ -19,7 +19,7 @@ email messages. It is a replacement for the "urlview" program.
 
 *NOTE* The last version that is Python 2 compatible is 0.9.3.
 
-Requires: Python 3.3+ and the python-urwid library
+Requires: Python 3.6+ and the python-urwid library
 
 Features
 --------
