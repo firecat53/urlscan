@@ -80,6 +80,9 @@ def parse_arguments():
     arg_parse.add_argument('--width', '-w', dest='width',
                            type=int, default=0,
                            help='Set width to display')
+    arg_parse.add_argument('--whitespace-off', '-W', dest='whitespaceoff',
+                           action='store_true', default=False,
+                           help="Don't display empty lines and ellipses.")
     arg_parse.add_argument('--headers', dest='headers',
                            action='store_true', default=False,
                            help='Scan certain message headers for URLs.')
@@ -171,6 +174,7 @@ def main():
                                    runsafe=args.runsafe,
                                    single=args.single,
                                    width=args.width,
+                                   whitespaceoff=args.whitespaceoff,
                                    pipe=args.pipe)
         tui.main()
     else:
