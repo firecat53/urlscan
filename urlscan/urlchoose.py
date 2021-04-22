@@ -93,7 +93,7 @@ class URLChooser:
 
     def __init__(self, extractedurls, compact=False, reverse=False, nohelp=False, dedupe=False,
                  shorten=True, run="", runsafe="", single=False, pipe=False,
-                 genconf=False, width=0):
+                 genconf=False, width=0, whitespaceoff=False):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.keys = {'/': self._search_key,
                      '0': self._digits,
@@ -188,6 +188,7 @@ class URLChooser:
         self.enter = False
         self.term_width, _ = urwid.raw_display.Screen().get_cols_rows()
         self.width = min(self.term_width, width or self.term_width)
+        self.whitespaceoff = whitespaceoff
         self.activate_keys = [i for i, j in urwid.Button._command_map._command.items()
                               if j == 'activate']
         self.items, self.urls = self.process_urls(extractedurls,
@@ -707,7 +708,7 @@ class URLChooser:
                     continue
             groupurls = []
             markup = []
-            if not usedfirst:
+            if not usedfirst and not self.whitespaceoff:
                 markup.append(('msgtext:ellipses', '...\n'))
             for chunks in group:
                 i = 0
@@ -736,8 +737,9 @@ class URLChooser:
                                    ('urlref:number:braces', ' ['),
                                    ('urlref:number', repr(url_idx)),
                                    ('urlref:number:braces', ']')]
-                markup += '\n'
-            if not usedlast:
+                if not self.whitespaceoff:
+                    markup += '\n'
+            if not usedlast and not self.whitespaceoff:
                 markup += [('msgtext:ellipses', '...\n\n')]
             items.append(urwid.Text(markup))
 
