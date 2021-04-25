@@ -109,15 +109,16 @@ Command Line usage
 
 ::
 
-    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [--headers] [-r, --run <expression>] [-f, --run-safe <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] [-E, --regex <expression>] <file>
+    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [--headers] [-r, --run <expression>] [-f, --run-safe <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] [-E, --regex <expression>] [-W -whitespace-off] <file>
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
 output a list of URLs/email addressess to stdout. The '-c' flag removes the
 context from around the URLs in the curses browser, and the '-d' flag removes
-duplicate URLs. 'R' reverses the displayed order of URLs and context. Files can
-also be piped to urlscan using normal shell pipe mechanisms: `cat <something> |
-urlscan` or `urlscan < <something>`
+duplicate URLs. The '-R' flag reverses the displayed order of URLs and context.
+Files can also be piped to urlscan using normal shell pipe mechanisms: `cat
+<something> | urlscan` or `urlscan < <something>`. The '-W' flag condenses the
+display output by suppressing blank lines and ellipses lines.
 
 Instead of opening a web browser, the selected URL can be passed as the argument
 to a command using `--run-safe "<command> {}"` or `--run "<command> {}"`. Note
