@@ -342,27 +342,31 @@ class URLChooser:
                                   '_digits'])
             help_men = "KEYBINDINGS\n" + help_men + "\n<0-9> - Jump to item"
             docs = ("OPTIONS\n"
-                    "all_escape -- toggle unescape all URLs\n"
-                    "all_shorten -- toggle shorten all URLs\n"
-                    "bottom -- move cursor to last item\n"
-                    "clear_screen -- redraw screen\n"
-                    "clipboard -- copy highlighted URL to clipboard using xsel/xclip\n"
-                    "clipboard_pri -- copy highlighted URL to primary selection using xsel/xclip\n"
+                    "all_escape    -- toggle unescape all URLs\n"
+                    "all_shorten   -- toggle shorten all URLs\n"
+                    "bottom        -- move cursor to last item\n"
+                    "clear_screen  -- redraw screen\n"
+                    "clipboard     -- copy highlighted URL to clipboard\n"
+                    "                 using xsel/xclip\n"
+                    "clipboard_pri -- copy highlighted URL to primary\n"
+                    "                 selection using xsel/xclip\n"
                     "config_create -- create ~/.config/urlscan/config.json\n"
-                    "context -- show/hide context\n"
-                    "down -- cursor down\n"
-                    "help_menu -- show/hide help menu\n"
-                    "link_handler -- cycle through xdg-open, webbrowser and user-defined function\n"
-                    "open_url -- open selected URL\n"
-                    "palette -- cycle through palettes\n"
-                    "quit -- quit\n"
-                    "reverse -- reverse order URLs/context\n"
-                    "shorten -- toggle shorten highlighted URL\n"
-                    "single -- quit urlscan after opening a single link\n"
-                    "top -- move to first list item\n"
-                    "up -- cursor up\n")
+                    "context       -- show/hide context\n"
+                    "down          -- cursor down\n"
+                    "help_menu     -- show/hide help menu\n"
+                    "link_handler  -- cycle through xdg-open, webbrowser \n"
+                    "                 and user-defined function\n"
+                    "open_url      -- open selected URL\n"
+                    "palette       -- cycle through palettes\n"
+                    "quit          -- quit\n"
+                    "reverse       -- reverse order URLs/context\n"
+                    "shorten       -- toggle shorten highlighted URL\n"
+                    "single        -- quit urlscan after opening a\n"
+                    "                 single link\n"
+                    "top           -- move to first list item\n"
+                    "up            -- cursor up\n")
             self.top.base_widget.body = \
-                urwid.ListBox(urwid.SimpleListWalker([urwid.Columns([(30, urwid.Text(help_men)),
+                urwid.ListBox(urwid.SimpleListWalker([urwid.Columns([(24, urwid.Text(help_men)),
                                                                      urwid.Text(docs)])]))
         else:
             self.top.base_widget.body = urwid.ListBox(self.items)

@@ -109,7 +109,22 @@ Command Line usage
 
 ::
 
-    urlscan [-g, --genconf] [-n, --no-browser] [-c, --compact] [-d, --dedupe] [--headers] [-r, --run <expression>] [-f, --run-safe <expression>] [-R, --reverse] [-s, --single] [-p, --pipe] [-w, --width] [-H, --nohelp] [-E, --regex <expression>] [-W -whitespace-off] <file>
+    urlscan OPTIONS <file>
+
+    OPTIONS [-c, --compact]
+            [-d, --dedupe]
+            [-E, --regex <expression>]
+            [-f, --run-safe <expression>]
+            [-g, --genconf]
+            [-H, --nohelp]
+            [    --headers]
+            [-n, --no-browser]
+            [-p, --pipe]
+            [-r, --run <expression>]
+            [-R, --reverse]
+            [-s, --single]
+            [-w, --width]
+            [-W  --whitespace-off]
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
