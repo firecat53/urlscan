@@ -68,22 +68,21 @@ command line with \fB--run-safe\fR or \fB--run\fR. The \fB--run\fR and
 
 .SH OPTIONS
 .TP
-.B \-g, \-\-genconf
-Generate ~/.config/urlscan/config.json with default options.
-.TP
 .B \-c, \-\-compact
 Display a simple list of the extracted URLs, instead of showing the
 context of each URL. Also toggle with `c` from within the viewer.
 .TP
-.B \-H, \-\-nohelp
-Start with header menu hidden.
-.TP
 .B \-d, \-\-dedupe
 Remove duplicated URLs from the list of URLs.
 .TP
-.B \-n, \-\-no-browser
-Disables the selection interface and print the links to standard output.
-Useful for scripting (implies \fB\-\-compact\fR).
+.B \-E, \-\-regex \<expression\>
+Use \<expression\> in place of the default set of regular expressions,
+to be used for any kind of matching. This is useful for example when
+selectively avoiding 'mailto:' links or any other pattern that urlscan
+could interpret as urls (such as '<filename>.<extension>'). Usage
+example:
+
+    $ urlscan --regex 'https?://.+\.\w+' file.txt
 .TP
 .B \-f, \-\-run\-safe \<expression\>
 Execute \<expression\> in place of opening URL with a browser. Use {} in
@@ -91,12 +90,19 @@ Execute \<expression\> in place of opening URL with a browser. Use {} in
 
     $ urlscan --run-safe 'tmux set buffer {}'
 .TP
-.B \-r, \-\-run \<expression\>
-Execute \<expression\> in place of opening URL with a browser. Use {} in
-\<expression\> to substitute in the URL. Shell features such as \| and \> can be
-used, but it is less secure. Examples:
+.B \-g, \-\-genconf
+Generate ~/.config/urlscan/config.json with default options.
+.TP
+.B \-H, \-\-nohelp
+Start with header menu hidden.
+.TP
+.B \-\-headers
+Scan email headers for URLs.
 
-    $ urlscan --run 'echo {} | xclip -i' file.txt
+.TP
+.B \-n, \-\-no-browser
+Disables the selection interface and print the links to standard output.
+Useful for scripting (implies \fB\-\-compact\fR).
 .TP
 .B \-p, \-\-pipe
 Pipe the selected URL to the command specified by `--run-safe` or `--run`. This
@@ -108,6 +114,13 @@ special characters in the URL. Example:
 .B \-R, \-\-reverse
 Reverse displayed order of URLs.
 .TP
+.B \-r, \-\-run \<expression\>
+Execute \<expression\> in place of opening URL with a browser. Use {} in
+\<expression\> to substitute in the URL. Shell features such as \| and \> can be
+used, but it is less secure. Examples:
+
+    $ urlscan --run 'echo {} | xclip -i' file.txt
+.TP
 .B \-s, \-\-single
 Exit urlscan after opening or copying a single browser link.
 
@@ -115,19 +128,6 @@ Exit urlscan after opening or copying a single browser link.
 .TP
 .B \-w, \-\-width
 Set display width.
-.TP
-.B \-E, \-\-regex \<expression\>
-Use \<expression\> in place of the default set of regular expressions,
-to be used for any kind of matching. This is useful for example when
-selectively avoiding 'mailto:' links or any other pattern that urlscan
-could interpret as urls (such as '<filename>.<extension>'). Usage
-example:
-
-    $ urlscan --regex 'https?://.+\.\\w+' file.txt
-.TP
-.B \-\-headers
-Scan email headers for URLs.
-
 .TP
 .B \-W, \-\-whitespace-off
 Suppress output of blank lines and ellipses lines.
@@ -200,7 +200,7 @@ The follow actions are supported:
 
 $HOME/.config/urlscan/config.json
 
-Only required if additional or modified palettes are desired.
+Only required if additional or modified palettes or keybindings are desired.
 
 .SH SEE ALSO
 \fI/usr/share/doc/urlscan/README\fR,
