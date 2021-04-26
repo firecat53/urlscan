@@ -145,7 +145,17 @@ class URLChooser:
                ('urlref:number', 'white', 'black', 'standout'),
                ('urlref:url', 'white', 'black', 'standout'),
                ('url:sel', 'black', 'light gray', 'bold')]
-        self.palettes.update([("default", default), ("bw", blw)])
+        # Boruch's colorized palette
+        colorized =[('header','brown','black','standout'),
+                    ('footer','white','dark red','standout'),
+                    ('search','white','dark green','standout'),
+                    ('msgtext','light cyan','black'),
+                    ('msgtext:ellipses','light gray','black'),
+                    ('urlref:number:braces','light gray','black'),
+                    ('urlref:number','yellow','black','standout'),
+                    ('urlref:url','dark green','black','standout'),
+                    ('url:sel','white','black','')]
+        self.palettes.update([("default", default), ("bw", blw), ("colorized", colorized)])
         if genconf is True:
             self._config_create()
         try:
