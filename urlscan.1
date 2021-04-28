@@ -123,7 +123,7 @@ selectively avoiding 'mailto:' links or any other pattern that urlscan
 could interpret as urls (such as '<filename>.<extension>'). Usage
 example:
 
-    $ urlscan --regex 'https?://.+\.\w+' file.txt
+    $ urlscan --regex 'https?://.+\.\\w+' file.txt
 .TP
 .B \-\-headers
 Scan email headers for URLs.
