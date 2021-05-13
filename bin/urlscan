@@ -97,7 +97,13 @@ def close_stdin():
 
     """
     if not os.isatty(0):
-        fdesc = os.open('/dev/tty', os.O_RDONLY)
+        try:
+            fdesc = os.open('/dev/tty', os.O_RDONLY)
+        except OSError:
+            # This is most likely a non-interactive session, try to open
+            # `stdin` directly
+            fdesc = os.open('/dev/stdin', os.O_RDONLY)
+
         if fdesc < 0:
             sys.stderr.write('Unable to open an input tty.\n')
             sys.exit(-1)
