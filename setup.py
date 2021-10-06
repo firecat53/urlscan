@@ -1,18 +1,30 @@
 #!/usr/bin/env python3
+"""urlscan setup.py"""
 
 from setuptools import setup
 
+
+def long_description():
+    """Generate long description from README"""
+    with open("README.md") as readme:
+        return readme.read()
+
+
 setup(name="urlscan",
-      version="0.9.6",
+      version="0.9.7",
       description="View/select the URLs in an email message or file",
+      long_description=long_description(),
+      long_description_content_type="text/markdown",
       author="Scott Hansen",
       author_email="firecat4153@gmail.com",
       url="https://github.com/firecat53/urlscan",
       download_url="https://github.com/firecat53/urlscan/archive/0.9.6.zip",
       packages=['urlscan'],
-      scripts=['bin/urlscan'],
+      entry_points={
+          'console_scripts': ['urlscan=urlscan.__main__:main']
+      },
       package_data={'urlscan': ['assets/*']},
-      data_files=[('share/doc/urlscan', ['README.rst', 'COPYING']),
+      data_files=[('share/doc/urlscan', ['README.md', 'COPYING']),
                   ('share/man/man1', ['urlscan.1'])],
       license="GPLv2",
       install_requires=["urwid>=1.2.1"],
@@ -28,5 +40,5 @@ setup(name="urlscan",
           'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
           'Topic :: Utilities'],
-      keywords=("urlscan urlview email mutt tmux"),
+      keywords="urlscan, urlview, email, mutt, tmux"
       )

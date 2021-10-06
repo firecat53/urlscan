@@ -1,17 +1,14 @@
-Urlscan
-=======
+# Urlscan
 
-Contributors
-------------
+## Contributors
 
-Scott Hansen <firecat4153@gmail.com> (Author and Maintainer)
+Scott Hansen \<firecat4153@gmail.com\> (Author and Maintainer)
 
-Maxime Chatelle <xakz@rxsoft.eu> (Debian Maintainer)
+Maxime Chatelle \<xakz@rxsoft.eu\> (Debian Maintainer)
 
-Daniel Burrows <dburrows@debian.org> (Original Author)
+Daniel Burrows \<dburrows@debian.org\> (Original Author)
 
-Purpose and Requirements
-------------------------
+## Purpose and Requirements
 
 Urlscan is a small program that is designed to integrate with the "mutt"
 mailreader to allow you to easily launch a Web browser for URLs contained in
@@ -21,8 +18,7 @@ email messages. It is a replacement for the "urlview" program.
 
 Requires: Python 3.6+ and the python-urwid library
 
-Features
---------
+## Features
 
 Urlscan parses an email message or file and scans it for URLs and email
 addresses. It then displays the URLs and their context within the message, and
@@ -71,11 +67,10 @@ Relative to urlview, urlscan has the following additional features:
 - Scan certain email headers for URLs. Currently `Link`, `Archived-At` and
   `List-*` are scanned when `--headers` is passed.
 
-Installation and setup
-----------------------
+## Installation and setup
 
 To install urlscan, install from your distribution repositories (Archlinux),
-from Pypi, or do a local development install with pip -e::
+from Pypi, or do a local development install with pip -e:
 
     pip install --user urlscan
 
@@ -83,7 +78,7 @@ from Pypi, or do a local development install with pip -e::
 
     cd <path/to/urlscan> && pip install --user -e .
 
-.. NOTE::
+**NOTE**
 
     The minimum required version of urwid is 1.2.1.
 
@@ -104,10 +99,7 @@ is not set, xdg-open will control which browser is used, if it's available.:
     export BROWSER=/usr/bin/epiphany
 
 
-Command Line usage
-------------------
-
-::
+## Command Line usage
 
     urlscan OPTIONS <file>
 
@@ -142,18 +134,16 @@ the URL can be piped to the command using `--run-safe <command> --pipe` (or
 `--run`). Using --run-safe with --pipe is preferred if the command supports it,
 as it is marginally more secure and tolerant of special characters in the URL.
 
-Theming
--------
+## Theming
 
 Run `urlscan -g` to generate ~/.config/urlscan/config.json with the default
 color and black & white palettes. This can be edited or added to, as desired.
 The first palette in the list will be the default. Configure the palettes
-according to the `Urwid display attributes`_.
+according to the [Urwid display attributes][1].
 
 Display width can be set with `--width`.
 
-Keybindings
------------
+## Keybindings
 
 Run `urlscan -g` to generate ~/.config/urlscan/config.json. All of the keys will
 be listed. You can either leave in place or delete any that will not be altered.
@@ -180,13 +170,11 @@ The follow actions are supported:
 - `top` -- move to first list item (default: `g`)
 - `up` -- cursor up (default: `k`)
 
-Update TLD list (for developers, not users)
--------------------------------------------
+## Update TLD list (for developers, not users)
 
 `wget https://data.iana.org/TLD/tlds-alpha-by-domain.txt`
 
-Known bugs and limitations
---------------------------
+## Known bugs and limitations
 
 - Running urlscan sometimes "messes up" the terminal background. This seems to
   be an urwid bug, but I haven't tracked down just what's going on.
@@ -201,4 +189,4 @@ Known bugs and limitations
   sub-parts, rather than just picking one, which may lead to URLs and context
   appearing twice. (Bypass this by selecting the '--dedupe' option)
 
-.. _Urwid display attributes: http://urwid.org/manual/displayattributes.html#display-attributes
+[1]: http://urwid.org/manual/displayattributes.html#display-attributes  "Urwid display attributes"
