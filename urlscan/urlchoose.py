@@ -25,6 +25,7 @@ import re
 import shlex
 from subprocess import call, Popen, PIPE, DEVNULL
 import sys
+from threading import Thread
 import webbrowser
 
 import urwid
@@ -106,9 +107,11 @@ class URLChooser:
                      '7': self._digits,
                      '8': self._digits,
                      '9': self._digits,
+                     'a': self._add_url,
                      'C': self._clipboard,
                      'c': self._context,
                      'ctrl l': self._clear_screen,
+                     'd': self._del_url,
                      'f1': self._help_menu,
                      'G': self._bottom,
                      'g': self._top,
@@ -116,6 +119,8 @@ class URLChooser:
                      'k': self._up,
                      'P': self._clipboard_pri,
                      'l': self._link_handler,
+                     'o': self._open_queue,
+                     'O': self._open_queue_win,
                      'p': self._palette,
                      'Q': self._quit,
                      'q': self._quit,
@@ -188,6 +193,7 @@ class URLChooser:
             self.xdg = False
         self.shorten = shorten
         self.compact = compact
+        self.queue = []
         self.run = run
         self.runsafe = runsafe
         self.single = single
@@ -219,7 +225,8 @@ class URLChooser:
         self.header = (":: F1 - help/keybindings :: "
                        "q - quit :: "
                        "/ - search :: "
-                       "URL opening mode - {}")
+                       "URL opening mode - {} :: "
+                       "Queue - {}")
         self.link_open_modes = ["Web Browser", "Xdg-Open"] if self.xdg is True else ["Web Browser"]
         if self.runsafe:
             self.link_open_modes.insert(0, self.runsafe)
@@ -228,7 +235,7 @@ class URLChooser:
         self.nohelp = nohelp
         if nohelp is False:
             self.headerwid = urwid.AttrMap(urwid.Text(
-                self.header.format(self.link_open_modes[0])), 'header')
+                self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
         else:
             self.headerwid = None
         self.top = urwid.Frame(listbox, self.headerwid)
@@ -343,6 +350,69 @@ class URLChooser:
         if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
             self._footer_display(load_text, 5)
 
+    def _background_queue(self, mode):
+        """Open URLs in background"""
+        for url in self.queue:
+            self.mkbrowseto(url, thread=True, mode=mode)()
+        self.draw_screen()
+
+    def _queue(self, mode=2):
+        """Open all URLs in queue
+
+            Args: mode - 2 for new tab, 1 for new window
+
+        """
+        load_text = "Loading URLs in queue..." if self.link_open_modes[0] != (self.run or self.runsafe) \
+            else "Executing: {}".format(self.run or self.runsafe)
+        if os.environ.get('BROWSER') in ['elinks', 'links', 'w3m', 'lynx']:
+            self._footer_display("Opening multiple links not support in text browsers", 5)
+        else:
+            self._footer_display(load_text, 5)
+        thr = Thread(target=self._background_queue, args=(mode,))
+        thr.start()
+        self.queue = []
+        self.headerwid = urwid.AttrMap(urwid.Text(
+            self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
+        self.top.base_widget.header = self.headerwid
+
+    def _open_queue(self):
+        """o (new tab)"""
+        if self.queue:
+            self._queue()
+
+    def _open_queue_win(self):
+        """O (new window)"""
+        if self.queue:
+            self._queue(1)
+
+    def _add_url(self):
+        """a"""
+        fpo = self.top.base_widget.body.focus_position
+        url_idx = len([i for i in self.items[:fpo + 1]
+                       if isinstance(i, urwid.Columns)]) - 1
+        if self.compact is False and fpo <= 1:
+            return
+        self.queue.append(self.urls[url_idx])
+        self.queue = list(set(self.queue))
+        self.headerwid = urwid.AttrMap(urwid.Text(
+            self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
+        self.top.base_widget.header = self.headerwid
+
+    def _del_url(self):
+        """d"""
+        fpo = self.top.base_widget.body.focus_position
+        url_idx = len([i for i in self.items[:fpo + 1]
+                       if isinstance(i, urwid.Columns)]) - 1
+        if self.compact is False and fpo <= 1:
+            return
+        try:
+            self.queue.remove(self.urls[url_idx])
+            self.headerwid = urwid.AttrMap(urwid.Text(
+                self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
+            self.top.base_widget.header = self.headerwid
+        except ValueError:
+            pass
+
     def _help_menu(self):
         """F1"""
         if self.help_menu is False:
@@ -352,6 +422,7 @@ class URLChooser:
                                   '_digits'])
             help_men = "KEYBINDINGS\n" + help_men + "\n<0-9> - Jump to item"
             docs = ("OPTIONS\n"
+                    "add_url       -- add URL to queue\n"
                     "all_escape    -- toggle unescape all URLs\n"
                     "all_shorten   -- toggle shorten all URLs\n"
                     "bottom        -- move cursor to last item\n"
@@ -362,10 +433,13 @@ class URLChooser:
                     "                 selection using xsel/xclip\n"
                     "config_create -- create ~/.config/urlscan/config.json\n"
                     "context       -- show/hide context\n"
+                    "del_url       -- delete URL from queue\n"
                     "down          -- cursor down\n"
                     "help_menu     -- show/hide help menu\n"
                     "link_handler  -- cycle through xdg-open, webbrowser \n"
                     "                 and user-defined function\n"
+                    "open_queue    -- open all URLs in queue\n"
+                    "open_queue_win-- open all URLs in queue in new window\n"
                     "open_url      -- open selected URL\n"
                     "palette       -- cycle through palettes\n"
                     "quit          -- quit\n"
@@ -661,15 +735,19 @@ class URLChooser:
         self.link_open_modes.insert(0, mode)
         if self.nohelp is False:
             self.headerwid = urwid.AttrMap(urwid.Text(
-                self.header.format(self.link_open_modes[0])), 'header')
+                self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
             self.top.base_widget.header = self.headerwid
 
-    def mkbrowseto(self, url):
+    def mkbrowseto(self, url, thread=False, mode=0):
         """Create the urwid callback function to open the web browser or call
         another function with the URL.
 
         """
         def browse(*args):
+            # These 3 lines prevent any stderr messages from webbrowser or xdg
+            savout = os.dup(2)
+            os.close(2)
+            os.open(os.devnull, os.O_RDWR)
             # double ()() to ensure self.search evaluated at runtime, not when
             # browse() is _created_. [0] is self.search, [1] is self.enter
             # self.enter prevents opening URL when in search mode
@@ -678,7 +756,7 @@ class URLChooser:
                     self.search = False
                     self.enter = False
             elif self.link_open_modes[0] == "Web Browser":
-                webbrowser.open(url)
+                webbrowser.open(url, new=mode)
             elif self.link_open_modes[0] == "Xdg-Open":
                 run = 'xdg-open "{}"'.format(url)
                 process = Popen(shlex.split(run), stdout=PIPE, stdin=PIPE)
@@ -697,7 +775,10 @@ class URLChooser:
 
             if self.single is True:
                 self._quit()
-            self.draw_screen()
+            # Restore normal stderr
+            os.dup2(savout, 2)
+            if thread is False:
+                self.draw_screen()
         return browse
 
     def process_urls(self, extractedurls, dedupe, shorten):
