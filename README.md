@@ -67,6 +67,8 @@ Relative to urlview, urlscan has the following additional features:
 - Scan certain email headers for URLs. Currently `Link`, `Archived-At` and
   `List-*` are scanned when `--headers` is passed.
 
+- Queue multiple URLs for opening and open them all at once with `a` and `o`.
+
 ## Installation and setup
 
 To install urlscan, install from your distribution repositories (Archlinux),
@@ -152,6 +154,7 @@ To unset a binding, set it equal to "".  For example: `"P": ""`
 
 The follow actions are supported:
 
+- `add_url` -- add a URL to the queue (default: `a`)
 - `all_escape` -- toggle unescape all URLs (default: `u`)
 - `all_shorten` -- toggle shorten all URLs (default: `S`)
 - `bottom` -- move cursor to last item (default: `G`)
@@ -159,9 +162,12 @@ The follow actions are supported:
 - `clipboard` -- copy highlighted URL to clipboard using xsel/xclip (default: `C`)
 - `clipboard_pri` -- copy highlighted URL to primary selection using xsel/xclip (default: `P`)
 - `context` -- show/hide context (default: `c`)
+- `del_url` -- delete URL from the queue (default: `d`)
 - `down` -- cursor down (default: `j`)
 - `help_menu` -- show/hide help menu (default: `F1`)
 - `link_handler` -- cycle link handling (webbrowser, xdg-open, --run-safe or --run) (default: `l`)
+- `open_queue` -- open all URLs in queue (default: `o`)
+- `open_queue_win` -- open all URLs in queue in new window (default: `O`)
 - `open_url` -- open selected URL (default: `space` or `enter`)
 - `palette` -- cycle through palettes (default: `p`)
 - `quit` -- quit (default: `q` or `Q`)
