@@ -485,9 +485,10 @@ class URLChooser:
             else:
                 self.top.base_widget.body.focus_position = \
                     self.items.index(self.items[max(int(self.number) - 1, 0)])
-        except (IndexError, ValueError):
+        except IndexError:
             self.number = self.number[:-1]
-            return
+        except ValueError:
+            pass
         self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
         if self.number:
             self._footer_display("Selection: {}".format(self.number), 1)
