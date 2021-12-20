@@ -22,6 +22,7 @@ from html.parser import HTMLParser
 import locale
 import os
 import re
+from sys import getdefaultencoding
 
 
 class Chunk:
@@ -40,8 +41,7 @@ class Chunk:
         self.url = url
 
     def __str__(self):
-        return 'Chunk(markup = %s, url= %s)' % (repr(self.markup),
-                                                repr(self.url))
+        return f'Chunk(markup = {repr(self.markup)}, url= {repr(self.url)})'
 
     def __repr__(self):
         return self.__str__()
@@ -115,12 +115,11 @@ class HTMLChunker(HTMLParser):
             if tag == 'ul':
                 depth = len([t for t in self.list_stack if t[0] == tag])
                 ul_tags = HTMLChunker.ul_tags
-                chunk = Chunk('%s  ' % (ul_tags[depth % len(ul_tags)]),
-                              self.cur_url())
+                chunk = Chunk(f"{ul_tags[depth % len(ul_tags)]}  ", self.cur_url())
             else:
                 counter = self.list_stack[-1][1]
                 self.list_stack[-1] = (tag, counter + 1)
-                chunk = Chunk("%2d." % counter, self.cur_url())
+                chunk = Chunk(f"{counter:%2d.}", self.cur_url())
             self.add_chunk(chunk)
         else:
             self.end_para()
@@ -226,7 +225,7 @@ class HTMLChunker(HTMLParser):
         elif char in HTMLChunker.extrachars:
             name = HTMLChunker.extrachars[char]
         else:
-            name = '&#%s;' % name
+            name = f"&#{name};"
         self.handle_data(name)
 
     entities = {'nbsp': ' ',
@@ -243,7 +242,7 @@ class HTMLChunker(HTMLParser):
         else:
             # If you see a reference, it needs to be
             # added above.
-            self.handle_data('&%s;' % name)
+            self.handle_data(f"&{name};")
 
 
 URLINTERNALPATTERN = r'[{}()@\w/\\\-%?!&.=:;+,#~]'
@@ -260,7 +259,7 @@ def load_tlds():
     file = os.path.join(os.path.dirname(__file__),
                         'assets',
                         'tlds-alpha-by-domain.txt')
-    with open(file) as fobj:
+    with open(file, encoding=getdefaultencoding()) as fobj:
         return [elem for elem in fobj.read().lower().splitlines()[1:]
                 if "--" not in elem]
 
@@ -316,7 +315,7 @@ def parse_text_urls(mesg, regex=None):
         else:
             email = match.group("email")
             if email and "mailto" not in email:
-                mailto = "mailto:{}".format(email)
+                mailto = f"mailto:{email}"
             else:
                 mailto = match.group(1)
             rval.append(Chunk(None, mailto))
@@ -412,7 +411,7 @@ def extracturls(mesg, regex=None):
     # lines with more than one entry or one entry that's
     # a URL are the only lines containing URLs.
 
-    linechunks = [parse_text_urls(l, regex=regex) for l in lines]
+    linechunks = [parse_text_urls(i, regex=regex) for i in lines]
 
     return extract_with_context(linechunks,
                                 lambda chunk: len(chunk) > 1 or

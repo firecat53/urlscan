@@ -23,7 +23,7 @@ import os
 from os.path import dirname, exists, expanduser
 import re
 import shlex
-from subprocess import call, Popen, PIPE, DEVNULL
+import subprocess
 import sys
 from threading import Thread
 import webbrowser
@@ -82,7 +82,7 @@ def splittext(text, search, attr):
 
     """
     if search:
-        pat = re.compile("({})".format(re.escape(search)), re.IGNORECASE)
+        pat = re.compile(f"({re.escape(search)})", re.IGNORECASE)
     else:
         return text
     final = pat.split(text)
@@ -151,20 +151,20 @@ class URLChooser:
                ('urlref:url', 'white', 'black', 'standout'),
                ('url:sel', 'black', 'light gray', 'bold')]
         # Boruch's colorized palette
-        colorized =[('header','brown','black','standout'),
-                    ('footer','white','dark red','standout'),
-                    ('search','white','dark green','standout'),
-                    ('msgtext','light cyan','black'),
-                    ('msgtext:ellipses','light gray','black'),
-                    ('urlref:number:braces','light gray','black'),
-                    ('urlref:number','yellow','black','standout'),
-                    ('urlref:url','dark green','black','standout'),
-                    ('url:sel','white','black','')]
+        colorized = [('header', 'brown', 'black', 'standout'),
+                     ('footer', 'white', 'dark red', 'standout'),
+                     ('search', 'white', 'dark green', 'standout'),
+                     ('msgtext', 'light cyan', 'black'),
+                     ('msgtext:ellipses', 'light gray', 'black'),
+                     ('urlref:number:braces', 'light gray', 'black'),
+                     ('urlref:number', 'yellow', 'black', 'standout'),
+                     ('urlref:url', 'dark green', 'black', 'standout'),
+                     ('url:sel', 'white', 'black', '')]
         self.palettes.update([("default", default), ("bw", blw), ("colorized", colorized)])
         if genconf is True:
             self._config_create()
         try:
-            with open(self.conf, 'r') as conf_file:
+            with open(self.conf, 'r', encoding=sys.getdefaultencoding()) as conf_file:
                 data = json.load(conf_file)
                 try:
                     for pal_name, pal in data['palettes'].items():
@@ -177,7 +177,7 @@ class URLChooser:
                         if value:
                             if value == "open_url":
                                 urwid.Button._command_map._command[key] = 'activate'
-                            value = getattr(self, "_{}".format(value))
+                            value = getattr(self, f"_{value}")
                         else:
                             del self.keys[key]
                             continue
@@ -187,7 +187,7 @@ class URLChooser:
         except FileNotFoundError:
             pass
         try:
-            call(['xdg-open'], stdout=DEVNULL)
+            subprocess.run(['xdg-open'], check=False, stdout=subprocess.DEVNULL)
             self.xdg = True
         except OSError:
             self.xdg = False
@@ -277,7 +277,7 @@ class URLChooser:
         """
         for j, k in enumerate(keys):
             if self.search is True:
-                text = "Search: {}".format(self.search_string)
+                text = f"Search: {self.search_string}"
                 if k == 'enter':
                     # Catch 'enter' key to prevent opening URL in mkbrowseto
                     self.enter = True
@@ -346,7 +346,7 @@ class URLChooser:
     def _open_url(self):
         """<Enter> or <space>"""
         load_text = "Loading URL..." if self.link_open_modes[0] != (self.run or self.runsafe) \
-            else "Executing: {}".format(self.run or self.runsafe)
+            else f"Executing: {self.run or self.runsafe}"
         if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
             self._footer_display(load_text, 5)
 
@@ -362,8 +362,9 @@ class URLChooser:
             Args: mode - 2 for new tab, 1 for new window
 
         """
-        load_text = "Loading URLs in queue..." if self.link_open_modes[0] != (self.run or self.runsafe) \
-            else "Executing: {}".format(self.run or self.runsafe)
+        load_text = "Loading URLs in queue..." \
+            if self.link_open_modes[0] != (self.run or self.runsafe) \
+            else f"Executing: {self.run or self.runsafe}"
         if os.environ.get('BROWSER') in ['elinks', 'links', 'w3m', 'lynx']:
             self._footer_display("Opening multiple links not support in text browsers", 5)
         else:
@@ -417,7 +418,7 @@ class URLChooser:
         """F1"""
         if self.help_menu is False:
             self.focus_pos_saved = self.top.base_widget.body.focus_position
-            help_men = "\n".join(["{} - {}".format(i, j.__name__.strip('_'))
+            help_men = "\n".join([f"{i} - {j.__name__.strip('_')}"
                                   for i, j in self.keys.items() if j.__name__ !=
                                   '_digits'])
             help_men = "KEYBINDINGS\n" + help_men + "\n<0-9> - Jump to item"
@@ -491,7 +492,7 @@ class URLChooser:
             pass
         self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
         if self.number:
-            self._footer_display("Selection: {}".format(self.number), 1)
+            self._footer_display(f"Selection: {self.number}", 1)
 
     def _clear_screen(self):
         """ Ctrl-l """
@@ -600,10 +601,13 @@ class URLChooser:
         cmds = COPY_COMMANDS_PRIMARY if pri else COPY_COMMANDS
         for cmd in cmds:
             try:
-                proc = Popen(shlex.split(cmd), stdin=PIPE, stdout=DEVNULL, stderr=DEVNULL)
-                proc.communicate(input=url.encode(sys.getdefaultencoding()))
-                self._footer_display("Copied url to {} selection".format(
-                    "primary" if pri is True else "clipboard"), 5)
+                subprocess.run(shlex.split(cmd),
+                               check=False,
+                               input=url.encode(sys.getdefaultencoding()),
+                               stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL)
+                self._footer_display("Copied url to "
+                                     f"{'primary' if pri is True else 'clipboard'} selection", 5)
             except OSError:
                 continue
             if self.single is True:
@@ -633,7 +637,7 @@ class URLChooser:
             os.makedirs(dirname(expanduser(self.conf)), exist_ok=True)
             keys = dict(zip(self.keys.keys(),
                             [i.__name__.strip('_') for i in self.keys.values()]))
-            with open(expanduser(self.conf), 'w') as pals:
+            with open(expanduser(self.conf), 'w', encoding=sys.getdefaultencoding()) as pals:
                 pals.writelines(json.dumps({"palettes": self.palettes, "keys": keys},
                                            indent=4))
             print("Created ~/.config/urlscan/config.json")
@@ -655,7 +659,7 @@ class URLChooser:
 
         """
         self.number = ""  # Clear URL selection number
-        text = "Search: {}".format(self.search_string)
+        text = f"Search: {self.search_string}"
         if self.search_string:
             footer = 'search'
         else:
@@ -680,7 +684,7 @@ class URLChooser:
         """ Search - search URLs and text.
 
         """
-        text = "Search: {}".format(self.search_string)
+        text = f"Search: {self.search_string}"
         footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
         self.top.base_widget.footer = footerwid
         search_items = []
@@ -745,7 +749,7 @@ class URLChooser:
         another function with the URL.
 
         """
-        def browse(*args):
+        def browse(*args):  # pylint: disable=unused-argument
             # These 3 lines prevent any stderr messages from webbrowser or xdg
             savout = os.dup(2)
             os.close(2)
@@ -760,20 +764,21 @@ class URLChooser:
             elif self.link_open_modes[0] == "Web Browser":
                 webbrowser.open(url, new=mode)
             elif self.link_open_modes[0] == "Xdg-Open":
-                run = 'xdg-open "{}"'.format(url)
-                process = Popen(shlex.split(run), stdout=PIPE, stdin=PIPE)
+                subprocess.run(shlex.split(f'xdg-open "{url}"'), check=False)
             elif self.link_open_modes[0] == self.runsafe:
                 if self.pipe:
-                    process = Popen(shlex.split(self.runsafe), stdout=PIPE, stdin=PIPE)
-                    process.communicate(input=url.encode(sys.getdefaultencoding()))
+                    subprocess.run(shlex.split(self.runsafe),
+                                   check=False,
+                                   input=url.encode(sys.getdefaultencoding()))
                 else:
                     cmd = [i.format(url) for i in shlex.split(self.runsafe)]
-                    Popen(cmd).communicate()
+                    subprocess.run(cmd, check=False)
             elif self.link_open_modes[0] == self.run and self.pipe:
-                process = Popen(shlex.split(self.run), stdout=PIPE, stdin=PIPE)
-                process.communicate(input=url.encode(sys.getdefaultencoding()))
+                subprocess.run(shlex.split(self.run),
+                               check=False,
+                               input=url.encode(sys.getdefaultencoding()))
             else:
-                Popen(self.run.format(url), shell=True).communicate()
+                subprocess.run(self.run.format(url), check=False, shell=True)
 
             if self.single is True:
                 self._quit()

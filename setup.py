@@ -6,7 +6,7 @@ from setuptools import setup
 
 def long_description():
     """Generate long description from README"""
-    with open("README.md") as readme:
+    with open("README.md", encoding='utf-8') as readme:
         return readme.read()
 
 
@@ -35,10 +35,10 @@ setup(name="urlscan",
           'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
           'Operating System :: OS Independent',
           'Programming Language :: Python',
-          'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
           'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.10',
           'Topic :: Utilities'],
       keywords="urlscan, urlview, email, mutt, tmux"
       )
