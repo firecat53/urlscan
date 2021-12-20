@@ -11,14 +11,14 @@ def long_description():
 
 
 setup(name="urlscan",
-      version="0.9.7",
+      version="0.9.8",
       description="View/select the URLs in an email message or file",
       long_description=long_description(),
       long_description_content_type="text/markdown",
       author="Scott Hansen",
       author_email="firecat4153@gmail.com",
       url="https://github.com/firecat53/urlscan",
-      download_url="https://github.com/firecat53/urlscan/archive/0.9.6.zip",
+      download_url="https://github.com/firecat53/urlscan/archive/0.9.8.zip",
       packages=['urlscan'],
       entry_points={
           'console_scripts': ['urlscan=urlscan.__main__:main']
