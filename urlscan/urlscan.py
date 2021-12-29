@@ -119,7 +119,7 @@ class HTMLChunker(HTMLParser):
             else:
                 counter = self.list_stack[-1][1]
                 self.list_stack[-1] = (tag, counter + 1)
-                chunk = Chunk(f"{counter:%2d.}", self.cur_url())
+                chunk = Chunk(f"{counter:2d}.", self.cur_url())
             self.add_chunk(chunk)
         else:
             self.end_para()
