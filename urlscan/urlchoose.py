@@ -18,6 +18,7 @@
 """An urwid listview-based widget that lets you choose a URL from a list of
 URLs."""
 
+import contextlib
 import json
 import os
 from os.path import dirname, exists, expanduser
@@ -744,48 +745,41 @@ class URLChooser:
                 self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
             self.top.base_widget.header = self.headerwid
 
-    def mkbrowseto(self, url, thread=False, mode=0):
+    def mkbrowseto(self, url, mode=0):
         """Create the urwid callback function to open the web browser or call
         another function with the URL.
 
         """
         def browse(*args):  # pylint: disable=unused-argument
-            # These 3 lines prevent any stderr messages from webbrowser or xdg
-            savout = os.dup(2)
-            os.close(2)
-            os.open(os.devnull, os.O_RDWR)
             # double ()() to ensure self.search evaluated at runtime, not when
             # browse() is _created_. [0] is self.search, [1] is self.enter
             # self.enter prevents opening URL when in search mode
-            if self._get_search()[0]() is True:
-                if self._get_search()[1]() is True:
-                    self.search = False
-                    self.enter = False
-            elif self.link_open_modes[0] == "Web Browser":
-                webbrowser.open(url, new=mode)
-            elif self.link_open_modes[0] == "Xdg-Open":
-                subprocess.run(shlex.split(f'xdg-open "{url}"'), check=False)
-            elif self.link_open_modes[0] == self.runsafe:
-                if self.pipe:
-                    subprocess.run(shlex.split(self.runsafe),
+            with redirect_output():
+                if self._get_search()[0]() is True:
+                    if self._get_search()[1]() is True:
+                        self.search = False
+                        self.enter = False
+                elif self.link_open_modes[0] == "Web Browser":
+                    webbrowser.open(url, new=mode)
+                elif self.link_open_modes[0] == "Xdg-Open":
+                    subprocess.run(shlex.split(f'xdg-open "{url}"'), check=False)
+                elif self.link_open_modes[0] == self.runsafe:
+                    if self.pipe:
+                        subprocess.run(shlex.split(self.runsafe),
+                                       check=False,
+                                       input=url.encode(sys.getdefaultencoding()))
+                    else:
+                        cmd = [i.format(url) for i in shlex.split(self.runsafe)]
+                        subprocess.run(cmd, check=False)
+                elif self.link_open_modes[0] == self.run and self.pipe:
+                    subprocess.run(shlex.split(self.run),
                                    check=False,
                                    input=url.encode(sys.getdefaultencoding()))
                 else:
-                    cmd = [i.format(url) for i in shlex.split(self.runsafe)]
-                    subprocess.run(cmd, check=False)
-            elif self.link_open_modes[0] == self.run and self.pipe:
-                subprocess.run(shlex.split(self.run),
-                               check=False,
-                               input=url.encode(sys.getdefaultencoding()))
-            else:
-                subprocess.run(self.run.format(url), check=False, shell=True)
+                    subprocess.run(self.run.format(url), check=False, shell=True)
 
-            if self.single is True:
-                self._quit()
-            # Restore normal stderr
-            os.dup2(savout, 2)
-            if thread is False:
-                self.draw_screen()
+                if self.single is True:
+                    self._quit()
         return browse
 
     def process_urls(self, extractedurls, dedupe, shorten):
@@ -861,3 +855,29 @@ class URLChooser:
                 items.append(urwid.Columns(markup))
 
         return items, urls
+
+
+@contextlib.contextmanager
+def redirect_output():
+    """
+    A context manager to temporarily redirect stderr and stdout to devnull
+
+    Usage:
+        with redirect_output():
+            webbrowser.open('https://google.com')
+
+    """
+    try:
+        err = os.dup(sys.stderr.fileno())
+        out = os.dup(sys.stdout.fileno())
+        dest_file = open(os.devnull, 'w')
+        os.dup2(dest_file.fileno(), sys.stderr.fileno())
+        os.dup2(dest_file.fileno(), sys.stdout.fileno())
+        yield
+    finally:
+        if err is not None:
+            os.dup2(err, sys.stderr.fileno())
+        if out is not None:
+            os.dup2(out, sys.stdout.fileno())
+        if dest_file is not None:
+            dest_file.close()
