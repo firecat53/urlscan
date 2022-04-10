@@ -814,6 +814,7 @@ class URLChooser:
                     if chunk.url is None:
                         markup.append(('msgtext', chunk.markup))
                     else:
+                        chunk.url = chunk.url.strip()
                         if (dedupe is True and chunk.url not in urls) \
                                 or dedupe is False:
                             urls.append(chunk.url)
@@ -824,7 +825,8 @@ class URLChooser:
                         if chunk.markup:
                             tmpmarkup.append(('msgtext', chunk.markup))
                         while i < len(chunks) and \
-                                chunks[i].url == chunk.url:
+                                (chunks[i].url if chunks[i].url is None
+                                    else chunks[i].url.strip()) == chunk.url:
                             if chunks[i].markup:
                                 tmpmarkup.append(chunks[i].markup)
                             i += 1
