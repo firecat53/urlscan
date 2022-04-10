@@ -354,7 +354,7 @@ class URLChooser:
     def _background_queue(self, mode):
         """Open URLs in background"""
         for url in self.queue:
-            self.mkbrowseto(url, thread=True, mode=mode)()
+            self.mkbrowseto(url, mode=mode)()
         self.draw_screen()
 
     def _queue(self, mode=2):
