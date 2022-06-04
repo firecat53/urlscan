@@ -245,7 +245,7 @@ class HTMLChunker(HTMLParser):
             self.handle_data(f"&{name};")
 
 
-URLINTERNALPATTERN = r'[{}()@\w/\\\-%?!&.=:;+,#~]'
+URLINTERNALPATTERN = r'[{}()@\w/\\\-%?!&.=:;+,#~*]'
 URLTRAILINGPATTERN = r'[{}(@\w/\-%&=+#$]'
 HTTPURLPATTERN = (r'(?:(https?|file|ftps?)://' + URLINTERNALPATTERN +
                   r'*' + URLTRAILINGPATTERN + r')')
