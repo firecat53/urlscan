@@ -2,7 +2,7 @@
 
 ## Contributors
 
-Scott Hansen \<firecat4153@gmail.com\> (Author and Maintainer)
+Scott Hansen \<tech@firecat53.net\> (Author and Maintainer)
 
 Maxime Chatelle \<xakz@rxsoft.eu\> (Debian Maintainer)
 
