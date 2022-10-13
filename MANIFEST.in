@@ -1,3 +1,0 @@
-include COPYING
-include urlscan.1
-include urlscan/assets/tlds-alpha-by-domain.txt

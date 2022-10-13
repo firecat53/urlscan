@@ -6,4 +6,5 @@
 build
 dist
 test_emails/
+urlscan/_version.py
 MANIFEST

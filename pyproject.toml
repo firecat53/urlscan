@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "urlscan"
+dynamic = ["version"]
+description = "View/select the URLs in an email message or file"
+readme = "README.md"
+license = "GPL-2.0"
+authors = [
+    { name = "Scott Hansen", email = "tech@firecat53.net" },
+]
+keywords = [
+    "email",
+    "mutt",
+    "tmux",
+    "urlscan",
+    "urlview",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Console :: Curses",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "urwid>=1.2.1",
+]
+
+[project.scripts]
+urlscan = "urlscan.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/firecat53/urlscan"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "urlscan/_version.py"
+
+[tool.hatch.build.targets.wheel.shared-data]
+LICENSE = "share/doc/urlscan/LICENSE"
+"README.md" = "share/doc/urlscan/README.md"
+"urlscan.1" = "share/man/man1/urlscan.1"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/urlscan",
+]
