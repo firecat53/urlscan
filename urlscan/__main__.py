@@ -28,6 +28,7 @@ import sys
 from email import policy
 from email.parser import BytesParser
 from urlscan import urlchoose, urlscan
+from urlscan._version import version
 
 
 def parse_arguments():
@@ -86,6 +87,9 @@ def parse_arguments():
     arg_parse.add_argument('--headers', dest='headers',
                            action='store_true', default=False,
                            help='Scan certain message headers for URLs.')
+    arg_parse.add_argument('--version', '-V', dest='version',
+                           action='store_true', default=False,
+                           help='Print urlscan version')
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
     return arg_parse.parse_args()
@@ -166,6 +170,9 @@ def main():
 
     """
     args = parse_arguments()
+    if args.version is True:
+        print(version)
+        return
     if args.genconf is True:
         urlchoose.URLChooser([], genconf=True)
         return
