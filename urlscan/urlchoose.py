@@ -399,6 +399,9 @@ class URLChooser:
         self.headerwid = urwid.AttrMap(urwid.Text(
             self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
         self.top.base_widget.header = self.headerwid
+        label = self.items[fpo][1].label
+        if not label.startswith("* "):
+            self.items[fpo][1].set_label(f"* {label}")
 
     def _del_url(self):
         """d"""
@@ -412,6 +415,9 @@ class URLChooser:
             self.headerwid = urwid.AttrMap(urwid.Text(
                 self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
             self.top.base_widget.header = self.headerwid
+            label = self.items[fpo][1].label
+            if label.startswith("* "):
+                self.items[fpo][1].set_label(label.lstrip("* "))
         except ValueError:
             pass
 
