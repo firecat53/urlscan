@@ -69,9 +69,13 @@ Relative to urlview, urlscan has the following additional features:
 
 ## Installation and setup
 
-To install urlscan, install from your distribution repositories (Archlinux),
-from Pypi, or do a local development install with pip -e:
+To install urlscan, install from your distribution repositories, from Pypi, or do
+a local development install with pip -e:
 
+    pipx install urlscan 
+    
+    OR
+    
     pip install --user urlscan
 
     OR
@@ -193,4 +197,9 @@ The follow actions are supported:
   sub-parts, rather than just picking one, which may lead to URLs and context
   appearing twice. (Bypass this by selecting the '--dedupe' option)
 
+## Build/development
+
+- pyproject.toml is configured for [hatch][2] for building and submitting to pypi.
+
 [1]: http://urwid.org/manual/displayattributes.html#display-attributes  "Urwid display attributes"
+[2]: https://hatch.pypa.io/latest/  "Hatch"
