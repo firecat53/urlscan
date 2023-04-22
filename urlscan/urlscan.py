@@ -245,7 +245,7 @@ class HTMLChunker(HTMLParser):
             self.handle_data(f"&{name};")
 
 
-URLINTERNALPATTERN = r'[{}()@\w/\\\-%?!&.=:;+,#~*]'
+URLINTERNALPATTERN = r'[\[\]{}()@\w/\\\-%?!&.=:;+,#~*]'
 URLTRAILINGPATTERN = r'[{}(@\w/\-%&=+#$]'
 HTTPURLPATTERN = (r'(?:(https?|file|ftps?)://' + URLINTERNALPATTERN +
                   r'*' + URLTRAILINGPATTERN + r')')
@@ -291,6 +291,7 @@ assert URLRE.match('testurl.smile.smile')
 assert URLRE.match('testurl.biz.smile.zw')
 assert not URLRE.match('example..biz')
 assert not URLRE.match('blah.baz.obviouslynotarealdomain')
+assert URLRE.match('http://[2a07:3500:11a0:320::22]:8080')
 
 
 def parse_text_urls(mesg, regex=None):
