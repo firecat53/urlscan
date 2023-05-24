@@ -211,6 +211,10 @@ class URLChooser:
         self.items, self.urls = self.process_urls(extractedurls,
                                                   dedupe=dedupe,
                                                   shorten=self.shorten)
+        # Original version of all items
+        self.items_orig = self.items
+        # Store items grouped into sections
+        self.items_org = grp_list(self.items)
         # Store 'compact' mode items
         self.items_com = [i for i in self.items if
                           isinstance(i, urwid.Columns) is True]
@@ -218,10 +222,6 @@ class URLChooser:
             self.items, self.items_com = self.items_com, self.items
         self.urls_unesc = [i.replace('\\', '') for i in self.urls]
         self.unesc = False
-        # Original version of all items
-        self.items_orig = self.items
-        # Store items grouped into sections
-        self.items_org = grp_list(self.items)
         listbox = urwid.ListBox(self.items)
         self.header = (":: F1 - help/keybindings :: "
                        "q - quit :: "
@@ -470,8 +470,7 @@ class URLChooser:
         if self.urls:
             self.search = True
             if self.compact is True:
-                self.compact = False
-                self.items, self.items_com = self.items_com, self.items
+                self._context()
         else:
             return
         self.no_matches = False
