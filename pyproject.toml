@@ -56,4 +56,5 @@ LICENSE = "share/doc/urlscan/LICENSE"
 [tool.hatch.build.targets.sdist]
 include = [
     "/urlscan",
+    "urlscan.1",
 ]
