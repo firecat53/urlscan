@@ -699,7 +699,7 @@ class URLChooser:
             for idx, item in enumerate(grp):
                 if isinstance(item, urwid.Columns):
                     for col_idx, col in enumerate(item.contents):
-                        if isinstance(col[0], urwid.decoration.AttrMap):
+                        if isinstance(col[0], urwid.AttrMap):
                             grp[idx][col_idx].set_label(splittext(col[0].base_widget.label,
                                                                   self.search_string,
                                                                   ''))
