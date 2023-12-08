@@ -72,10 +72,10 @@ Relative to urlview, urlscan has the following additional features:
 To install urlscan, install from your distribution repositories, from Pypi, or do
 a local development install with pip -e:
 
-    pipx install urlscan 
-    
+    pipx install urlscan
+
     OR
-    
+
     pip install --user urlscan
 
     OR
@@ -96,6 +96,15 @@ Once urlscan is installed, add the following lines to your .muttrc:
 
 Once this is done, Control-b while reading mail in mutt will automatically
 invoke urlscan on the message.
+
+> Note for Neomutt users: [As of version
+> `2023-05-17`](https://github.com/neomutt/neomutt/releases/tag/20230517) true
+> color support was implemented. If you are using true color support with Neomutt,
+> or are encountering the error `setupterm: could not find terminfo database`,
+> then you should also add `TERM=xterm-256color` to your macro in `.muttrc`.
+> See more here [#135](https://github.com/firecat53/urlscan/issues/135). For example:
+> `macro index,pager  \cb "<pipe-message>  TERM=xterm-256color urlscan<Enter>" "call urlscan to
+extract URLs out of a message"`
 
 To choose a particular browser, set the environment variable BROWSER. If BROWSER
 is not set, xdg-open will control which browser is used, if it's available.:
