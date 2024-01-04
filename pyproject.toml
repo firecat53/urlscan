@@ -7,7 +7,7 @@ name = "urlscan"
 dynamic = ["version"]
 description = "View/select the URLs in an email message or file"
 readme = "README.md"
-license = "GPL-2.0"
+license = "GPL-2.0-or-later"
 authors = [
     { name = "Scott Hansen", email = "tech@firecat53.net" },
 ]
