@@ -56,7 +56,7 @@ def parse_arguments():
     arg_parse.add_argument('--regex', '-E',
                            help="Alternate custom regex to be used for all "
                            "kinds of matching. "
-                           "For example: --regex 'https?://.+\.\w+'")
+                           r"For example: --regex 'https?://.+\.\w+'")
     arg_parse.add_argument('--run', '-r',
                            help="Alternate command to run on selected URL "
                            "instead of opening URL in browser. Use {} to "
