@@ -1,5 +1,7 @@
 # Urlscan
 
+[![main](https://github.com/firecat53/urlscan/actions/workflows/main.yml/badge.svg)](https://github.com/firecat53/urlscan/actions/workflows/main.yml)
+
 ## Contributors
 
 Scott Hansen \<tech@firecat53.net\> (Author and Maintainer)
