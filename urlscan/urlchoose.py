@@ -30,6 +30,7 @@ from threading import Thread
 import webbrowser
 
 import urwid
+import urwid.decoration
 import urwid.curses_display
 import urwid.raw_display
 
