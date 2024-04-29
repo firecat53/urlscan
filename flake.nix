@@ -39,7 +39,7 @@
       pkgs,
       commonPackages,
     }: {
-      default = pkgs.python3Packages.buildPythonApplication {
+      default = pkgs.python312Packages.buildPythonApplication {
         name = "urlscan";
         pname = "urlscan";
         format = "pyproject";
