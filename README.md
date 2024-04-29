@@ -211,6 +211,8 @@ The follow actions are supported:
 ## Build/development
 
 - pyproject.toml is configured for [hatch][2] for building and submitting to pypi.
+- flake.nix is available for a development shell or building/testing the package
+  if desired. `nix develop`
 
 [1]: http://urwid.org/manual/displayattributes.html#display-attributes  "Urwid display attributes"
 [2]: https://hatch.pypa.io/latest/  "Hatch"
