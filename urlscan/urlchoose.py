@@ -118,6 +118,8 @@ class URLChooser:
                      'g': self._top,
                      'j': self._down,
                      'k': self._up,
+                     'J': self._next,
+                     'K': self._previous,
                      'P': self._clipboard_pri,
                      'l': self._link_handler,
                      'o': self._open_queue,
@@ -220,6 +222,8 @@ class URLChooser:
                           isinstance(i, urwid.Columns) is True]
         if self.compact is True:
             self.items, self.items_com = self.items_com, self.items
+        self.selectable_positions = [i for i, item in enumerate(self.items)
+                                     if item.selectable()]
         self.urls_unesc = [i.replace('\\', '') for i in self.urls]
         self.unesc = False
         listbox = urwid.ListBox(self.items)
@@ -522,6 +526,28 @@ class URLChooser:
         """ G """
         # Goto bottom of the list
         self.top.base_widget.body.focus_position = len(self.items) - 1
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+
+    def _next(self):
+        """ J """
+        current_position = self.top.base_widget.body.focus_position
+        if current_position >= self.selectable_positions[-1]:
+            # Do not jump if focus is on or after the last selectable position
+            return
+        # Jump to the first selectable position after the currently focused position
+        target_position = min(p for p in self.selectable_positions if p > current_position)
+        self.top.base_widget.body.focus_position = target_position
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+
+    def _previous(self):
+        """ K """
+        current_position = self.top.base_widget.body.focus_position
+        if current_position <= self.selectable_positions[0]:
+            # Do not jump if focus is on or before the first selectable position
+            return
+        # Jump to the first selectable position before the currently focused position
+        target_position = max(p for p in self.selectable_positions if p < current_position)
+        self.top.base_widget.body.focus_position = target_position
         self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _shorten(self):
