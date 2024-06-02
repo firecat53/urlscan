@@ -118,6 +118,8 @@ class URLChooser:
                      'g': self._top,
                      'j': self._down,
                      'k': self._up,
+                     'J': self._next,
+                     'K': self._previous,
                      'P': self._clipboard_pri,
                      'l': self._link_handler,
                      'o': self._open_queue,
@@ -446,10 +448,12 @@ class URLChooser:
                     "help_menu     -- show/hide help menu\n"
                     "link_handler  -- cycle through xdg-open, webbrowser \n"
                     "                 and user-defined function\n"
+                    "next          -- jump to next URL\n"
                     "open_queue    -- open all URLs in queue\n"
                     "open_queue_win-- open all URLs in queue in new window\n"
                     "open_url      -- open selected URL\n"
                     "palette       -- cycle through palettes\n"
+                    "previous      -- jump to previous URL\n"
                     "quit          -- quit\n"
                     "reverse       -- reverse order URLs/context\n"
                     "shorten       -- toggle shorten highlighted URL\n"
@@ -522,6 +526,31 @@ class URLChooser:
         """ G """
         # Goto bottom of the list
         self.top.base_widget.body.focus_position = len(self.items) - 1
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+
+    def _selectable_positions(self):
+        return [i for i, item in enumerate(self.items) if item.selectable()]
+
+    def _next(self):
+        """ J """
+        current_position = self.top.base_widget.body.focus_position
+        if current_position >= self._selectable_positions()[-1]:
+            # Do not jump if focus is on or after the last selectable position
+            return
+        # Jump to the first selectable position after the currently focused position
+        target_position = min(p for p in self._selectable_positions() if p > current_position)
+        self.top.base_widget.body.focus_position = target_position
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+
+    def _previous(self):
+        """ K """
+        current_position = self.top.base_widget.body.focus_position
+        if current_position <= self._selectable_positions()[0]:
+            # Do not jump if focus is on or before the first selectable position
+            return
+        # Jump to the first selectable position before the currently focused position
+        target_position = max(p for p in self._selectable_positions() if p < current_position)
+        self.top.base_widget.body.focus_position = target_position
         self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _shorten(self):
