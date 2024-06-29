@@ -22,6 +22,7 @@ import contextlib
 import json
 import os
 from os.path import dirname, exists, expanduser
+from sys import platform
 import re
 import shlex
 import subprocess
@@ -34,7 +35,10 @@ import urwid.curses_display
 import urwid.raw_display
 
 
-if 'WAYLAND_DISPLAY' in os.environ:
+if platform == 'darwin':
+    COPY_COMMANDS = ('pbcopy',)
+    COPY_COMMANDS_PRIMARY = ('pbcopy',)
+elif 'WAYLAND_DISPLAY' in os.environ:
     COPY_COMMANDS = ('wl-copy',)
     COPY_COMMANDS_PRIMARY = ('wl-copy --primary',)
 else:
