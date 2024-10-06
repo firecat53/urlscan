@@ -116,6 +116,8 @@ class URLChooser:
                      'C': self._clipboard,
                      'c': self._context,
                      'ctrl l': self._clear_screen,
+                     'ctrl f': self._page_down,
+                     'ctrl b': self._page_up,
                      'd': self._del_url,
                      'f1': self._help_menu,
                      'G': self._bottom,
@@ -544,6 +546,16 @@ class URLChooser:
         # Jump to the first selectable position after the currently focused position
         target_position = min(p for p in self._selectable_positions() if p > current_position)
         self.top.base_widget.body.focus_position = target_position
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+
+    def _page_up(self):
+        """ Ctrl-b """
+        self.top.base_widget.keypress(self.size, "page up")
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+
+    def _page_down(self):
+        """ Ctrl-f """
+        self.top.base_widget.keypress(self.size, "page down")
         self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _previous(self):
