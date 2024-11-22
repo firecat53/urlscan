@@ -70,6 +70,10 @@ jobs:
       id-token: write  # IMPORTANT: mandatory for sigstore
 
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all tags and history
       - name: Download all the dists
         uses: actions/download-artifact@v4
         with:
