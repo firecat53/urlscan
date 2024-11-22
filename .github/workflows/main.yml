@@ -81,6 +81,12 @@ jobs:
           inputs: >-
             ./dist/*.tar.gz
             ./dist/*.whl
+      - name: Get tag annotation
+        id: tag_annotation
+        run: |
+          # Extract the tag annotation for release notes
+          tag_annotation=$(git for-each-ref --format '%(contents:body)' refs/tags/${{ github.ref_name }})
+          echo "annotation=$tag_annotation" >> $GITHUB_ENV
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -88,7 +94,8 @@ jobs:
           gh release create
           '${{ github.ref_name }}'
           --repo '${{ github.repository }}'
-          --notes ""
+          --title '${{ github.ref_name }}'
+          --notes "${{ env.annotation }}"
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}

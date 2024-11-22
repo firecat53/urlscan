@@ -191,10 +191,6 @@ The follow actions are supported:
 - `top` -- move to first list item (default: `g`)
 - `up` -- cursor up (default: `k`)
 
-## Update TLD list (for developers, not users)
-
-`wget https://data.iana.org/TLD/tlds-alpha-by-domain.txt`
-
 ## Known bugs and limitations
 
 - Running urlscan sometimes "messes up" the terminal background. This seems to
@@ -215,6 +211,15 @@ The follow actions are supported:
 - pyproject.toml is configured for [hatch][2] for building and submitting to pypi.
 - flake.nix is available for a development shell or building/testing the package
   if desired. `nix develop`
+- To update TLD list: `wget https://data.iana.org/TLD/tlds-alpha-by-domain.txt`
+- GitHub Action will upload to TestPyPi on each push to `main`. To create a
+  GitHub and PyPi release, create a new tag (formatting below) and push tags.
+
+        <tag name on first line>
+        
+        * Release note 1
+        * Release note 2
+        * ...
 
 [1]: http://urwid.org/manual/displayattributes.html#display-attributes  "Urwid display attributes"
 [2]: https://hatch.pypa.io/latest/  "Hatch"
