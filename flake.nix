@@ -16,7 +16,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
           commonPackages = builtins.attrValues {
             inherit
-              (pkgs.python312Packages)
+              (pkgs.python3Packages)
               python
               urwid
               ;
@@ -39,7 +39,7 @@
       pkgs,
       commonPackages,
     }: {
-      default = pkgs.python312Packages.buildPythonApplication {
+      default = pkgs.python3Packages.buildPythonApplication {
         name = "urlscan";
         pname = "urlscan";
         format = "pyproject";
@@ -50,7 +50,7 @@
             git
             ;
           inherit
-            (pkgs.python312Packages)
+            (pkgs.python3Packages)
             hatchling
             hatch-vcs
             ;
