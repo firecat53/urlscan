@@ -3,6 +3,8 @@
 *.egg-info
 *.gz
 *.xz
+.envrc
+.direnv/
 build
 dist
 test_emails/
