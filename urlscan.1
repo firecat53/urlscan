@@ -70,9 +70,8 @@ command line with \fB--run-safe\fR or \fB--run\fR. The \fB--run\fR and
 
 .SH OPTIONS
 .TP
-.B \-c, \-\-compact
-Display a simple list of the extracted URLs, instead of showing the
-context of each URL. Also toggle with `c` from within the viewer.
+.BR \-c ", " \-\-compact
+Compact display mode; don't show the context of each URL.
 .TP
 .B \-d, \-\-dedupe
 Remove duplicated URLs from the list of URLs.
@@ -98,9 +97,9 @@ Generate ~/.config/urlscan/config.json with default options.
 .B \-H, \-\-nohelp
 Start with header menu hidden.
 .TP
-.B \-\-headers
-Scan email headers for URLs.
-
+.BR \-\-headers
+Scan certain message headers for URLs. Currently Link, Archived-At and
+List-* are scanned.
 .TP
 .B \-n, \-\-no-browser
 Disables the selection interface and print the links to standard output.
@@ -131,8 +130,14 @@ Exit urlscan after opening or copying a single browser link.
 .B \-w, \-\-width
 Set display width.
 .TP
-.B \-W, \-\-whitespace-off
-Suppress output of blank lines and ellipses lines.
+.BR \-W ", " \-\-whitespace\-off
+Don't display empty lines and ellipses.
+.TP
+.BR \-C ", " \-\-colors " {true,256,88,16,8,mono}"
+Set the urwid color mode. Default is "16". "true" = 2**24 colors and "mono" = 1 color.
+.TP
+.BR \-V ", " \-\-version
+Print urlscan version.
 
 .SH MUTT INTEGRATION
 

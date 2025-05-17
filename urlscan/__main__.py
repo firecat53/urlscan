@@ -87,6 +87,10 @@ def parse_arguments():
     arg_parse.add_argument('--headers', dest='headers',
                            action='store_true', default=False,
                            help='Scan certain message headers for URLs.')
+    arg_parse.add_argument('--colors', '-C',
+                           choices=['true', '256', '88', '16', '8', 'mono'],
+                           default='16',
+                           help='Set the terminal color palette (true=2**24, mono=1)')
     arg_parse.add_argument('--version', '-V', dest='version',
                            action='store_true', default=False,
                            help='Print urlscan version')
@@ -188,7 +192,8 @@ def main():
                                    single=args.single,
                                    width=args.width,
                                    whitespaceoff=args.whitespaceoff,
-                                   pipe=args.pipe)
+                                   pipe=args.pipe,
+                                   colors=args.colors)
         tui.main()
     else:
         out = urlchoose.URLChooser(urlscan.msgurls(msg, regex=args.regex, headers=args.headers),

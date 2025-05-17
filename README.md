@@ -52,6 +52,9 @@ Relative to urlview, urlscan has the following additional features:
   default config file for editing by running `urlscan -g`. Cycle through
   available palettes with `p`. Set display width with `--width`.
 
+- Set the urwid color mode with `--colors`. Options include 'true' (2**24
+  colors), '256', '88', '16', '8', or 'mono'. Default is '16'.
+
 - Copy URL to clipboard with `C` or to primary selection with `P`.  Requires
   xsel or xclip.
 
@@ -132,6 +135,7 @@ is not set, xdg-open will control which browser is used, if it's available.:
             [-s, --single]
             [-w, --width]
             [-W  --whitespace-off]
+            [-C, --colors {true,256,88,16,8,mono}]
 
 Urlscan can extract URLs and email addresses from emails or any text file.
 Calling with no flags will start the curses browser. Calling with '-n' will just
@@ -155,6 +159,22 @@ Run `urlscan -g` to generate ~/.config/urlscan/config.json with the default
 color and black & white palettes. This can be edited or added to, as desired.
 The first palette in the list will be the default. Configure the palettes
 according to the [Urwid display attributes][1].
+
+Partial example from default palette:
+```json
+        "default": [
+            [
+                "header",   # Urwid widget name
+                "white",    # Standard foreground color
+                "dark blue",# Standard background color
+                "standout", # Monochrome settings
+                "#ffffff",  # Extended foreground color (88 through True colors)
+                "#0000aa"   # Extended foreground color (88 through True colors)
+            ],
+            [
+                "footer",
+                ...
+```
 
 Display width can be set with `--width`.
 

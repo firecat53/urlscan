@@ -31,8 +31,6 @@ from threading import Thread
 import webbrowser
 
 import urwid
-import urwid.curses_display
-import urwid.raw_display
 
 
 if platform == 'darwin':
@@ -99,7 +97,7 @@ class URLChooser:
 
     def __init__(self, extractedurls, compact=False, reverse=False, nohelp=False, dedupe=False,
                  shorten=True, run="", runsafe="", single=False, pipe=False,
-                 genconf=False, width=0, whitespaceoff=False):
+                 genconf=False, width=0, whitespaceoff=False, colors="true"):
         self.conf = expanduser("~/.config/urlscan/config.json")
         self.keys = {'/': self._search_key,
                      '0': self._digits,
@@ -138,46 +136,64 @@ class URLChooser:
                      's': self._shorten,
                      'u': self._all_escape
                      }
+        # Set urwid color mode based on the colors parameter
+        self.color = {
+            "true": 2**24,
+            "256": 256,
+            "88": 88,
+            "16": 16,
+            "8": 8,
+            "mono": 1
+        }.get(colors, 16)
         self.palettes = {}
         # Default color palette
-        default = [('header', 'white', 'dark blue', 'standout'),
-                   ('footer', 'white', 'dark red', 'standout'),
-                   ('search', 'white', 'dark green', 'standout'),
-                   ('msgtext', '', ''),
-                   ('msgtext:ellipses', 'light gray', 'black'),
-                   ('urlref:number:braces', 'light gray', 'black'),
-                   ('urlref:number', 'yellow', 'black', 'standout'),
-                   ('urlref:url', 'white', 'black', 'standout'),
-                   ('url:sel', 'white', 'dark blue', 'bold')]
+        default = [('header', 'white', 'dark blue', 'standout', '#ffffff', '#0000aa'),
+                   ('footer', 'white', 'dark red', 'standout', '#ffffff', '#aa0000'),
+                   ('search', 'white', 'dark green', 'standout', '#ffffff', '#00aa00'),
+                   ('msgtext', '', '', '', '', ''),
+                   ('msgtext:ellipses', 'light gray', 'black', '', '#aaaaaa', '#000000'),
+                   ('urlref:number:braces', 'light gray', 'black', '', '#aaaaaa', '#000000'),
+                   ('urlref:number', 'yellow', 'black', 'standout', '#ffff00', '#000000'),
+                   ('urlref:url', 'white', 'black', 'standout', '#ffffff', '#000000'),
+                   ('url:sel', 'white', 'dark blue', 'bold', '#ffffff', '#0000aa')]
         # Default black & white palette
-        blw = [('header', 'black', 'light gray', 'standout'),
-               ('footer', 'black', 'light gray', 'standout'),
-               ('search', 'black', 'light gray', 'standout'),
-               ('msgtext', '', ''),
-               ('msgtext:ellipses', 'white', 'black'),
-               ('urlref:number:braces', 'white', 'black'),
-               ('urlref:number', 'white', 'black', 'standout'),
-               ('urlref:url', 'white', 'black', 'standout'),
-               ('url:sel', 'black', 'light gray', 'bold')]
-        # Boruch's colorized palette
-        colorized = [('header', 'brown', 'black', 'standout'),
-                     ('footer', 'white', 'dark red', 'standout'),
-                     ('search', 'white', 'dark green', 'standout'),
-                     ('msgtext', 'light cyan', 'black'),
-                     ('msgtext:ellipses', 'light gray', 'black'),
-                     ('urlref:number:braces', 'light gray', 'black'),
-                     ('urlref:number', 'yellow', 'black', 'standout'),
-                     ('urlref:url', 'dark green', 'black', 'standout'),
-                     ('url:sel', 'white', 'black', '')]
-        self.palettes.update([("default", default), ("bw", blw), ("colorized", colorized)])
+        blw = [('header', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
+               ('footer', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
+               ('search', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
+               ('msgtext', '', '', '', '', ''),
+               ('msgtext:ellipses', 'white', 'black', '', '#ffffff', '#000000'),
+               ('urlref:number:braces', 'white', 'black', '', '#ffffff', '#000000'),
+               ('urlref:number', 'white', 'black', 'standout', '#ffffff', '#000000'),
+               ('urlref:url', 'white', 'black', 'standout', '#ffffff', '#000000'),
+               ('url:sel', 'black', 'light gray', 'bold', '#000000', '#aaaaaa')]
+        # Default catppuccin palette
+        ctp = [("header", "white", "dark blue", "standout", "#CDD6F4", "#89B4FA"),
+               ("footer", "white", "dark red", "standout", "#CDD6F4", "#F38BA8"),
+               ("search", "white", "dark green", "standout", "#CDD6F4", "#A6E3A1"),
+               ("msgtext", "", "", "", "#CDD6F4", "#1E1E2E"),
+               ("msgtext:ellipses", "light gray", "black", "", "#B4BEFE", "#1E1E2E"),
+               ("urlref:number:braces", "light gray", "black", "", "#B4BEFE", "#1E1E2E"),
+               ("urlref:number", "yellow", "black", "standout", "#F9E2AF", "#1E1E2E"),
+               ("urlref:url", "white", "black", "standout", "#CBA6F7", "#1E1E2E"),
+               ("url:sel", "white", "dark blue", "bold", "#F5E0DC", "#313244")]
+
         if genconf is True:
+            # Add default palettes for config generation
+            self.palettes.update([("default", default), ("bw", blw), ("catppuccin", ctp)])
             self._config_create()
+
+        # Flag to track if we found palettes in config.json
+        config_has_palettes = False
+
         try:
             with open(self.conf, 'r', encoding=sys.getdefaultencoding()) as conf_file:
                 data = json.load(conf_file)
                 try:
-                    for pal_name, pal in data['palettes'].items():
-                        self.palettes.update([(pal_name, [tuple(i) for i in pal])])
+                    if 'palettes' in data and data['palettes']:
+                        # If config has palettes, use only those
+                        config_has_palettes = True
+                        for pal_name, pal in data['palettes'].items():
+                            self.palettes.update([(pal_name, [tuple(i) for i in pal])])
                 except KeyError:
                     pass
                 try:
@@ -195,6 +211,10 @@ class URLChooser:
                     pass
         except FileNotFoundError:
             pass
+
+        # If no palettes were found in config, use the default hardcoded ones
+        if not config_has_palettes:
+            self.palettes.update([("default", default), ("bw", blw), ("catppuccin", ctp)])
         try:
             subprocess.run(['xdg-open'], check=False, stdout=subprocess.DEVNULL)
             self.xdg = True
@@ -255,7 +275,7 @@ class URLChooser:
                 (2 if self.compact is False else 0)
         if reverse is True:
             self._reverse()
-        self.tui = urwid.curses_display.Screen()
+        self.tui = urwid.raw_display.Screen()
         self.palette_names = list(self.palettes.keys())
         self.palette_idx = 0
         self.number = ""
@@ -268,6 +288,7 @@ class URLChooser:
         self.loop = urwid.MainLoop(self.top, self.palettes[self.palette_names[0]], screen=self.tui,
                                    handle_mouse=False, input_filter=self.handle_keys,
                                    unhandled_input=self.unhandled)
+        self.loop.screen.set_terminal_properties(self.color)
         self.loop.run()
 
     @property
