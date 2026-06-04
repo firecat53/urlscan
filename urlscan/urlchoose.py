@@ -389,7 +389,7 @@ class URLChooser:
     def _background_queue(self, mode):
         """Open URLs in background"""
         for url in self.queue:
-            self.mkbrowseto(url, mode=mode)()
+            self.mkbrowseto(url, mode=mode, background=True)()
         self.draw_screen()
 
     def _queue(self, mode=2):
@@ -822,9 +822,13 @@ class URLChooser:
                 self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
             self.top.base_widget.header = self.headerwid
 
-    def mkbrowseto(self, url, mode=0):
+    def mkbrowseto(self, url, mode=0, background=False):
         """Create the urwid callback function to open the web browser or call
         another function with the URL.
+
+        Args: background (default False)
+                If False, runs browser in a thread so it doesn't block the
+                urwid event loop.
 
         """
         def browse(*args):  # pylint: disable=unused-argument
@@ -872,7 +876,15 @@ class URLChooser:
 
                 if self.single is True:
                     self._quit()
-        return browse
+
+        if background or os.environ.get('BROWSER') in TERMINAL_BROWSERS:
+            return browse
+
+        def browse_async(*args):  # pylint: disable=unused-argument
+            # daemon=True so quitting urlscan doesn't wait for a still-open
+            # browser to close.
+            Thread(target=browse, args=args, daemon=True).start()
+        return browse_async
 
     def process_urls(self, extractedurls, dedupe, shorten):
         """Process the 'extractedurls' and ready them for either the curses browser
