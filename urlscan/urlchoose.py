@@ -45,6 +45,10 @@ else:
     COPY_COMMANDS = ("xsel -ib", "xclip -i -selection clipboard")
     COPY_COMMANDS_PRIMARY = ("xsel -i", "xclip -i")
 
+# Text-mode browsers take over the terminal and render to stdout, so they
+# must be run in the foreground with the urwid screen suspended.
+TERMINAL_BROWSERS = ('elinks', 'links', 'w3m', 'lynx')
+
 
 def shorten_url(url, cols, shorten):
     """Shorten long URLs to fit on one line.
@@ -379,7 +383,7 @@ class URLChooser:
         """<Enter> or <space>"""
         load_text = "Loading URL..." if self.link_open_modes[0] != (self.run or self.runsafe) \
             else f"Executing: {self.run or self.runsafe}"
-        if os.environ.get('BROWSER') not in ['elinks', 'links', 'w3m', 'lynx']:
+        if os.environ.get('BROWSER') not in TERMINAL_BROWSERS:
             self._footer_display(load_text, 5)
 
     def _background_queue(self, mode):
@@ -397,10 +401,10 @@ class URLChooser:
         load_text = "Loading URLs in queue..." \
             if self.link_open_modes[0] != (self.run or self.runsafe) \
             else f"Executing: {self.run or self.runsafe}"
-        if os.environ.get('BROWSER') in ['elinks', 'links', 'w3m', 'lynx']:
+        if os.environ.get('BROWSER') in TERMINAL_BROWSERS:
             self._footer_display("Opening multiple links not support in text browsers", 5)
-        else:
-            self._footer_display(load_text, 5)
+            return
+        self._footer_display(load_text, 5)
         thr = Thread(target=self._background_queue, args=(mode,))
         thr.start()
         self.queue = []
@@ -827,12 +831,27 @@ class URLChooser:
             # double ()() to ensure self.search evaluated at runtime, not when
             # browse() is _created_. [0] is self.search, [1] is self.enter
             # self.enter prevents opening URL when in search mode
+            if self._get_search()[0]() is True:
+                if self._get_search()[1]() is True:
+                    self.search = False
+                    self.enter = False
+                return
+            if self.link_open_modes[0] == "Web Browser" \
+                    and os.environ.get('BROWSER') in TERMINAL_BROWSERS:
+                # Text-mode browsers need control of the real terminal and
+                # their own stdout, so suspend the urwid screen and run them
+                # in the foreground.
+                self.loop.stop()
+                try:
+                    subprocess.run([os.environ['BROWSER'], url], check=False)
+                finally:
+                    self.loop.start()
+                    self.draw_screen()
+                if self.single is True:
+                    self._quit()
+                return
             with redirect_output():
-                if self._get_search()[0]() is True:
-                    if self._get_search()[1]() is True:
-                        self.search = False
-                        self.enter = False
-                elif self.link_open_modes[0] == "Web Browser":
+                if self.link_open_modes[0] == "Web Browser":
                     webbrowser.open(url, new=mode)
                 elif self.link_open_modes[0] == "Xdg-Open":
                     subprocess.run(shlex.split(f'xdg-open "{url}"'), check=False)
