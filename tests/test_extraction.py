@@ -65,8 +65,21 @@ def test_a_plain_text_url_shows_as_a_placeholder():
     assert [unit_text(unit) for unit in group] == ['see <URL> now', '']
 
 
-def test_context_is_the_lines_around_the_url():
+def test_context_is_one_line_either_side_of_the_url():
     groups = urlscan.extracturls('A\nB\nC\nsee http://example.com\nD\nE\n')
     (group, usedfirst, usedlast), = groups
-    assert [unit_text(unit) for unit in group] == ['B', 'C', 'see <URL>', 'D']
+    assert [unit_text(unit) for unit in group] == ['C', 'see <URL>', 'D']
     assert not usedfirst and not usedlast
+
+
+def test_nearby_urls_share_one_group():
+    """A gap of two lines is the context of both, so the groups merge; a gap
+    of three leaves a line belonging to neither, and they stay apart."""
+    merged = urlscan.extracturls('http://a.example.com\nD\nX\nhttp://b.example.com\n')
+    (group, _, _), = merged
+    assert [unit_text(unit) for unit in group] == \
+        ['<URL>', 'D', 'X', '<URL>', '']
+    split = urlscan.extracturls(
+        'http://a.example.com\nD\nX\nY\nhttp://b.example.com\n')
+    assert [[unit_text(unit) for unit in group] for group, _, _ in split] == \
+        [['<URL>', 'D'], ['Y', '<URL>', '']]

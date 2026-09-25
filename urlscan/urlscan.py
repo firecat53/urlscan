@@ -355,8 +355,10 @@ def extract_with_context(lst, pred, before_context, after_context):
     while start < len(lst):
         usedfirst = False
         usedlast = False
-        # Extend to the next match.
-        while start + length < len(lst) and length < before_context + 1 \
+        # Extend to the next match. `length` counts only lines of context
+        # here, not the match itself, so it stops at before_context. (The
+        # after_context loop below starts its count at 1 for the match.)
+        while start + length < len(lst) and length < before_context \
                 and not pred(lst[start + length]):
             length += 1
 
