@@ -408,6 +408,106 @@ def extract_with_context(lst, pred, before_context, after_context):
     return rval
 
 
+# Text converted from HTML keeps its links as a footnote block: a marker where
+# the link sat, and the URLs gathered at the end. Each converter writes the
+# definitions its own way.
+MARKDOWN_DEF = re.compile(r'^\s*\[(?P<label>[^\]]+)\]:\s+(?P<url>\S+)\s*$')
+BRACKET_DEF = re.compile(r'^\s*\[(?P<label>\d+)\]\s+(?P<url>\S+)\s*$')
+NUMBERED_DEF = re.compile(r'^\s*(?P<label>\d+)\.\s+(?P<url>\S+)\s*$')
+REFERENCES_HEADING = re.compile(r'^\s*References:?\s*$', re.IGNORECASE)
+
+
+def _reference_definitions(lines, linechunks):
+    """Map the index of each footnote definition line to its label.
+
+    A definition must hold exactly one URL, so that substituting it cannot
+    change which URLs are found. The bare 'N. url' form that lynx writes is
+    only taken after a References heading: on its own it is an ordinary
+    numbered list.
+
+    """
+    definitions = {}
+    references_seen = False
+    for idx, line in enumerate(lines):
+        if REFERENCES_HEADING.match(line):
+            references_seen = True
+            continue
+        match = MARKDOWN_DEF.match(line) or BRACKET_DEF.match(line)
+        if match is None and references_seen:
+            match = NUMBERED_DEF.match(line)
+        if match is None:
+            continue
+        if sum(chunk.url is not None for chunk in linechunks[idx]) == 1:
+            definitions[idx] = match.group('label')
+    return definitions
+
+
+def _marker_position(lines, definitions, label):
+    """Find where `label`'s marker sits in the prose, as (line, column).
+
+    The first occurrence outside the footnote block wins. None if the marker
+    is nowhere to be found, which includes a multi word label that the
+    converter wrapped across a line break.
+
+    """
+    marker = f'[{label}]'
+    for idx, line in enumerate(lines):
+        if idx in definitions:
+            continue
+        column = line.find(marker)
+        if column != -1:
+            return idx, column
+    return None
+
+
+def resolve_reference_links(lines, linechunks):
+    """Give each footnote definition the context of its marker in the prose.
+
+    A line like '[1]: https://example.com' says nothing about where the link
+    led. The words around the '[1]' in the message do, so that line is rebuilt
+    as the prose line with the marker replaced by the URL itself.
+
+    The text either side of the marker is carried over as plain text rather
+    than rescanned, so that a URL written out in the prose is not found a
+    second time. Every definition still holds exactly one URL, in the order it
+    was defined, leaving the URL list and its numbering untouched.
+
+    Anything unrecognised is left exactly as it was: mail without a footnote
+    block, a label defined twice, or a marker that cannot be found.
+
+        Args: lines - the message, split into lines
+              linechunks - those lines, parsed by parse_text_urls
+        Returns: list of lists of Chunks
+
+    """
+    definitions = _reference_definitions(lines, linechunks)
+    if not definitions:
+        return linechunks
+
+    labels = list(definitions.values())
+    rval = list(linechunks)
+    for idx, label in definitions.items():
+        if labels.count(label) > 1:
+            continue
+        found = _marker_position(lines, definitions, label)
+        if found is None:
+            continue
+        line, column = found
+        url_chunk = next(c for c in linechunks[idx] if c.url is not None)
+        before = lines[line][:column]
+        after = lines[line][column + len(label) + 2:]
+        # lynx and w3m put the marker hard against the link text it labels,
+        # and a writer may equally have typed it against the word before, so
+        # keep the URL from running into either.
+        if before[-1:].isalnum():
+            before = before + ' '
+        if after[:1].isalnum():
+            after = ' ' + after
+        rval[idx] = ([Chunk(before, None)] if before else []) + [url_chunk] + \
+            ([Chunk(after, None)] if after else [])
+    return rval
+
+
 NLRE = re.compile('\r\n|\n|\r')
 
 
@@ -431,6 +531,7 @@ def extracturls(mesg, regex=None):
     # a URL are the only lines containing URLs.
 
     linechunks = [parse_text_urls(i, regex=regex) for i in lines]
+    linechunks = resolve_reference_links(lines, linechunks)
 
     return extract_with_context(linechunks,
                                 lambda chunk: len(chunk) > 1 or
