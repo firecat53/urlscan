@@ -1,0 +1,11 @@
+Bad!
+[My Link](<http://example.com/test(1)>)
+with [parens at end](http://example.com/test(1))
+http://example.com/test_(test)
+
+
+Good!
+[Watson](http://tailordev.github.io/Watson/)
+with [parens](http://example.com/test(1).html)
+http://example.com/test(1).html
+http://msdn.microsoft.com/en-us/library/aa752574(VS.85).aspx

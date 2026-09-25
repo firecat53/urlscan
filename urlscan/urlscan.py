@@ -47,6 +47,22 @@ class Chunk:
         return self.__str__()
 
 
+def chunk_text(chunk):
+    """Return the displayed text of a chunk, ignoring any display attribute.
+
+    Text chunks from plain text messages carry a bare string, those from the
+    HTML parser carry an (attribute, string) tuple, and a plain text URL chunk
+    carries no markup at all.
+
+    """
+    markup = chunk.markup
+    if markup is None:
+        return ''
+    if isinstance(markup, tuple):
+        return markup[1]
+    return markup
+
+
 def isheadertag(tag):
     """Determine if tag is a header """
     return len(tag) == 2 and tag[0] == 'h' and tag[1].isdigit()

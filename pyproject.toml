@@ -58,3 +58,6 @@ include = [
     "/urlscan",
     "urlscan.1",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

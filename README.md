@@ -234,6 +234,17 @@ The follow actions are supported:
 - pyproject.toml is configured for [hatch][2] for building and submitting to pypi.
 - flake.nix is available for a development shell or building/testing the package
   if desired. `nix develop`
+- Tests live in `tests/` and run with `make test`, which uses `pytest` from the
+  dev shell (`nix develop`) if it isn't already on your PATH. Pass extra pytest
+  arguments with `make test PYTEST_ARGS="-k extraction -v"`. `nix build` runs
+  them too.
+  The sample messages are in `tests/fixtures/`: some synthetic, the rest real
+  messages that have been de-identified. Personal names, addresses and company
+  domains were replaced, keeping each host's label count and the validity of
+  its TLD, so urlscan finds exactly the same URLs it did before.
+  `test_emails/` remains available as a gitignored scratch directory for your
+  own mail; when it exists the suite also runs its input-independent invariants
+  over whatever is in it.
 - To update TLD list: `wget https://data.iana.org/TLD/tlds-alpha-by-domain.txt`
 - The version is hardcoded in `urlscan/__init__.py` (`make version` or
   `urlscan -V`). Anything else needing a version number reads from there.

@@ -1,0 +1,654 @@
+Delivered-To: reader@example.net
+Received: by 10.223.165.29 with SMTP id i29csp776914wrb;
+        Fri, 24 Feb 2017 09:52:00 -0800 (PST)
+X-Received: by 10.157.50.197 with SMTP id u63mr1990812otb.260.1487958720351;
+        Fri, 24 Feb 2017 09:52:00 -0800 (PST)
+Return-Path: <pellery@example.org>
+Received: from gcc01-CY1-obe.outbound.protection.outlook.com (mail-cy1gcc01on0065.outbound.protection.outlook.com. [23.103.200.65])
+        by mx.google.com with ESMTPS id l50si3281685otc.185.2017.02.24.09.52.00
+        for <reader@example.net>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 24 Feb 2017 09:52:00 -0800 (PST)
+Received-SPF: pass (google.com: domain of pellery@example.org designates 23.103.200.65 as permitted sender) client-ip=23.103.200.65;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@example.onmicrosoft.com;
+       spf=pass (google.com: domain of pellery@example.org designates 23.103.200.65 as permitted sender) smtp.mailfrom=pellery@example.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=example.onmicrosoft.com;
+ s=selector1-example-org;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=REgXpaPXw8gBOFuoLUWdYq359Q3vhH0P509hjyXpbNE=;
+ b=kCAVUQU2PvLsw2HJASZzaD85q9tnQtXSI5FKPj6PEQ0v9syIo6i05NgrfyQIn00WNYMnb5Vuq9LqHzpMpOvSzKAejqBptpDBrVqMqku1PCVmPKzFNNzz3+sMIHg9n0HeySeHkp49240ItQI8/EbnhM1BF61sMvAKQprBilpHs44=
+Received: from BL2PR09MB1138.namprd09.prod.outlook.com (10.167.102.154) by
+ BL2PR09MB1137.namprd09.prod.outlook.com (10.167.102.153) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
+ 15.1.919.13; Fri, 24 Feb 2017 17:51:54 +0000
+Received: from BL2PR09MB1138.namprd09.prod.outlook.com ([10.167.102.154]) by
+ BL2PR09MB1138.namprd09.prod.outlook.com ([10.167.102.154]) with mapi id
+ 15.01.0919.018; Fri, 24 Feb 2017 17:51:53 +0000
+From: "Ellery, Pat C." <pellery@example.org>
+To: Grp.FD.Battalion Chiefs <Grp.FD.BattalionChiefs@example.org>, "Grp.FD.Office
+ Staff" <Grp.FD.OfficeStaff@example.org>, Grp.FD.PubEd <Grp.FD.PubEd@example.org>,
+	Grp.FD.Company Officers <Grp.FD.CompanyOfficers@example.org>
+Subject: Pub Ed goals and processing requests
+Thread-Topic: Pub Ed goals and processing requests
+Thread-Index: AdKJY1N4BijcNLWrQuKUWeCJUEjHkw==
+Date: Fri, 24 Feb 2017 17:51:53 +0000
+Message-ID: <BL2PR09MB1138341D3ECBFC574CA79AC1D5520@mail.example.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-Exchange-Inbox-Rules-Loop: tmorgan@example.org
+X-MS-TNEF-Correlator:
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pellery@example.org; 
+x-originating-ip: [216.57.200.246]
+x-ms-office365-filtering-correlation-id: 2fdc417b-e663-4257-1e18-08d45cddd18b
+x-microsoft-antispam: UriScan:;BCL:0;PCL:0;RULEID:(22001);SRVR:BL2PR09MB1137;
+x-microsoft-exchange-diagnostics: 1;BL2PR09MB1137;24:Jt2BYA7Z1oFrExOnkwLfQkEedmrawVMCUMm7zAKry/Rt2lQuN+DAGgRKxsWF4UKwoJM6gw8QGoAY6QK3yKvbSgJbZrcvmTGkqVClpnto1GE=;20:iQlw/qLXHG6dG6gZBLrtWeHxZRpT/btPi5qdVC6jTMBK2+yBvTwQhvYGaPbymCswJKo/PEUMUZIZYTf/T49A/B1F18pWR+1tej39Zz3mQjzcqTb9uDwgvGthloNOVk5KTr95k+hBXLhmAw5S+JU3Dm55dWM93qf9sE1clEMyMQ0=
+x-exchange-antispam-report-test: UriScan:(148322886591682)(209352067349851)(81227570615382)(21748063052155);
+x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(9101524098)(601004)(2401047)(8121501046)(3002001)(10201501046);SRVR:BL2PR09MB1137;BCL:0;PCL:0;RULEID:;SRVR:BL2PR09MB1137;
+x-forefront-antispam-report: SFV:SKI;SFS:;DIR:INB;SFP:;SCL:-1;SRVR:BL2PR09MB1137;H:BL2PR09MB1138.namprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;SFV:NSPM;SFS:(10009020)(7916002)(189002)(199003)(68736007)(450100001)(7906003)(74316002)(7736002)(122556002)(81156014)(8936002)(7696004)(9686003)(6306002)(54896002)(236005)(6506006)(54356999)(50986999)(8676002)(6436002)(81166006)(33656002)(89836001)(101416001)(99286003)(3660700001)(606005)(3280700002)(55016002)(6636002)(106356001)(66066001)(105586002)(5660300001)(92566002)(2900100001)(189998001)(6116002)(3846002)(53936002)(39060400002)(102836003)(25786008)(77096006)(790700001)(86362001)(97736004);DIR:OUT;SFP:1101;SCL:1;SRVR:BL2PR09MB1137;H:BL2PR09MB1138.namprd09.prod.outlook.com;FPR:;SPF:None;PTR:InfoNoRecords;MX:1;A:1;LANG:en;
+spamdiagnosticoutput: 1:0
+x-forefront-prvs: 0228DDDDD7
+received-spf: None (protection.outlook.com: example.org does not designate
+ permitted sender hosts)
+Content-Type: multipart/alternative;
+	boundary="_000_BL2PR09MB1138341D3ECBFC574CA79AC1D5520BL2PR09MB1138namp_"
+MIME-Version: 1.0
+X-OriginatorOrg: example.org
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Feb 2017 17:51:53.2750
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d438603e-c0cb-4a12-86e4-0001e1d225b9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL2PR09MB1137
+X-TUID: u7EXx3bocR/9
+
+--_000_BL2PR09MB1138341D3ECBFC574CA79AC1D5520BL2PR09MB1138namp_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+Greetings,
+
+I wanted to touch base with you all as we work to strengthen BFD's Public E=
+ducation program, focusing in on our 2017 goals and the process for handlin=
+g all Pub Ed requests.
+
+Goals:
+
+*         Get to "YES" if at all possible (fulfill as many Pub Ed requests =
+as possible)
+
+*         Maintain our annual presence in schools
+
+*         Provide off-duty Pub Ed group support to assigned on-duty crews f=
+or complex or lengthy (over 1 hour) events
+
+*         Focus curriculum on high-risk populations/high-hazard occupancies=
+ (kids, seniors; residential, institutional)
+
+*         Deliver 3-4 free CPR/AED training events to public during 2017
+
+*         Greater use of the fire safety house; train Pub Ed group members =
+on its use
+
+*         Deliver a weekly social media message via Facebook/Twitter
+
+*         Improve tracking/documentation of Pub Ed events
+
+*         Clarify the process for assigning crews and staff to Pub Ed event=
+s
+
+Assignment Process:
+
+*         Dana Whitfield will take the lead in receiving and processing r=
+equests
+
+*         All requests submitted via online form at https://www.example.org/ser=
+vices/education/presentations-tours/pages/fire-tours.aspx (this helps is as=
+signing, tracking events, and gathering metrics)
+
+*         Assignments will be made using the following criteria:
+
+*         Station tour requests, non-specialized presentations < 1 hour, an=
+d other requests < 1 hour (i.e. visit to pre-school):  on-duty crew
+
+*         Requests greater than 1 hour (i.e. safety fair):  on-duty crew(s)=
+ + Pub Ed group member(s)
+
+*         Specialized presentations (career fairs, CPR, evacuation vs. Shel=
+ter-in-Place, fire safety house demo):  Pub Ed group member(s)
+
+*         For station tours and other requests < 1 hour, Dana will assign =
+directly to a duty crew after reviewing the BFD activity calendar
+
+*         For requests > 1 hour, Dana will email shift BC (with a copy to =
+BC Henkel) for crew assignment
+
+*         For requests meeting criteria for Pub Ed group members, Dana wil=
+l email DC Ellery
+
+*         Captain VanderMey (Pub Ed group leader) will coordinate Pub Ed gr=
+oup assignments
+
+*         BCs/DC must email Dana the assigned on-duty crew/Pub Ed group me=
+mbers
+
+*         BCs continue to consider rotating on-duty crews in/out to support=
+ lengthy requests (i.e. a 5-hour safety fair)
+
+*         The assigned lead (typically a company officer or Pub Ed group me=
+mber) will receive an automated "You've been assigned..." email with the de=
+tails of the event
+
+Closing the loop (company officer or Pub Ed group member):
+
+*         Upon completing the event (preferably the same day), the assigned=
+ lead closes out the event in Staff Central "Fire Tours"
+
+*         click on your event
+
+*         click on "Edit Item"
+
+*         enter the amount of time, number of attendees, topics covered, et=
+c at the bottom of the form
+
+*         click "Save"
+
+If you have any questions or concerns, please send them my way.
+
+Pat Ellery
+Division Chief - Life Safety Division
+Bellingham Fire Department
+(555) 010-8422
+pellery@example.org
+
+My incoming and outgoing email messages are subject to public disclosure re=
+quirements per RCW 42.56
+
+
+
+--_000_BL2PR09MB1138341D3ECBFC574CA79AC1D5520BL2PR09MB1138namp_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:"Lucida Sans Unicode";
+	panose-1:2 11 6 2 3 5 4 2 2 4;}
+@font-face
+	{font-family:"Trebuchet MS";
+	panose-1:2 11 6 3 2 2 2 2 2 4;}
+@font-face
+	{font-family:"Brush Script MT";
+	panose-1:3 6 8 2 4 4 6 7 3 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{mso-style-priority:34;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+span.EmailStyle18
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+/* List Definitions */
+@list l0
+	{mso-list-id:363992089;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1239830914 67698689 67698713 67698715 67698703 67698=
+713 67698715 67698703 67698713 67698715;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l0:level2
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l0:level3
+	{mso-level-number-format:roman-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:right;
+	text-indent:-9.0pt;}
+@list l0:level4
+	{mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l0:level5
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l0:level6
+	{mso-level-number-format:roman-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:right;
+	text-indent:-9.0pt;}
+@list l0:level7
+	{mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l0:level8
+	{mso-level-number-format:alpha-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;}
+@list l0:level9
+	{mso-level-number-format:roman-lower;
+	mso-level-tab-stop:none;
+	mso-level-number-position:right;
+	text-indent:-9.0pt;}
+@list l1
+	{mso-list-id:693270793;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1664660748 67698689 67698689 67698693 67698689 67698=
+691 67698693 67698689 67698691 67698693;}
+@list l1:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l1:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l1:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l1:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l1:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l2
+	{mso-list-id:1213733534;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-378616756 67698689 67698689 67698693 67698689 67698=
+691 67698693 67698689 67698691 67698693;}
+@list l2:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l2:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l2:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l2:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l2:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l2:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l2:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l2:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l2:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">Greetings,<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I wanted to touch base with you all as we work to st=
+rengthen BFD's Public Education program, focusing in on our 2017 goals and =
+the process for handling all Pub Ed requests.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Goals:<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Get to &quot;YES&quot; if at all possible (f=
+ulfill as many Pub Ed requests as possible)<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Maintain our annual presence in schools<o:p>=
+</o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Provide off-duty Pub Ed group support to ass=
+igned on-duty crews for complex or lengthy (over 1 hour) events<o:p></o:p><=
+/p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Focus curriculum on high-risk populations/hi=
+gh-hazard occupancies (kids, seniors; residential, institutional)<o:p></o:p=
+></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Deliver 3-4 free CPR/AED training events to =
+public during 2017<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Greater use of the fire safety house; train =
+Pub Ed group members on its use<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Deliver a weekly social media message via Fa=
+cebook/Twitter<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Improve tracking/documentation of Pub Ed eve=
+nts<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l0 level=
+1 lfo2"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Clarify the process for assigning crews and =
+staff to Pub Ed events<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Assignment Process:<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Dana Whitfield will take the lead in recei=
+ving and processing requests<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>All requests submitted via online form at <a=
+ href=3D"https://www.example.org/services/education/presentations-tours/pages/f=
+ire-tours.aspx">
+https://www.example.org/services/education/presentations-tours/pages/fire-tours=
+.aspx</a> (this helps is assigning, tracking events, and gathering metrics)=
+<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Assignments will be made using the following=
+ criteria:<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"margin-left:1.0in;text-indent:-.25in=
+;mso-list:l1 level2 lfo4">
+<![if !supportLists]><span style=3D"font-family:Symbol"><span style=3D"mso-=
+list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roman&quot;"=
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Station tour requests, non-specialized prese=
+ntations &lt; 1 hour, and other requests &lt; 1 hour (i.e. visit to pre-sch=
+ool):&nbsp;
+<b>on-duty crew</b><o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"margin-left:1.0in;text-indent:-.25in=
+;mso-list:l1 level2 lfo4">
+<![if !supportLists]><span style=3D"font-family:Symbol"><span style=3D"mso-=
+list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roman&quot;"=
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Requests greater than 1 hour (i.e. safety fa=
+ir):&nbsp; <b>
+on-duty crew(s) &#43; Pub Ed group member(s)</b><o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"margin-left:1.0in;text-indent:-.25in=
+;mso-list:l1 level2 lfo4">
+<![if !supportLists]><span style=3D"font-family:Symbol"><span style=3D"mso-=
+list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roman&quot;"=
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Specialized presentations (career fairs, CPR=
+, evacuation vs. Shelter-in-Place, fire safety house demo):&nbsp;
+<b>Pub Ed group member(s)</b><o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>For station tours and other requests &lt; 1 =
+hour, Dana will assign directly to a duty crew after reviewing the BFD act=
+ivity calendar<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>For requests &gt; 1 hour, Dana will email s=
+hift BC (with a copy to BC Henkel) for crew assignment<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>For requests meeting criteria for Pub Ed gro=
+up members, Dana will email DC Ellery<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Captain VanderMey (Pub Ed group leader) will=
+ coordinate Pub Ed group assignments<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>BCs/DC must email Dana the assigned on-duty=
+ crew/Pub Ed group members<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>BCs continue to consider rotating on-duty cr=
+ews in/out to support lengthy requests (i.e. a 5-hour safety fair)<o:p></o:=
+p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l1 level=
+1 lfo4"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>The assigned lead (typically a company offic=
+er or Pub Ed group member) will receive an automated &quot;You've been assi=
+gned&#8230;&quot; email with the details of the event<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Closing the loop (company officer or Pub Ed group me=
+mber):<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"text-indent:-.25in;mso-list:l2 level=
+1 lfo5"><![if !supportLists]><span style=3D"font-family:Symbol"><span style=
+=3D"mso-list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roma=
+n&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>Upon completing the event (preferably the sa=
+me day), the assigned lead closes out the event in Staff Central &quot;Fire=
+ Tours&quot;
+<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"margin-left:1.0in;text-indent:-.25in=
+;mso-list:l2 level2 lfo5">
+<![if !supportLists]><span style=3D"font-family:Symbol"><span style=3D"mso-=
+list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roman&quot;"=
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>click on your event<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"margin-left:1.0in;text-indent:-.25in=
+;mso-list:l2 level2 lfo5">
+<![if !supportLists]><span style=3D"font-family:Symbol"><span style=3D"mso-=
+list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roman&quot;"=
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>click on &quot;Edit Item&quot;<o:p></o:p></p=
+>
+<p class=3D"MsoListParagraph" style=3D"margin-left:1.0in;text-indent:-.25in=
+;mso-list:l2 level2 lfo5">
+<![if !supportLists]><span style=3D"font-family:Symbol"><span style=3D"mso-=
+list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roman&quot;"=
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>enter the amount of time, number of attendee=
+s, topics covered, etc at the bottom of the form<o:p></o:p></p>
+<p class=3D"MsoListParagraph" style=3D"margin-left:1.0in;text-indent:-.25in=
+;mso-list:l2 level2 lfo5">
+<![if !supportLists]><span style=3D"font-family:Symbol"><span style=3D"mso-=
+list:Ignore">&middot;<span style=3D"font:7.0pt &quot;Times New Roman&quot;"=
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></span><![endif]>click &quot;Save&quot;<o:p></o:p></p>
+<p class=3D"MsoNormal" style=3D"text-indent:.5in"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">If you have any questions or concerns, please send t=
+hem my way.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:16.0pt;font-family:&quot;Br=
+ush Script MT&quot;;color:#002060">Pat Ellery<o:p></o:p></span></p>
+<p class=3D"MsoNormal">Division Chief - Life Safety Division<o:p></o:p></p>
+<p class=3D"MsoNormal">Bellingham Fire Department<o:p></o:p></p>
+<p class=3D"MsoNormal">(555) 010-8422<o:p></o:p></p>
+<p class=3D"MsoNormal"><a href=3D"pellery@example.org">pellery@example.org</a><o:=
+p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><i><span style=3D"color:black">My incoming and outgo=
+ing email messages are subject to public disclosure requirements per RCW 42=
+.56</span></i><i><span style=3D"font-family:&quot;Trebuchet MS&quot;,sans-s=
+erif"><o:p></o:p></span></i></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</body>
+</html>
+
+--_000_BL2PR09MB1138341D3ECBFC574CA79AC1D5520BL2PR09MB1138namp_--

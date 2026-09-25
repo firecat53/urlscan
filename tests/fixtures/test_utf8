@@ -1,0 +1,19 @@
+Date: Wed, 26 Nov 2014 18:46:02 +0100                                              
+From: Intranet Team <intranet@example.com>                                         
+To: me <me@example.com>                                                            
+Subject: some nice subject                                                         
+
+Hallo,                                                                             
+
+I don't know where this is going but... urlscan doesn't handle URLs
+that contain UTF-8 characters. I just received an email which
+contains the following URL which urlscan fails to parse correctly:
+http://www.pantherhouse.com/newshelton/my-wife-thinks-i’m-a-swan/
+When I paste it into Firefox directly, it successfully opens
+
+http://github.com/firecat53@gmail/ürlscan
+https://Schöne_Grüße.com/test
+dein Orgateam
+
+mailto:someuser4153@gmail.com
+readerandfriend@gmail.com
