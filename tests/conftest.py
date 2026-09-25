@@ -69,12 +69,23 @@ def group_text(group):
 
 
 def group_urls(groups):
-    """Flatten extracted groups into the URL list, in display order."""
-    return [chunk.url.strip()
-            for group, _, _ in groups
-            for unit in group
-            for chunk in unit
-            if chunk.url is not None]
+    """Flatten extracted groups into the URL list, in display order.
+
+    A run of adjacent chunks sharing a URL counts once, as urlchoose draws it:
+    an HTML anchor whose text is styled arrives as several chunks.
+    """
+    urls = []
+    for group, _, _ in groups:
+        for unit in group:
+            previous = None
+            for chunk in unit:
+                if chunk.url is None:
+                    previous = None
+                    continue
+                if chunk.url.strip() != previous:
+                    urls.append(chunk.url.strip())
+                previous = chunk.url.strip()
+    return urls
 
 
 def scan(path, **kwargs):

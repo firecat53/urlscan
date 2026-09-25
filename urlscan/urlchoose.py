@@ -32,6 +32,8 @@ import webbrowser
 
 import urwid
 
+from urlscan.urlscan import chunk_text
+
 
 if platform == 'darwin':
     COPY_COMMANDS = ('pbcopy',)
@@ -907,7 +909,18 @@ class URLChooser:
             markup = []
             if not usedfirst and not self.whitespaceoff:
                 markup.append(('msgtext:ellipses', '...\n'))
+            previous = None
             for chunks in group:
+                chunks = [c for c in chunks if c.url is not None or chunk_text(c)]
+                if self.whitespaceoff:
+                    # Units run together on one line here, so keep the last
+                    # word of one off the first word of the next.
+                    if not chunks:
+                        continue
+                    if previous is not None and not _ends_in_space(previous) \
+                            and not _starts_with_space(chunks):
+                        markup.append(' ')
+                    previous = chunks
                 i = 0
                 while i < len(chunks):
                     chunk = chunks[i]
@@ -923,12 +936,12 @@ class URLChooser:
                         # Collect all immediately adjacent
                         # chunks with the same URL.
                         tmpmarkup = []
-                        if chunk.markup:
+                        if chunk_text(chunk):
                             tmpmarkup.append(('msgtext', chunk.markup))
                         while i < len(chunks) and \
                                 (chunks[i].url if chunks[i].url is None
                                     else chunks[i].url.strip()) == chunk.url:
-                            if chunks[i].markup:
+                            if chunk_text(chunks[i]):
                                 tmpmarkup.append(chunks[i].markup)
                             i += 1
                         url_idx = urls.index(chunk.url) + 1 if dedupe is True else len(urls)
@@ -948,6 +961,19 @@ class URLChooser:
                 items.append(URLRow(url, i, shorten_url(url, self.width, shorten)))
 
         return items, urls
+
+
+def _starts_with_space(chunks):
+    """Whether the first chunk of a unit opens with whitespace on screen."""
+    return chunks[0].url is None and chunk_text(chunks[0])[:1].isspace()
+
+
+def _ends_in_space(chunks):
+    """Whether the last chunk of a unit closes with whitespace on screen.
+
+    A URL chunk never does: it is drawn followed by its ' [n]' reference.
+    """
+    return chunks[-1].url is None and chunk_text(chunks[-1])[-1:].isspace()
 
 
 @contextlib.contextmanager
