@@ -281,7 +281,9 @@ class URLChooser:
         if self.compact is True:
             self.items, self.items_com = self.items_com, self.items
         self.unesc = False
-        listbox = urwid.ListBox(self.items)
+        # One list for the life of the app. _show() changes what it shows.
+        self.walker = urwid.SimpleFocusListWalker(self.items)
+        self.listbox = urwid.ListBox(self.walker)
         self.header = (":: F1 - help/keybindings :: "
                        "q - quit :: "
                        "/ - search :: "
@@ -298,12 +300,11 @@ class URLChooser:
                 self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
         else:
             self.headerwid = None
-        self.top = urwid.Frame(listbox, self.headerwid)
+        self.top = urwid.Frame(self.listbox, self.headerwid)
         self.pad = self.term_width - self.width
         self.top = urwid.Padding(self.top, left=0, right=self.pad)
         if self.urls:
-            self.top.base_widget.body.focus_position = \
-                (2 if self.compact is False else 0)
+            self.listbox.focus_position = self._first_url_pos()
         if reverse is True:
             self._reverse()
         self.tui = urwid.raw_display.Screen()
@@ -407,8 +408,25 @@ class URLChooser:
         """Return the URLRow with focus, or None if focus isn't on a URL."""
         if not self.items:
             return None
-        row = self.top.base_widget.body.focus
+        row = self.listbox.focus
         return row if isinstance(row, URLRow) else None
+
+    def _show(self, items, focus=None):
+        """Show `items` in the list, moving focus to position `focus` if given."""
+        self.items = items
+        self.walker[:] = items
+        if focus is not None and items:
+            self._focus(focus)
+
+    def _focus(self, pos):
+        """Move focus to list position `pos`."""
+        self.listbox.focus_position = pos
+        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+
+    def _first_url_pos(self):
+        """Return the list position of the first URL, or None if none is shown."""
+        positions = self._selectable_positions()
+        return positions[0] if positions else None
 
     def _url(self, row):
         """Return row's URL, unescaped if unescaping is toggled on (u)."""
@@ -499,7 +517,6 @@ class URLChooser:
     def _help_menu(self):
         """F1"""
         if self.help_menu is False:
-            self.focus_pos_saved = self.top.base_widget.body.focus_position
             help_men = "\n".join([f"{'space' if i == ' ' else i} - {j.__name__.strip('_')}"
                                   for i, j in self.keys.items() if j.__name__ !=
                                   '_digits'])
@@ -538,8 +555,7 @@ class URLChooser:
                 urwid.ListBox(urwid.SimpleListWalker([urwid.Columns([(24, urwid.Text(help_men)),
                                                                      urwid.Text(docs)])]))
         else:
-            self.top.base_widget.body = urwid.ListBox(self.items)
-            self.top.base_widget.body.focus_position = self.focus_pos_saved
+            self.top.base_widget.body = self.listbox
         self.help_menu = not self.help_menu
 
     def _search_key(self):
@@ -556,24 +572,19 @@ class URLChooser:
         self._search()
         footerwid = urwid.AttrMap(urwid.Text("Search: "), 'footer')
         self.top.base_widget.footer = footerwid
-        self.items = self.items_orig
-        self.top.base_widget.body = urwid.ListBox(self.items)
 
     def _digits(self):
         """ 0-9 """
         self.number += self.key
         try:
             if self.compact is False:
-                self.top.base_widget.body.focus_position = \
-                    self.items.index(self.items_com[max(int(self.number) - 1, 0)])
+                self._focus(self.items.index(self.items_com[max(int(self.number) - 1, 0)]))
             else:
-                self.top.base_widget.body.focus_position = \
-                    self.items.index(self.items[max(int(self.number) - 1, 0)])
+                self._focus(self.items.index(self.items[max(int(self.number) - 1, 0)]))
         except IndexError:
             self.number = self.number[:-1]
         except ValueError:
             pass
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
         if self.number:
             self._footer_display(f"Selection: {self.number}", 1)
 
@@ -592,28 +603,25 @@ class URLChooser:
     def _top(self):
         """ g """
         # Goto top of the list
-        self.top.base_widget.body.focus_position = 2 if self.compact is False else 0
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+        self._focus(self._first_url_pos())
 
     def _bottom(self):
         """ G """
         # Goto bottom of the list
-        self.top.base_widget.body.focus_position = len(self.items) - 1
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+        self._focus(len(self.items) - 1)
 
     def _selectable_positions(self):
         return [i for i, item in enumerate(self.items) if item.selectable()]
 
     def _next(self):
         """ J """
-        current_position = self.top.base_widget.body.focus_position
+        current_position = self.listbox.focus_position
         if current_position >= self._selectable_positions()[-1]:
             # Do not jump if focus is on or after the last selectable position
             return
         # Jump to the first selectable position after the currently focused position
         target_position = min(p for p in self._selectable_positions() if p > current_position)
-        self.top.base_widget.body.focus_position = target_position
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+        self._focus(target_position)
 
     def _page_up(self):
         """ Ctrl-b """
@@ -627,14 +635,13 @@ class URLChooser:
 
     def _previous(self):
         """ K """
-        current_position = self.top.base_widget.body.focus_position
+        current_position = self.listbox.focus_position
         if current_position <= self._selectable_positions()[0]:
             # Do not jump if focus is on or before the first selectable position
             return
         # Jump to the first selectable position before the currently focused position
         target_position = max(p for p in self._selectable_positions() if p < current_position)
-        self.top.base_widget.body.focus_position = target_position
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
+        self._focus(target_position)
 
     def _shorten(self):
         """ s """
@@ -661,7 +668,7 @@ class URLChooser:
     def _reverse(self):
         """ R """
         # Reverse items
-        fpo = self.top.base_widget.body.focus_position
+        fpo = self.listbox.focus_position
         if self.compact is True:
             self.items.reverse()
         else:
@@ -674,8 +681,7 @@ class URLChooser:
                 else:
                     rev.insert(2, item)
             self.items = rev
-        self.top.base_widget.body = urwid.ListBox(self.items)
-        self.top.base_widget.body.focus_position = self._cur_focus(fpo)
+        self._show(self.items, self._cur_focus(fpo))
 
     def _context(self):
         """ c """
@@ -686,10 +692,9 @@ class URLChooser:
             self.top.base_widget.footer = footerwid
             self.search_string = ""
             self.items = self.items_orig
-        fpo = self.top.base_widget.body.focus_position
+        fpo = self.listbox.focus_position
         self.items, self.items_com = self.items_com, self.items
-        self.top.base_widget.body = urwid.ListBox(self.items)
-        self.top.base_widget.body.focus_position = self._cur_focus(fpo)
+        self._show(self.items, self._cur_focus(fpo))
         self.compact = not self.compact
 
     def _clipboard(self, pri=False):
@@ -811,12 +816,9 @@ class URLChooser:
                         done = True
             if done is True:
                 search_items.extend(grp)
-        self.items = search_items
-        self.top.base_widget.body = urwid.ListBox(self.items)
-        if self.items:
-            self.top.base_widget.body.focus_position = 2 if self.compact is False else 0
-            # Trick urwid into redisplaying the cursor
-            self.top.base_widget.keypress(self.size, "")
+        self._show(search_items)
+        if search_items:
+            self._focus(self._first_url_pos())
             self.no_matches = False
         else:
             self.no_matches = True
