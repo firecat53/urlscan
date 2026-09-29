@@ -381,13 +381,18 @@ class URLChooser:
             if key == 'enter':
                 # Leave search mode, keeping the matches and their highlighting
                 self.search = False
+                if self.no_matches is True:
+                    # Nothing matched, so drop the search rather than leave
+                    # an empty list: show every URL again
+                    self.search_string = ""
+                    self._search()
                 self._search_footer()
             elif self.no_matches is False and len(key) == 1 and key.isprintable():
                 self.search_string += key
                 self._search()
             return
-        if not self.urls and key not in "Qq":
-            return  # No other actions are useful with no URLs
+        if not self.items and key not in ("q", "Q", "/"):
+            return  # No other actions are useful with no URLs shown
         if self.help_menu is False:
             try:
                 self.keys[key]()

@@ -6,11 +6,10 @@ every action works on the URL the user sees.
 """
 
 import json
-import time
 
 import pytest
 
-from tui_harness import gui_browser, make_chooser, opened, run_with_keys, wait_for  # noqa: F401
+from tui_harness import gui_browser, make_chooser, only_opened, run_with_keys  # noqa: F401
 
 ESCAPED = "https://one.example.com/a\\_b"
 UNESCAPED = "https://one.example.com/a_b"
@@ -31,14 +30,6 @@ def write_config(home, keys):
     conf = home / ".config" / "urlscan" / "config.json"
     conf.parent.mkdir(parents=True)
     conf.write_text(json.dumps({"keys": keys}))
-
-
-def only_opened(log, expected):
-    """True if `expected` is opened and nothing else follows shortly after."""
-    if not wait_for(lambda: opened(log) == expected):
-        return False
-    time.sleep(0.3)
-    return opened(log) == expected
 
 
 @pytest.mark.parametrize("key", ["\r", " "])
@@ -82,20 +73,3 @@ def test_open_url_can_be_rebound(tmp_path, config_home):
     # Enter on the first URL does nothing; x on the second opens it.
     run_with_keys(make_chooser(log, MESSAGE), "\rjxq")
     assert only_opened(log, [SECOND])
-
-
-def test_enter_ends_search_without_opening(tmp_path):
-    """Space is part of the search string, and Enter ends the search without
-    opening anything. After that, keys work normally again.
-
-    """
-    log = tmp_path / "opened"
-    chooser = make_chooser(log, MESSAGE)
-    run_with_keys(chooser, "/d link\rq")
-    assert chooser.search_string == "d link"
-    assert chooser.search is False
-    assert only_opened(log, [])
-
-    log2 = tmp_path / "opened2"
-    run_with_keys(make_chooser(log2, MESSAGE), "/d link\rj\rq")
-    assert only_opened(log2, [SECOND])

@@ -64,12 +64,26 @@ def wait_for(condition, timeout=TIMEOUT):
     return False
 
 
+def only_opened(log, expected):
+    """True if `expected` is opened and nothing else follows shortly after."""
+    if not wait_for(lambda: opened(log) == expected):
+        return False
+    time.sleep(0.3)
+    return opened(log) == expected
+
+
 def run_with_keys(chooser, keys):
     """Run chooser.main() on a pty, typing `keys` once the screen is up.
+
+    `keys` is a string, or a list of strings typed with a pause between them.
+    urwid reads keys typed together as one batch, so use a list when a key's
+    effect must land before the next key arrives (closing the help menu
+    discards the rest of its batch, for example).
 
     Raises LoopTimeout if main() doesn't return within TIMEOUT seconds.
 
     """
+    chunks = [keys] if isinstance(keys, str) else keys
     master, slave = pty.openpty()
     fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, 80, 0, 0))
     term_in = os.fdopen(slave, "r", closefd=False)
@@ -91,8 +105,11 @@ def run_with_keys(chooser, keys):
         # the line discipline waiting for a newline.
         if wait_for(lambda: finished.is_set()
                     or not termios.tcgetattr(slave)[3] & termios.ICANON):
-            if not finished.is_set():
-                os.write(master, keys.encode())
+            for chunk in chunks:
+                if finished.is_set():
+                    break
+                os.write(master, chunk.encode())
+                time.sleep(0.1)
 
     def on_alarm(_signum, _frame):
         raise LoopTimeout(f"main loop still running after {TIMEOUT}s")
