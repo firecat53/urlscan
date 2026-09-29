@@ -1,0 +1,175 @@
+"""URL opening runs in worker threads; the UI must still quit and redraw.
+
+These drive the real urwid main loop on a pseudo-terminal and type keys into
+it, so they exercise the same path as a user in mutt or tmux.
+
+"""
+
+from email import policy
+from email.parser import BytesParser
+import fcntl
+from pathlib import Path
+import os
+import pty
+import signal
+import struct
+import sys
+import termios
+import threading
+import time
+
+import pytest
+import urwid
+
+# Test against the working tree rather than any installed copy of urlscan.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from urlscan import urlchoose, urlscan  # noqa: E402
+
+URLS = ["https://one.example.com/a", "https://two.example.com/b"]
+MESSAGE = f"Subject: test\n\nFirst {URLS[0]} and second {URLS[1]}\n".encode()
+
+# How long a test may wait for the main loop to exit before failing.
+TIMEOUT = 10
+
+
+class LoopTimeout(Exception):
+    """The main loop did not exit in time."""
+
+
+def make_chooser(log, **kwargs):
+    """Build a URLChooser for MESSAGE whose links are 'opened' by appending
+    them to the file `log`.
+
+    """
+    msg = BytesParser(policy=policy.default.clone(utf8=True)).parsebytes(MESSAGE)
+    runsafe = f"sh -c 'echo \"$0\" >> {log}' {{}}"
+    return urlchoose.URLChooser(urlscan.msgurls(msg), runsafe=runsafe, **kwargs)
+
+
+def opened(log):
+    """URLs written to `log` by the runsafe command, in order."""
+    return log.read_text().split() if log.exists() else []
+
+
+def wait_for(condition, timeout=TIMEOUT):
+    """Poll until condition() is true. Returns whether it became true."""
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        if condition():
+            return True
+        time.sleep(0.02)
+    return False
+
+
+def run_with_keys(chooser, keys):
+    """Run chooser.main() on a pty, typing `keys` once the screen is up.
+
+    Raises LoopTimeout if main() doesn't return within TIMEOUT seconds.
+
+    """
+    master, slave = pty.openpty()
+    fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, 80, 0, 0))
+    term_in = os.fdopen(slave, "r", closefd=False)
+    term_out = os.fdopen(os.dup(slave), "w")
+    chooser.tui = urwid.raw_display.Screen(input=term_in, output=term_out)
+    finished = threading.Event()
+
+    def drain():
+        # Keep reading the screen output so urwid never blocks writing it.
+        # Ends with EIO once every slave fd is closed.
+        try:
+            while os.read(master, 65536):
+                pass
+        except OSError:
+            pass
+
+    def type_keys():
+        # Keys typed before urwid puts the terminal in raw mode would sit in
+        # the line discipline waiting for a newline.
+        if wait_for(lambda: finished.is_set()
+                    or not termios.tcgetattr(slave)[3] & termios.ICANON):
+            if not finished.is_set():
+                os.write(master, keys.encode())
+
+    def on_alarm(_signum, _frame):
+        raise LoopTimeout(f"main loop still running after {TIMEOUT}s")
+
+    helpers = [threading.Thread(target=drain, daemon=True),
+               threading.Thread(target=type_keys, daemon=True)]
+    for thread in helpers:
+        thread.start()
+    old = signal.signal(signal.SIGALRM, on_alarm)
+    signal.alarm(TIMEOUT)
+    try:
+        chooser.main()
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old)
+        # Stop the helpers before closing master and slave: a helper still
+        # using a closed fd number could hit a file the test opens next and
+        # steal its contents.
+        finished.set()
+        helpers[1].join()
+        term_in.close()
+        term_out.close()
+        os.close(slave)
+        helpers[0].join()
+        os.close(master)
+
+
+@pytest.fixture(autouse=True)
+def gui_browser(monkeypatch):
+    """Take the threaded (non text-mode browser) path when opening links."""
+    monkeypatch.setenv("BROWSER", "firefox")
+
+
+def test_single_quits_after_opening_url(tmp_path):
+    """--single: Enter opens the URL in a worker thread, then urlscan exits."""
+    log = tmp_path / "opened"
+    chooser = make_chooser(log, single=True)
+    run_with_keys(chooser, "\r")
+    assert wait_for(lambda: opened(log) == URLS[:1])
+
+
+def test_single_opens_whole_queue_then_quits(tmp_path):
+    """--single with the queue: every queued URL opens before urlscan exits."""
+    log = tmp_path / "opened"
+    chooser = make_chooser(log, single=True)
+    # Queue both URLs, then open the queue.
+    run_with_keys(chooser, "aja" + "o")
+    assert sorted(opened(log)) == sorted(URLS)
+
+
+def test_queue_opens_every_url_and_keeps_running(tmp_path):
+    """Without --single, opening the queue opens every URL and urlscan keeps
+    running until the user quits.
+
+    """
+    log = tmp_path / "opened"
+    chooser = make_chooser(log)
+    returned = threading.Event()
+    running_after_open = []
+
+    def quit_once_opened():
+        if wait_for(lambda: len(opened(log)) == len(URLS)):
+            # Give the redraw request time to reach the main loop.
+            time.sleep(0.3)
+            running_after_open.append(not returned.is_set())
+            os.kill(os.getpid(), signal.SIGUSR1)
+
+    # 'q' can't be typed up front: it would quit before the queue opens. Quit
+    # from the main thread once both URLs are logged instead.
+    def on_usr1(_signum, _frame):
+        chooser._quit()
+
+    old = signal.signal(signal.SIGUSR1, on_usr1)
+    threading.Thread(target=quit_once_opened, daemon=True).start()
+    try:
+        run_with_keys(chooser, "aja" + "o")
+    finally:
+        returned.set()
+        signal.signal(signal.SIGUSR1, old)
+    assert sorted(opened(log)) == sorted(URLS)
+    assert running_after_open == [True]
+    assert chooser.queue == []

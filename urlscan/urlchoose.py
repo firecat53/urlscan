@@ -295,7 +295,24 @@ class URLChooser:
                                    handle_mouse=False, input_filter=self.handle_keys,
                                    unhandled_input=self.unhandled)
         self.loop.screen.set_terminal_properties(self.color)
+        # Worker threads (URL opening) must not touch urwid directly. They
+        # write a command to this pipe and _ui_pipe_callback runs it in the
+        # main loop thread. The pipe is left open for the life of the process
+        # so a thread still running after quit can't write to a reused fd.
+        self.ui_pipe = self.loop.watch_pipe(self._ui_pipe_callback)
         self.loop.run()
+
+    def _ui_pipe_callback(self, data):
+        """Run commands sent from worker threads in the main loop thread.
+
+            b"q" - quit
+            b"r" - redraw the screen
+
+        """
+        if b"q" in data:
+            self._quit()
+        if b"r" in data:
+            self.draw_screen()
 
     @property
     def size(self):
@@ -386,11 +403,11 @@ class URLChooser:
         if os.environ.get('BROWSER') not in TERMINAL_BROWSERS:
             self._footer_display(load_text, 5)
 
-    def _background_queue(self, mode):
-        """Open URLs in background"""
-        for url in self.queue:
+    def _background_queue(self, queue, mode):
+        """Open URLs in background. Runs in a worker thread."""
+        for url in queue:
             self.mkbrowseto(url, mode=mode, background=True)()
-        self.draw_screen()
+        os.write(self.ui_pipe, b"q" if self.single is True else b"r")
 
     def _queue(self, mode=2):
         """Open all URLs in queue
@@ -405,7 +422,7 @@ class URLChooser:
             self._footer_display("Opening multiple links not support in text browsers", 5)
             return
         self._footer_display(load_text, 5)
-        thr = Thread(target=self._background_queue, args=(mode,))
+        thr = Thread(target=self._background_queue, args=(self.queue, mode))
         thr.start()
         self.queue = []
         self.headerwid = urwid.AttrMap(urwid.Text(
@@ -874,8 +891,11 @@ class URLChooser:
                 else:
                     subprocess.run(self.run.format(url), check=False, shell=True)
 
-                if self.single is True:
-                    self._quit()
+            # This runs in a worker thread, so ask the main loop to quit.
+            # When opening the queue (background), _background_queue quits
+            # after the whole queue is opened instead.
+            if self.single is True and background is False:
+                os.write(self.ui_pipe, b"q")
 
         if background or os.environ.get('BROWSER') in TERMINAL_BROWSERS:
             return browse
