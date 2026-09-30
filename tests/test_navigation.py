@@ -95,6 +95,44 @@ def test_search_focuses_first_match(tmp_path, keys, shown, expected):
     assert focused_url(chooser) == expected
 
 
-def test_reverse(tmp_path):
+@pytest.mark.parametrize("keys, shown, expected", [
+    ("Rq", [D, C, B, A], A),       # focus stays on the same URL
+    ("JRq", [D, C, B, A], B),
+    ("GRq", [D, C, B, A], D),
+    ("JcRq", [D, C, B, A], B),     # compact
+    ("cGRq", [D, C, B, A], D),
+    ("JRcq", [D, C, B, A], B),     # context toggle keeps the reversal
+    ("JRccq", [D, C, B, A], B),
+    ("cRcq", [D, C, B, A], A),
+    ("JRRq", [A, B, C, D], B),     # and back
+    ("cJRcRq", [A, B, C, D], B),
+])
+def test_reverse(tmp_path, keys, shown, expected):
+    chooser = run(tmp_path, keys)
+    assert shown_urls(chooser) == shown
+    assert focused_url(chooser) == expected
+
+
+def test_reverse_keeps_context_above_urls(tmp_path):
     chooser = run(tmp_path, "Rq")
+    kinds = [type(i).__name__ for i in chooser.items]
+    assert kinds == ["Divider", "Text", "URLRow",
+                     "Divider", "Text", "URLRow", "URLRow",
+                     "Divider", "Text", "URLRow"]
+
+
+@pytest.mark.parametrize("keys, expected", [
+    ("Rc3q", C),     # numbers go to the URL labelled [n], whatever the order
+    ("R1q", A),
+    ("R4q", D),
+    ("c9q", A),      # no URL 9: ignored
+])
+def test_number_jump(tmp_path, keys, expected):
+    assert focused_url(run(tmp_path, keys)) == expected
+
+
+def test_start_reversed(tmp_path):
+    chooser = make_chooser(tmp_path / "opened", MESSAGE, shorten=False, reverse=True)
+    run_with_keys(chooser, "q")
     assert shown_urls(chooser) == [D, C, B, A]
+    assert focused_url(chooser) == D

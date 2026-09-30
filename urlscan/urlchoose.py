@@ -149,7 +149,7 @@ def grp_list(items):
     for item in items:
         if isinstance(item, urwid.Divider):
             res.append(grp)
-            grp = [items[0]]
+            grp = [item]
         else:
             grp.append(item)
     res.append(grp)
@@ -240,18 +240,15 @@ class URLChooser:
         # Every URL row, whether or not the current view (search, compact)
         # shows it
         self.rows = [i for i in self.items if isinstance(i, URLRow)]
-        # Original version of all items
-        self.items_orig = self.items
-        # Store items grouped into sections
-        self.items_org = grp_list(self.items)
-        # Store 'compact' mode items
-        self.items_com = [i for i in self.items if
-                          isinstance(i, URLRow)]
-        if self.compact is True:
-            self.items, self.items_com = self.items_com, self.items
+        # Each group is a divider, its context text and its URL rows.
+        # _update_view() builds the list from the groups a search matched,
+        # hiding context if compact and in reverse order if reversed.
+        self.groups = grp_list(self.items)
+        self.shown_groups = self.groups
+        self.reversed = reverse
         self.unesc = False
         # One list for the life of the app. _show() changes what it shows.
-        self.walker = urwid.SimpleFocusListWalker(self.items)
+        self.walker = urwid.SimpleFocusListWalker([])
         self.listbox = urwid.ListBox(self.walker)
         self.header = (":: F1/? - help/keybindings :: "
                        "q - quit :: "
@@ -267,11 +264,8 @@ class URLChooser:
         self.pad = self.term_width - self.width
         self.top = urwid.Padding(urwid.Frame(self.listbox), left=0, right=self.pad)
         self._set_header()
-        if self.urls:
-            self.listbox.focus_position = self._first_url_pos()
-        if reverse is True:
-            self._reverse()
         self.tui = urwid.raw_display.Screen()
+        self._update_view()
         self.palette_names = list(self.palettes.keys())
         self.palette_idx = 0
         self.number = ""
@@ -419,6 +413,27 @@ class URLChooser:
         positions = self._selectable_positions()
         return positions[0] if positions else None
 
+    def _update_view(self, keep_focus=True):
+        """Rebuild the list from the shown groups, compact and reversed.
+
+        Focus stays on the same URL if it is still shown and keep_focus is
+        True; otherwise it moves to the first URL.
+
+        """
+        row = self._focused_row() if keep_focus else None
+        groups = self.shown_groups
+        if self.reversed is True:
+            # Reverse the URLs, not the lines: each group keeps its divider and
+            # context above its URLs
+            groups = [[i for i in grp if not isinstance(i, URLRow)] +
+                      [i for i in reversed(grp) if isinstance(i, URLRow)]
+                      for grp in reversed(groups)]
+        items = [i for grp in groups for i in grp
+                 if self.compact is False or isinstance(i, URLRow)]
+        self._show(items)
+        if items:
+            self._focus(items.index(row) if row in items else self._first_url_pos())
+
     def _url(self, row):
         """Return row's URL, unescaped if unescaping is toggled on (u)."""
         return row.url.replace('\\', '') if self.unesc is True else row.url
@@ -548,8 +563,8 @@ class URLChooser:
         """ / """
         if self.urls:
             self.search = True
-            if self.compact is True:
-                self._context()
+            # Search shows context, where most matches are
+            self.compact = False
         else:
             return
         self.no_matches = False
@@ -572,15 +587,12 @@ class URLChooser:
     def _digits(self):
         """ 0-9 """
         self.number += self.key
-        try:
-            if self.compact is False:
-                self._focus(self.items.index(self.items_com[max(int(self.number) - 1, 0)]))
-            else:
-                self._focus(self.items.index(self.items[max(int(self.number) - 1, 0)]))
-        except IndexError:
+        idx = max(int(self.number) - 1, 0)
+        if idx >= len(self.rows):
+            # No URL has that number: ignore the last digit
             self.number = self.number[:-1]
-        except ValueError:
-            pass
+        elif self.rows[idx] in self.items:
+            self._focus(self.items.index(self.rows[idx]))
         if self.number:
             self._footer_display(f"Selection: {self.number}", 1)
 
@@ -663,34 +675,15 @@ class URLChooser:
 
     def _reverse(self):
         """ R """
-        # Reverse items
-        fpo = self.listbox.focus_position
-        if self.compact is True:
-            self.items.reverse()
-        else:
-            rev = []
-            for item in self.items:
-                if isinstance(item, urwid.Divider):
-                    rev.insert(0, item)
-                elif isinstance(item, urwid.Text):
-                    rev.insert(1, item)
-                else:
-                    rev.insert(2, item)
-            self.items = rev
-        self._show(self.items, self._cur_focus(fpo))
+        # Reverse the order of the URLs
+        self.reversed = not self.reversed
+        self._update_view()
 
     def _context(self):
         """ c """
         # Show/hide context
-        if self.search_string:
-            # Reset search when toggling compact mode
-            self._set_footer("", 'default')
-            self.search_string = ""
-            self.items = self.items_orig
-        fpo = self.listbox.focus_position
-        self.items, self.items_com = self.items_com, self.items
-        self._show(self.items, self._cur_focus(fpo))
         self.compact = not self.compact
+        self._update_view()
 
     def _clipboard(self, pri=False):
         """ C """
@@ -781,25 +774,14 @@ class URLChooser:
         """Show `text` in the footer with display attribute `attr`."""
         self.top.base_widget.footer = urwid.AttrMap(urwid.Text(text), attr)
 
-    def _cur_focus(self, fpo=0):
-        # Return correct focus when toggling 'show context'
-        if self.compact is False:
-            idx = len([i for i in self.items_com[:fpo + 1]
-                       if isinstance(i, URLRow)]) - 1
-            idx = max(idx, 0)
-        elif self.compact is True:
-            idx = [i for i in enumerate(self.items)
-                   if isinstance(i[1], URLRow)][fpo][0]
-        return idx
-
     def _search(self):
         """ Search - search URLs and text.
 
         """
         text = f"Search: {self.search_string}"
         self._set_footer(text)
-        search_items = []
-        for grp in self.items_org:
+        matches = []
+        for grp in self.groups:
             done = False
             for idx, item in enumerate(grp):
                 if isinstance(item, URLRow):
@@ -819,10 +801,10 @@ class URLChooser:
                         grp[idx].set_text(splittext(item.text, self.search_string, 'search'))
                         done = True
             if done is True:
-                search_items.extend(grp)
-        self._show(search_items)
-        if search_items:
-            self._focus(self._first_url_pos())
+                matches.append(grp)
+        self.shown_groups = matches
+        self._update_view(keep_focus=False)
+        if matches:
             self.no_matches = False
         else:
             self.no_matches = True

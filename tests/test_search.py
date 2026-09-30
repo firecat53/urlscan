@@ -2,7 +2,13 @@
 
 import pytest
 
+from test_navigation import MESSAGE as NAV_MESSAGE
 from tui_harness import gui_browser, make_chooser, only_opened, run_with_keys  # noqa: F401
+
+def all_items(chooser):
+    """Every divider, context text and URL row, in message order."""
+    return [i for grp in chooser.groups for i in grp]
+
 
 FIRST = "https://one.example.com/a"
 SECOND = "https://two.example.com/b"
@@ -35,7 +41,7 @@ def test_enter_on_no_matches_restores_list(tmp_path):
     run_with_keys(chooser, "/zzzz\rq")
     assert chooser.search is False
     assert chooser.search_string == ""
-    assert chooser.items == chooser.items_orig
+    assert chooser.items == all_items(chooser)
 
 
 # Keys that move focus or read it, which crashed on the empty list a
@@ -66,7 +72,7 @@ def test_esc_clears_search(tmp_path, keys):
     run_with_keys(chooser, keys)
     assert chooser.search is False
     assert chooser.search_string == ""
-    assert chooser.items == chooser.items_orig
+    assert chooser.items == all_items(chooser)
     assert not highlighted(chooser)
     footer = chooser.top.base_widget.footer
     assert footer.base_widget.text == ""
@@ -94,3 +100,21 @@ def test_up_and_home_are_not_typed_into_search(tmp_path, key):
     chooser = make_chooser(tmp_path / "opened", MESSAGE)
     run_with_keys(chooser, ["/Sec", key, "ond\r", "q"])
     assert chooser.search_string == "Second"
+
+
+def test_context_toggle_keeps_search(tmp_path):
+    """c during a search keeps showing only the matches, and Esc still clears
+    the search afterwards.
+
+    """
+    chooser = make_chooser(tmp_path / "opened", NAV_MESSAGE, shorten=False)
+    run_with_keys(chooser, "/Beta\rcq")
+    assert chooser.compact is True
+    assert chooser.items == chooser.rows[1:3]
+    assert chooser.search_string == "Beta"
+
+    chooser = make_chooser(tmp_path / "opened", NAV_MESSAGE, shorten=False)
+    run_with_keys(chooser, ["/Beta\rc", "\x1b", "q"])
+    assert chooser.search_string == ""
+    assert chooser.items == chooser.rows
+    assert not highlighted(chooser)
