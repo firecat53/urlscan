@@ -474,10 +474,13 @@ class URLChooser:
             self._footer_display("Opening multiple links not support in text browsers", 5)
             return
         self._footer_display(load_text, 5)
-        thr = Thread(target=self._background_queue, args=(self.queue, mode))
+        opened = self.queue
+        thr = Thread(target=self._background_queue, args=(opened, mode))
         thr.start()
         self.queue = []
         self._set_header()
+        for url in opened:
+            self._mark_queued(url)
 
     def _open_queue(self):
         """o (new tab)"""

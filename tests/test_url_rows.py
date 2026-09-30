@@ -102,3 +102,14 @@ def test_adding_a_duplicate_marks_every_copy(tmp_path):
     run_with_keys(chooser, "aq")
     assert chooser.queue == [DUP]
     assert labels(chooser) == ["* " + DUP, "* " + DUP, SECOND]
+
+
+@pytest.mark.parametrize("key", ["o", "O"], ids=["new_tab", "new_window"])
+def test_opening_queue_clears_markers(tmp_path, key):
+    log = tmp_path / "opened"
+    chooser = make_chooser(log, DUP_MESSAGE, shorten=False)
+    run_with_keys(chooser, "aJJa" + key + "q")
+    # Wait for the queue's worker thread before the next test starts.
+    assert only_opened(log, [DUP, SECOND])
+    assert chooser.queue == []
+    assert labels(chooser) == [DUP, DUP, SECOND]
