@@ -50,6 +50,79 @@ else:
 TERMINAL_BROWSERS = ('elinks', 'links', 'w3m', 'lynx')
 
 
+# Default keybindings: key -> action. Actions are URLChooser methods without
+# the leading underscore, the same names config.json uses.
+DEFAULT_KEYS = {'enter': 'open_url',
+                ' ': 'open_url',
+                '/': 'search_key',
+                **{str(i): 'digits' for i in range(10)},
+                'a': 'add_url',
+                'C': 'clipboard',
+                'c': 'context',
+                'ctrl l': 'clear_screen',
+                'ctrl f': 'page_down',
+                'ctrl b': 'page_up',
+                'd': 'del_url',
+                'f1': 'help_menu',
+                'G': 'bottom',
+                'g': 'top',
+                'j': 'down',
+                'k': 'up',
+                'J': 'next',
+                'K': 'previous',
+                'P': 'clipboard_pri',
+                'l': 'link_handler',
+                'o': 'open_queue',
+                'O': 'open_queue_win',
+                'p': 'palette',
+                'Q': 'quit',
+                'q': 'quit',
+                'R': 'reverse',
+                'S': 'all_shorten',
+                's': 'shorten',
+                'u': 'all_escape'}
+
+# urwid color modes for --colors
+COLOR_MODES = {"true": 2**24,
+               "256": 256,
+               "88": 88,
+               "16": 16,
+               "8": 8,
+               "mono": 1}
+
+# Built-in palettes, used unless config.json has its own. Each entry is
+# (name, foreground, background, mono, foreground_high, background_high).
+DEFAULT_PALETTES = {
+    "default": [('header', 'white', 'dark blue', 'standout', '#ffffff', '#0000aa'),
+                ('footer', 'white', 'dark red', 'standout', '#ffffff', '#aa0000'),
+                ('search', 'white', 'dark green', 'standout', '#ffffff', '#00aa00'),
+                ('msgtext', '', '', '', '', ''),
+                ('msgtext:ellipses', 'light gray', 'black', '', '#aaaaaa', '#000000'),
+                ('urlref:number:braces', 'light gray', 'black', '', '#aaaaaa', '#000000'),
+                ('urlref:number', 'yellow', 'black', 'standout', '#ffff00', '#000000'),
+                ('urlref:url', 'white', 'black', 'standout', '#ffffff', '#000000'),
+                ('url:sel', 'white', 'dark blue', 'bold', '#ffffff', '#0000aa')],
+    "bw": [('header', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
+           ('footer', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
+           ('search', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
+           ('msgtext', '', '', '', '', ''),
+           ('msgtext:ellipses', 'white', 'black', '', '#ffffff', '#000000'),
+           ('urlref:number:braces', 'white', 'black', '', '#ffffff', '#000000'),
+           ('urlref:number', 'white', 'black', 'standout', '#ffffff', '#000000'),
+           ('urlref:url', 'white', 'black', 'standout', '#ffffff', '#000000'),
+           ('url:sel', 'black', 'light gray', 'bold', '#000000', '#aaaaaa')],
+    "catppuccin": [("header", "white", "dark blue", "standout", "#CDD6F4", "#89B4FA"),
+                   ("footer", "white", "dark red", "standout", "#CDD6F4", "#F38BA8"),
+                   ("search", "white", "dark green", "standout", "#CDD6F4", "#A6E3A1"),
+                   ("msgtext", "", "", "", "#CDD6F4", "#1E1E2E"),
+                   ("msgtext:ellipses", "light gray", "black", "", "#B4BEFE", "#1E1E2E"),
+                   ("urlref:number:braces", "light gray", "black", "", "#B4BEFE", "#1E1E2E"),
+                   ("urlref:number", "yellow", "black", "standout", "#F9E2AF", "#1E1E2E"),
+                   ("urlref:url", "white", "black", "standout", "#CBA6F7", "#1E1E2E"),
+                   ("url:sel", "white", "dark blue", "bold", "#F5E0DC", "#313244")],
+}
+
+
 def shorten_url(url, cols, shorten):
     """Shorten long URLs to fit on one line.
 
@@ -132,121 +205,12 @@ class URLChooser:
                  shorten=True, run="", runsafe="", single=False, pipe=False,
                  genconf=False, width=0, whitespaceoff=False, colors="true"):
         self.conf = expanduser("~/.config/urlscan/config.json")
-        self.keys = {'enter': self._open_url,
-                     ' ': self._open_url,
-                     '/': self._search_key,
-                     '0': self._digits,
-                     '1': self._digits,
-                     '2': self._digits,
-                     '3': self._digits,
-                     '4': self._digits,
-                     '5': self._digits,
-                     '6': self._digits,
-                     '7': self._digits,
-                     '8': self._digits,
-                     '9': self._digits,
-                     'a': self._add_url,
-                     'C': self._clipboard,
-                     'c': self._context,
-                     'ctrl l': self._clear_screen,
-                     'ctrl f': self._page_down,
-                     'ctrl b': self._page_up,
-                     'd': self._del_url,
-                     'f1': self._help_menu,
-                     'G': self._bottom,
-                     'g': self._top,
-                     'j': self._down,
-                     'k': self._up,
-                     'J': self._next,
-                     'K': self._previous,
-                     'P': self._clipboard_pri,
-                     'l': self._link_handler,
-                     'o': self._open_queue,
-                     'O': self._open_queue_win,
-                     'p': self._palette,
-                     'Q': self._quit,
-                     'q': self._quit,
-                     'R': self._reverse,
-                     'S': self._all_shorten,
-                     's': self._shorten,
-                     'u': self._all_escape
-                     }
-        # Set urwid color mode based on the colors parameter
-        self.color = {
-            "true": 2**24,
-            "256": 256,
-            "88": 88,
-            "16": 16,
-            "8": 8,
-            "mono": 1
-        }.get(colors, 16)
-        self.palettes = {}
-        # Default color palette
-        default = [('header', 'white', 'dark blue', 'standout', '#ffffff', '#0000aa'),
-                   ('footer', 'white', 'dark red', 'standout', '#ffffff', '#aa0000'),
-                   ('search', 'white', 'dark green', 'standout', '#ffffff', '#00aa00'),
-                   ('msgtext', '', '', '', '', ''),
-                   ('msgtext:ellipses', 'light gray', 'black', '', '#aaaaaa', '#000000'),
-                   ('urlref:number:braces', 'light gray', 'black', '', '#aaaaaa', '#000000'),
-                   ('urlref:number', 'yellow', 'black', 'standout', '#ffff00', '#000000'),
-                   ('urlref:url', 'white', 'black', 'standout', '#ffffff', '#000000'),
-                   ('url:sel', 'white', 'dark blue', 'bold', '#ffffff', '#0000aa')]
-        # Default black & white palette
-        blw = [('header', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
-               ('footer', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
-               ('search', 'black', 'light gray', 'standout', '#000000', '#aaaaaa'),
-               ('msgtext', '', '', '', '', ''),
-               ('msgtext:ellipses', 'white', 'black', '', '#ffffff', '#000000'),
-               ('urlref:number:braces', 'white', 'black', '', '#ffffff', '#000000'),
-               ('urlref:number', 'white', 'black', 'standout', '#ffffff', '#000000'),
-               ('urlref:url', 'white', 'black', 'standout', '#ffffff', '#000000'),
-               ('url:sel', 'black', 'light gray', 'bold', '#000000', '#aaaaaa')]
-        # Default catppuccin palette
-        ctp = [("header", "white", "dark blue", "standout", "#CDD6F4", "#89B4FA"),
-               ("footer", "white", "dark red", "standout", "#CDD6F4", "#F38BA8"),
-               ("search", "white", "dark green", "standout", "#CDD6F4", "#A6E3A1"),
-               ("msgtext", "", "", "", "#CDD6F4", "#1E1E2E"),
-               ("msgtext:ellipses", "light gray", "black", "", "#B4BEFE", "#1E1E2E"),
-               ("urlref:number:braces", "light gray", "black", "", "#B4BEFE", "#1E1E2E"),
-               ("urlref:number", "yellow", "black", "standout", "#F9E2AF", "#1E1E2E"),
-               ("urlref:url", "white", "black", "standout", "#CBA6F7", "#1E1E2E"),
-               ("url:sel", "white", "dark blue", "bold", "#F5E0DC", "#313244")]
-
+        self.keys = {key: getattr(self, f"_{action}") for key, action in DEFAULT_KEYS.items()}
+        self.color = COLOR_MODES.get(colors, 16)
+        self.palettes = dict(DEFAULT_PALETTES)
         if genconf is True:
-            # Add default palettes for config generation
-            self.palettes.update([("default", default), ("bw", blw), ("catppuccin", ctp)])
             self._config_create()
-
-        # Flag to track if we found palettes in config.json
-        config_has_palettes = False
-
-        try:
-            with open(self.conf, 'r', encoding=sys.getdefaultencoding()) as conf_file:
-                data = json.load(conf_file)
-                try:
-                    if 'palettes' in data and data['palettes']:
-                        # If config has palettes, use only those
-                        config_has_palettes = True
-                        for pal_name, pal in data['palettes'].items():
-                            self.palettes.update([(pal_name, [tuple(i) for i in pal])])
-                except KeyError:
-                    pass
-                try:
-                    items = data['keys'].items()
-                    for key, value in items:
-                        if value:
-                            self.keys[key] = getattr(self, f"_{value}")
-                        else:
-                            # An empty action unbinds the key
-                            self.keys.pop(key, None)
-                except KeyError:
-                    pass
-        except FileNotFoundError:
-            pass
-
-        # If no palettes were found in config, use the default hardcoded ones
-        if not config_has_palettes:
-            self.palettes.update([("default", default), ("bw", blw), ("catppuccin", ctp)])
+        self._load_config()
         try:
             subprocess.run(['xdg-open'], check=False, stdout=subprocess.DEVNULL)
             self.xdg = True
@@ -307,6 +271,27 @@ class URLChooser:
         self.palette_idx = 0
         self.number = ""
         self.help_menu = False
+
+    def _load_config(self):
+        """Apply palettes and keybindings from config.json, if it exists.
+
+        Palettes in the config replace the built-in ones. A key whose action
+        is "" is unbound.
+
+        """
+        try:
+            with open(self.conf, 'r', encoding=sys.getdefaultencoding()) as conf_file:
+                data = json.load(conf_file)
+        except FileNotFoundError:
+            return
+        if data.get('palettes'):
+            self.palettes = {name: [tuple(i) for i in pal]
+                             for name, pal in data['palettes'].items()}
+        for key, action in data.get('keys', {}).items():
+            if action:
+                self.keys[key] = getattr(self, f"_{action}")
+            else:
+                self.keys.pop(key, None)
 
     def main(self):
         """Urwid main event loop
@@ -728,10 +713,8 @@ class URLChooser:
         # Create ~/.config/urlscan/config.json if if doesn't exist
         if not exists(self.conf):
             os.makedirs(dirname(expanduser(self.conf)), exist_ok=True)
-            keys = dict(zip(self.keys.keys(),
-                            [i.__name__.strip('_') for i in self.keys.values()]))
             with open(expanduser(self.conf), 'w', encoding=sys.getdefaultencoding()) as pals:
-                pals.writelines(json.dumps({"palettes": self.palettes, "keys": keys},
+                pals.writelines(json.dumps({"palettes": self.palettes, "keys": DEFAULT_KEYS},
                                            indent=4))
             print("Created ~/.config/urlscan/config.json")
         else:
