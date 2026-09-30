@@ -295,14 +295,9 @@ class URLChooser:
         elif self.run:
             self.link_open_modes.insert(0, self.run)
         self.nohelp = nohelp
-        if nohelp is False:
-            self.headerwid = urwid.AttrMap(urwid.Text(
-                self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
-        else:
-            self.headerwid = None
-        self.top = urwid.Frame(self.listbox, self.headerwid)
         self.pad = self.term_width - self.width
-        self.top = urwid.Padding(self.top, left=0, right=self.pad)
+        self.top = urwid.Padding(urwid.Frame(self.listbox), left=0, right=self.pad)
+        self._set_header()
         if self.urls:
             self.listbox.focus_position = self._first_url_pos()
         if reverse is True:
@@ -470,9 +465,7 @@ class URLChooser:
         thr = Thread(target=self._background_queue, args=(self.queue, mode))
         thr.start()
         self.queue = []
-        self.headerwid = urwid.AttrMap(urwid.Text(
-            self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
-        self.top.base_widget.header = self.headerwid
+        self._set_header()
 
     def _open_queue(self):
         """o (new tab)"""
@@ -491,9 +484,7 @@ class URLChooser:
             return
         if self._url(row) not in self.queue:
             self.queue.append(self._url(row))
-        self.headerwid = urwid.AttrMap(urwid.Text(
-            self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
-        self.top.base_widget.header = self.headerwid
+        self._set_header()
         label = row.button.label
         if not label.startswith("* "):
             row.button.set_label(f"* {label}")
@@ -505,9 +496,7 @@ class URLChooser:
             return
         try:
             self.queue.remove(self._url(row))
-            self.headerwid = urwid.AttrMap(urwid.Text(
-                self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
-            self.top.base_widget.header = self.headerwid
+            self._set_header()
             label = row.button.label
             if label.startswith("* "):
                 row.button.set_label(label[2:])
@@ -570,8 +559,7 @@ class URLChooser:
         self.search_string = ""
         # Reset the search highlighting
         self._search()
-        footerwid = urwid.AttrMap(urwid.Text("Search: "), 'footer')
-        self.top.base_widget.footer = footerwid
+        self._set_footer("Search: ")
 
     def _digits(self):
         """ 0-9 """
@@ -688,8 +676,7 @@ class URLChooser:
         # Show/hide context
         if self.search_string:
             # Reset search when toggling compact mode
-            footerwid = urwid.AttrMap(urwid.Text(""), 'default')
-            self.top.base_widget.footer = footerwid
+            self._set_footer("", 'default')
             self.search_string = ""
             self.items = self.items_orig
         fpo = self.listbox.focus_position
@@ -754,8 +741,7 @@ class URLChooser:
         """Display given text in the footer. Clears after <time> seconds
 
         """
-        footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
-        self.top.base_widget.footer = footerwid
+        self._set_footer(text)
         self.loop.set_alarm_in(time, self._footer_callback)
 
     def _footer_callback(self, _loop, _data):
@@ -771,10 +757,21 @@ class URLChooser:
     def _search_footer(self):
         """Show the search string in the footer, or clear it if there is none."""
         if self.search_string:
-            footerwid = urwid.AttrMap(urwid.Text(f"Search: {self.search_string}"), 'search')
+            self._set_footer(f"Search: {self.search_string}", 'search')
         else:
-            footerwid = urwid.AttrMap(urwid.Text(""), 'default')
-        self.top.base_widget.footer = footerwid
+            self._set_footer("", 'default')
+
+    def _set_header(self):
+        """Show the help line, open mode and queue size, unless --nohelp."""
+        if self.nohelp is True:
+            self.top.base_widget.header = None
+        else:
+            self.top.base_widget.header = urwid.AttrMap(urwid.Text(
+                self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
+
+    def _set_footer(self, text, attr='footer'):
+        """Show `text` in the footer with display attribute `attr`."""
+        self.top.base_widget.footer = urwid.AttrMap(urwid.Text(text), attr)
 
     def _cur_focus(self, fpo=0):
         # Return correct focus when toggling 'show context'
@@ -792,8 +789,7 @@ class URLChooser:
 
         """
         text = f"Search: {self.search_string}"
-        footerwid = urwid.AttrMap(urwid.Text(text), 'footer')
-        self.top.base_widget.footer = footerwid
+        self._set_footer(text)
         search_items = []
         for grp in self.items_org:
             done = False
@@ -822,8 +818,7 @@ class URLChooser:
             self.no_matches = False
         else:
             self.no_matches = True
-            footerwid = urwid.AttrMap(urwid.Text(text + "  No Matches"), 'footer')
-            self.top.base_widget.footer = footerwid
+            self._set_footer(text + "  No Matches")
 
     def draw_screen(self):
         """Render curses screen
@@ -840,10 +835,7 @@ class URLChooser:
         """
         mode = self.link_open_modes.pop()
         self.link_open_modes.insert(0, mode)
-        if self.nohelp is False:
-            self.headerwid = urwid.AttrMap(urwid.Text(
-                self.header.format(self.link_open_modes[0], len(self.queue))), 'header')
-            self.top.base_widget.header = self.headerwid
+        self._set_header()
 
     def mkbrowseto(self, url, mode=0, background=False):
         """Create a function to open the web browser or call another function
