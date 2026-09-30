@@ -87,3 +87,10 @@ def test_question_mark_is_typed_into_search(tmp_path):
     run_with_keys(chooser, ["/what?\r", "q"])
     assert chooser.search_string == "what?"
     assert chooser.help_menu is False
+
+
+@pytest.mark.parametrize("key", ["\x1b[A", "\x1b[H"], ids=["up", "home"])
+def test_up_and_home_are_not_typed_into_search(tmp_path, key):
+    chooser = make_chooser(tmp_path / "opened", MESSAGE)
+    run_with_keys(chooser, ["/Sec", key, "ond\r", "q"])
+    assert chooser.search_string == "Second"

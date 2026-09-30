@@ -39,6 +39,8 @@ def run(tmp_path, keys):
     # with context hidden (c), where URLs are adjacent.
     ("cjq", B),      # down
     ("cjjkq", B),    # up
+    ("cjj\x1b[Aq", B),   # up arrow
+    ("G\x1b[Hq", A),     # home
     ("Jq", B),       # next URL
     ("JJq", C),
     ("GKq", C),      # previous URL

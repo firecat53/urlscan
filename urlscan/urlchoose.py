@@ -340,7 +340,10 @@ class URLChooser:
                 if k == 'backspace':
                     self.search_string = self.search_string[:-1]
                     self._search()
-            elif self.help_menu is True:
+                # Pass other keys through unchanged: the remaps below would
+                # turn up/home into letters typed into the search.
+                continue
+            if self.help_menu is True:
                 self._help_menu()
                 return []
             if k == 'up':
