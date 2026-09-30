@@ -406,7 +406,6 @@ class URLChooser:
     def _focus(self, pos):
         """Move focus to list position `pos`."""
         self.listbox.focus_position = pos
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _first_url_pos(self):
         """Return the list position of the first URL, or None if none is shown."""
@@ -634,12 +633,10 @@ class URLChooser:
     def _page_up(self):
         """ Ctrl-b """
         self.top.base_widget.keypress(self.size, "page up")
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _page_down(self):
         """ Ctrl-f """
         self.top.base_widget.keypress(self.size, "page down")
-        self.top.base_widget.keypress(self.size, "")  # Trick urwid into redisplaying the cursor
 
     def _previous(self):
         """ K """

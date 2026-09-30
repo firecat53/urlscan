@@ -47,6 +47,8 @@ def run(tmp_path, keys):
     ("KKq", A),      # previous stops at the first URL
     ("GJq", D),      # next stops at the last URL
     ("3q", C),       # jump to URL number
+    ("c\x06q", D),   # page down (ctrl f); one page holds every URL
+    ("cG\x02q", A),  # page up (ctrl b)
 ])
 def test_move_focus(tmp_path, keys, expected):
     assert focused_url(run(tmp_path, keys)) == expected
