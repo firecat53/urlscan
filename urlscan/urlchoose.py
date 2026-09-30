@@ -494,26 +494,37 @@ class URLChooser:
         row = self._focused_row()
         if row is None:
             return
-        if self._url(row) not in self.queue:
-            self.queue.append(self._url(row))
-        self._set_header()
-        label = row.button.label
-        if not label.startswith("* "):
-            row.button.set_label(f"* {label}")
+        url = self._url(row)
+        if url not in self.queue:
+            self.queue.append(url)
+            self._set_header()
+        self._mark_queued(url)
 
     def _del_url(self):
         """d"""
         row = self._focused_row()
         if row is None:
             return
-        try:
-            self.queue.remove(self._url(row))
+        url = self._url(row)
+        if url in self.queue:
+            self.queue.remove(url)
             self._set_header()
+        self._mark_queued(url)
+
+    def _mark_queued(self, url):
+        """Mark every row showing `url` with "* " if it is queued, and unmark
+        them if not. Without --dedupe the same URL can be on several rows.
+
+        """
+        queued = url in self.queue
+        for row in self.rows:
+            if self._url(row) != url:
+                continue
             label = row.button.label
-            if label.startswith("* "):
+            if queued and not label.startswith("* "):
+                row.button.set_label(f"* {label}")
+            elif not queued and label.startswith("* "):
                 row.button.set_label(label[2:])
-        except ValueError:
-            pass
 
     def _help_menu(self):
         """F1 or ?"""

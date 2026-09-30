@@ -73,3 +73,32 @@ def test_open_url_can_be_rebound(tmp_path, config_home):
     # Enter on the first URL does nothing; x on the second opens it.
     run_with_keys(make_chooser(log, MESSAGE), "\rjxq")
     assert only_opened(log, [SECOND])
+
+
+DUP = "https://dup.example.com/x"
+# The same URL twice. Without --dedupe it gets two rows, [1] and [2].
+DUP_MESSAGE = f"Subject: test\n\nFirst {DUP} and again {DUP} and {SECOND}\n"
+
+
+def labels(chooser):
+    return [row.button.label for row in chooser.rows]
+
+
+@pytest.mark.parametrize("keys", [
+    "aJaKdJdq",     # add both, delete both, one at a time
+    "aJaKdq",       # add both, delete from the first
+    "aJadq",        # add both, delete from the second
+    "aJdq",         # add one, delete from its duplicate
+])
+def test_duplicate_urls_share_queued_marker(tmp_path, keys):
+    chooser = make_chooser(tmp_path / "opened", DUP_MESSAGE, shorten=False)
+    run_with_keys(chooser, keys)
+    assert chooser.queue == []
+    assert labels(chooser) == [DUP, DUP, SECOND]
+
+
+def test_adding_a_duplicate_marks_every_copy(tmp_path):
+    chooser = make_chooser(tmp_path / "opened", DUP_MESSAGE, shorten=False)
+    run_with_keys(chooser, "aq")
+    assert chooser.queue == [DUP]
+    assert labels(chooser) == ["* " + DUP, "* " + DUP, SECOND]
