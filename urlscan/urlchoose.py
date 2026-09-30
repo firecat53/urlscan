@@ -64,6 +64,8 @@ DEFAULT_KEYS = {'enter': 'open_url',
                 'ctrl b': 'page_up',
                 'd': 'del_url',
                 'f1': 'help_menu',
+                '?': 'help_menu',
+                'esc': 'clear_search',
                 'G': 'bottom',
                 'g': 'top',
                 'j': 'down',
@@ -248,7 +250,7 @@ class URLChooser:
         # One list for the life of the app. _show() changes what it shows.
         self.walker = urwid.SimpleFocusListWalker(self.items)
         self.listbox = urwid.ListBox(self.walker)
-        self.header = (":: F1 - help/keybindings :: "
+        self.header = (":: F1/? - help/keybindings :: "
                        "q - quit :: "
                        "/ - search :: "
                        "URL opening mode - {} :: "
@@ -368,6 +370,8 @@ class URLChooser:
                     self.search_string = ""
                     self._search()
                 self._search_footer()
+            elif key == 'esc':
+                self._clear_search()
             elif self.no_matches is False and len(key) == 1 and key.isprintable():
                 self.search_string += key
                 self._search()
@@ -489,7 +493,7 @@ class URLChooser:
             pass
 
     def _help_menu(self):
-        """F1"""
+        """F1 or ?"""
         if self.help_menu is False:
             help_men = "\n".join([f"{'space' if i == ' ' else i} - {j.__name__.strip('_')}"
                                   for i, j in self.keys.items() if j.__name__ !=
@@ -500,6 +504,7 @@ class URLChooser:
                     "all_escape    -- toggle unescape all URLs\n"
                     "all_shorten   -- toggle shorten all URLs\n"
                     "bottom        -- move cursor to last item\n"
+                    "clear_search  -- clear search and show all URLs\n"
                     "clear_screen  -- redraw screen\n"
                     "clipboard     -- copy highlighted URL to clipboard\n"
                     "                 using xsel/xclip\n"
@@ -545,6 +550,17 @@ class URLChooser:
         # Reset the search highlighting
         self._search()
         self._set_footer("Search: ")
+
+    def _clear_search(self):
+        """ Esc """
+        # Drop the search, typed or finished, and show every URL again
+        if self.search is False and not self.search_string:
+            return
+        self.search = False
+        self.no_matches = False
+        self.search_string = ""
+        self._search()  # Clears the highlighting and restores the list
+        self._search_footer()
 
     def _digits(self):
         """ 0-9 """

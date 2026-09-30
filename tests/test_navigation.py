@@ -65,11 +65,21 @@ def test_context_toggle_shows_only_urls(tmp_path):
     assert shown_urls(chooser) == [A, B, C, D]
 
 
-def test_help_menu_keeps_focus(tmp_path):
-    # F1 opens help; any key closes it (and is otherwise ignored).
-    chooser = run(tmp_path, ["JJ", "\x1bOP", "x", "q"])
+@pytest.mark.parametrize("help_key", ["\x1bOP", "?"], ids=["F1", "?"])
+def test_help_menu_keeps_focus(tmp_path, help_key):
+    # Help opens; any key closes it (and is otherwise ignored).
+    chooser = run(tmp_path, ["JJ", help_key, "x", "q"])
     assert focused_url(chooser) == C
     assert shown_urls(chooser) == [A, B, C, D]
+
+
+@pytest.mark.parametrize("help_key", ["\x1bOP", "?"], ids=["F1", "?"])
+def test_help_key_opens_help(tmp_path, help_key):
+    # With help open, g only closes it, so focus stays at the bottom.
+    # Without help, g would move focus to the top.
+    chooser = run(tmp_path, ["G", help_key, "g", "q"])
+    assert focused_url(chooser) == D
+    assert chooser.help_menu is False
 
 
 @pytest.mark.parametrize("keys, shown, expected", [

@@ -48,3 +48,42 @@ def test_enter_on_no_matches_restores_list(tmp_path):
 def test_keys_after_no_match_search(tmp_path, key):
     chooser = make_chooser(tmp_path / "opened", MESSAGE)
     run_with_keys(chooser, ["/zzzz\r", key, "q", "q"])
+
+
+def highlighted(chooser):
+    """True if any context text shows search highlighting."""
+    return any(attr == 'search' for item in chooser.items
+               if hasattr(item, 'attrib') for attr, _ in item.attrib)
+
+
+@pytest.mark.parametrize("keys", [
+    ["/Second", "\x1b", "q"],          # while typing
+    ["/zzzz", "\x1b", "q"],            # while typing, no matches
+    ["/Second\r", "\x1b", "q"],        # after Enter, results showing
+], ids=["typing", "no_matches", "after_enter"])
+def test_esc_clears_search(tmp_path, keys):
+    chooser = make_chooser(tmp_path / "opened", MESSAGE)
+    run_with_keys(chooser, keys)
+    assert chooser.search is False
+    assert chooser.search_string == ""
+    assert chooser.items == chooser.items_orig
+    assert not highlighted(chooser)
+    footer = chooser.top.base_widget.footer
+    assert footer.base_widget.text == ""
+
+
+def test_esc_without_search_does_nothing(tmp_path):
+    """Esc with no search doesn't touch the list, so compact mode stays."""
+    chooser = make_chooser(tmp_path / "opened", MESSAGE)
+    run_with_keys(chooser, ["c", "\x1b", "q"])
+    assert chooser.compact is True
+    assert chooser.items == chooser.rows
+
+
+def test_question_mark_is_typed_into_search(tmp_path):
+    """While searching, ? is part of the search, not the help key."""
+    message = f"Subject: test\n\nWhat? {FIRST}\n"
+    chooser = make_chooser(tmp_path / "opened", message)
+    run_with_keys(chooser, ["/what?\r", "q"])
+    assert chooser.search_string == "what?"
+    assert chooser.help_menu is False

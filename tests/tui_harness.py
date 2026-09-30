@@ -30,6 +30,11 @@ from urlscan import urlchoose, urlscan  # noqa: E402
 URLS = ["https://one.example.com/a", "https://two.example.com/b"]
 MESSAGE = f"Subject: test\n\nFirst {URLS[0]} and second {URLS[1]}\n"
 
+# Pause between chunks of keys. It must exceed urwid's escape-sequence wait
+# (Screen.complete_wait, 0.125s), or a lone Esc followed by a key is read as
+# one meta-key.
+CHUNK_PAUSE = 0.3
+
 # How long a test may wait for the main loop to exit before failing.
 TIMEOUT = 10
 
@@ -109,7 +114,7 @@ def run_with_keys(chooser, keys):
                 if finished.is_set():
                     break
                 os.write(master, chunk.encode())
-                time.sleep(0.1)
+                time.sleep(CHUNK_PAUSE)
 
     def on_alarm(_signum, _frame):
         raise LoopTimeout(f"main loop still running after {TIMEOUT}s")

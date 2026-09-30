@@ -39,7 +39,7 @@ Relative to urlview, urlscan has the following additional features:
 
 - Jump to a URL by typing the number.
 
-- Incremental case-insensitive search with `/`.
+- Incremental case-insensitive search with `/`. `Esc` clears the search.
 
 - Execute an arbitrary function (for example, copy URL to clipboard) instead of
   opening URL in a browser.
@@ -61,7 +61,7 @@ Relative to urlview, urlscan has the following additional features:
 - Run a command with the selected URL as the argument or pipe the selected
   URL to a command.
 
-- Show complete help menu with `F1`. Hide header on startup with `--nohelp`.
+- Show complete help menu with `F1` or `?`. Hide header on startup with `--nohelp`.
 
 - Use a custom regular expression with `-E` for matching urls or any
   other pattern. In junction with `-r`, this effectively turns urlscan
@@ -191,13 +191,14 @@ The follow actions are supported:
 - `all_escape` -- toggle unescape all URLs (default: `u`)
 - `all_shorten` -- toggle shorten all URLs (default: `S`)
 - `bottom` -- move cursor to last item (default: `G`)
+- `clear_search` -- clear the search and show all URLs (default: `Esc`)
 - `clear_screen` -- redraw screen (default: `Ctrl-l`)
 - `clipboard` -- copy highlighted URL to clipboard using xsel/xclip (default: `C`)
 - `clipboard_pri` -- copy highlighted URL to primary selection using xsel/xclip (default: `P`)
 - `context` -- show/hide context (default: `c`)
 - `del_url` -- delete URL from the queue (default: `d`)
 - `down` -- cursor down (default: `j`)
-- `help_menu` -- show/hide help menu (default: `F1`)
+- `help_menu` -- show/hide help menu (default: `F1` or `?`)
 - `link_handler` -- cycle link handling (webbrowser, xdg-open, --run-safe or --run) (default: `l`)
 - `next` -- jump to next URL (default: `J`)
 - `open_queue` -- open all URLs in queue (default: `o`)
