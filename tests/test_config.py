@@ -56,18 +56,36 @@ def test_config_keys(conf):
     assert action(chooser, "k") == "up"     # untouched defaults remain
 
 
+@pytest.mark.parametrize("name", ["space", " "])
+def test_space_key_names(conf, name):
+    write_config(conf, {"keys": {name: "quit"}})
+    assert action(urlchoose.URLChooser([]), " ") == "quit"
+
+
+@pytest.mark.parametrize("name", ["space", " "])
+def test_unbind_space(conf, name):
+    write_config(conf, {"keys": {name: ""}})
+    chooser = urlchoose.URLChooser([])
+    assert " " not in chooser.keys
+    assert "space" not in chooser.keys
+    assert action(chooser, "enter") == "open_url"
+
+
 def test_genconf_writes_defaults(conf, capsys):
     urlchoose.URLChooser([], genconf=True)
     data = json.loads(conf.read_text())
     assert list(data["palettes"]) == BUILTIN_PALETTES
     assert data["keys"]["enter"] == "open_url"
+    assert data["keys"]["space"] == "open_url"
+    assert " " not in data["keys"]
     assert data["keys"]["J"] == "next"
     assert data["keys"]["5"] == "digits"
     assert "Created" in capsys.readouterr().out
     # The generated file loads back to the same bindings and palettes.
     chooser = urlchoose.URLChooser([])
     assert list(chooser.palettes) == BUILTIN_PALETTES
-    assert {k: action(chooser, k) for k in chooser.keys} == data["keys"]
+    loaded = {("space" if k == " " else k): action(chooser, k) for k in chooser.keys}
+    assert loaded == data["keys"]
 
 
 def test_genconf_keeps_existing_config(conf, capsys):

@@ -84,6 +84,9 @@ DEFAULT_KEYS = {'enter': 'open_url',
                 's': 'shorten',
                 'u': 'all_escape'}
 
+# Names config.json may use for keys whose urwid name is hard to read
+KEY_ALIASES = {"space": " "}
+
 # urwid color modes for --colors
 COLOR_MODES = {"true": 2**24,
                "256": 256,
@@ -278,7 +281,7 @@ class URLChooser:
         """Apply palettes and keybindings from config.json, if it exists.
 
         Palettes in the config replace the built-in ones. A key whose action
-        is "" is unbound.
+        is "" is unbound. Keys may use the names in KEY_ALIASES.
 
         """
         try:
@@ -290,6 +293,7 @@ class URLChooser:
             self.palettes = {name: [tuple(i) for i in pal]
                              for name, pal in data['palettes'].items()}
         for key, action in data.get('keys', {}).items():
+            key = KEY_ALIASES.get(key, key)
             if action:
                 self.keys[key] = getattr(self, f"_{action}")
             else:
@@ -732,8 +736,10 @@ class URLChooser:
         # Create ~/.config/urlscan/config.json if if doesn't exist
         if not exists(self.conf):
             os.makedirs(dirname(expanduser(self.conf)), exist_ok=True)
+            aliases = {urwid_name: alias for alias, urwid_name in KEY_ALIASES.items()}
+            keys = {aliases.get(key, key): action for key, action in DEFAULT_KEYS.items()}
             with open(expanduser(self.conf), 'w', encoding=sys.getdefaultencoding()) as pals:
-                pals.writelines(json.dumps({"palettes": self.palettes, "keys": DEFAULT_KEYS},
+                pals.writelines(json.dumps({"palettes": self.palettes, "keys": keys},
                                            indent=4))
             print("Created ~/.config/urlscan/config.json")
         else:

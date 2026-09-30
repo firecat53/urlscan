@@ -185,6 +185,8 @@ be listed. You can either leave in place or delete any that will not be altered.
 
 To unset a binding, set it equal to "".  For example: `"P": ""`
 
+The space bar can be written as `"space"` or `" "`.
+
 The follow actions are supported:
 
 - `add_url` -- add a URL to the queue (default: `a`)
