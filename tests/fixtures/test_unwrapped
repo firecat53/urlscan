@@ -1,0 +1,20 @@
+From: Weekly Digest <digest@example.org>
+To: reader@example.net
+Subject: Issue 47 - what we shipped this week
+Date: Mon, 8 Sep 2026 09:14:22 -0700
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+Hi folks,
+
+Plenty to get through this week, so let's dive straight in. The headline item is that the storage rewrite has finally landed after four months of work, which means the migration guide at https://docs.example.org/storage/migrating is now the canonical reference and the older wiki page should be considered dead. Please do read it before upgrading, because the on-disk format has changed and there is no automatic rollback once you have started.
+
+On the community side, we had a really productive discussion about release cadence in the forum thread at https://forum.example.org/t/release-cadence-2026/8891 and the rough consensus was that quarterly releases with monthly patch drops strikes the right balance for most people, though a vocal minority would prefer something faster. Nothing is decided yet and the thread is still open if you have opinions.
+
+A quick reminder that the annual user survey closes at the end of the month. It takes about six minutes and genuinely does shape the roadmap, so if you have not filled it in yet please head over to https://survey.example.org/2026/annual and give us your thoughts. Last year's results led directly to the offline mode work that several of you have been asking about for years.
+
+Finally, thanks to everyone who turned up to the meetup in Lisbon. Photos and the slide decks from all six talks are collected at https://events.example.org/lisbon-2026/recap for anyone who could not make it in person. The next one is provisionally penciled in for spring.
+
+Until next week,
+The team

@@ -1,0 +1,20 @@
+From: x
+To: Morgan Mitchell <mm@example.com>
+Subject: x
+Mime-Version: 1.0
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_1386762_655054341.1177393971856"
+Status: RO
+Content-Length: 1604
+Lines: 81
+
+------=_Part_1386762_655054341.1177393971856
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hi,                                                                                                                                     
+Probably related to #12 the URLs contained in markdown-formated emails are not extracted correctly.
+Markdown URLs are enclosed into brackets so the URL is extracted with the final bracket due too
+https://github.com/firecat53/urlscan/blob/0.8.1/urlscan/urlscan.py#L248                                                                 
+Markdown URL ``` [urlscan](https://github.com/firecat53/urlscan/)``` it gets 
+

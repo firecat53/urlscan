@@ -1,0 +1,14 @@
+From: Product Updates <updates@example.com>
+To: reader@example.net
+Subject: What's new in September
+Date: Tue, 9 Sep 2026 11:02:00 -0700
+Mime-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<html><body>
+<h2>What's new in September</h2>
+<p>We've spent most of this month on performance, and the results are worth writing up properly. The full benchmark methodology and the raw numbers are in <a href="https://blog.example.com/2026/09/performance-deep-dive">this deep dive on the engineering blog</a>, but the short version is that cold start times are down by roughly sixty percent on the reference hardware and memory usage during large imports has been cut nearly in half.</p>
+<p>Alongside that, we rewrote the query planner. This was a long time coming and it fixes a whole category of pathological slow queries that some of you have been reporting for the better part of a year. There is a short <a href="https://docs.example.com/query-planner/whats-changed">migration note</a> covering the two cases where behaviour changes in a way you might notice, and we would strongly encourage reading it if you rely on custom index hints.</p>
+<p>One deprecation to flag: the legacy export API will stop accepting new connections at the end of November. Everything you need to move across is documented at <a href="https://docs.example.com/export/v2-migration">the v2 migration guide</a>, and the endpoint shapes are close enough that most integrations are a fifteen minute change. Shout if you get stuck and we will help.</p>
+</body></html>

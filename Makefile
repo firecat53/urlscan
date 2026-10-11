@@ -2,6 +2,16 @@
 version:
 	@grep -Po '^__version__ = "\K[^"]+' urlscan/__init__.py
 
+# Run the test suite. Uses pytest straight off PATH when it is there, as it is
+# inside `nix develop`; otherwise enters the dev shell to get it.
+# Usage: make test [PYTEST_ARGS="-k context -v"]
+test:
+	@if command -v pytest >/dev/null 2>&1; then \
+		pytest $(PYTEST_ARGS); \
+	else \
+		nix develop --command pytest $(PYTEST_ARGS); \
+	fi
+
 # Bump __version__, refresh the man page date, commit, and create an annotated
 # tag. $EDITOR prefilled with version and commits since the last tag.
 # Usage: make release VERSION=1.1.0
@@ -42,4 +52,4 @@ release:
 	@echo "Tagged $(VERSION). Push with:"
 	@echo "    git push origin $$(git rev-parse --abbrev-ref HEAD) --follow-tags"
 
-.PHONY: version release
+.PHONY: version release test

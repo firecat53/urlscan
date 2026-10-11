@@ -1,0 +1,14 @@
+ dabascht  ~  
+ dabascht  ~  tmux capture-pane -p | urlscan -d
+ dabascht  ~  mpv --no-video --loop https://www.youtube.com/watch?v=sTal8O7uMxg 
+Playing: https://www.youtube.com/watch?v=sTal8O7uMxg 
+ (+) Audio --aid=1 --alang=eng (*) (opus 2ch 48000Hz)
+
+ mpv --no-video --loop https://www.youtube.com/watch\?v\=sTal8O7uMxg
+Playing: https://www.youtube.com/watch?v=sTal8O7uMxg
+ (+) Audio --aid=1 --alang=eng (*) (opus 2ch 48000Hz)
+AO: [pulse] 48000Hz stereo 2ch float
+A: 00:00:09 / 01:11:17 (0%) Cache: 10s+828KB
+
+
+Exiting... (Quit)

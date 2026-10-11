@@ -1,0 +1,139 @@
+Received: from BAPPEX006-MBX.webde.local (172.19.76.174) by
+ EXFEINT02.webde.local (10.2.3.92) with Microsoft SMTP Server (TLS) id
+ 14.3.174.1; Tue, 9 Dec 2014 10:35:17 +0100
+Received: from KAPPEX001-CAS.united.domain (172.19.70.13) by
+ BAPPEX006-MBX.webde.local (172.19.76.174) with Microsoft SMTP Server (TLS) id
+ 15.0.995.29; Tue, 9 Dec 2014 10:35:16 +0100
+Received: from mrint.1and1.com (172.19.128.176) by owa.extranet.1and1.org
+ (172.19.70.13) with Microsoft SMTP Server (TLS) id 15.0.995.29 via Frontend
+ Transport; Tue, 9 Dec 2014 10:35:15 +0100
+Received: from [212.227.35.68] (helo=vakuum.i.schlund.de)	by mrint.1and1.com
+ with esmtpsa (TLS1.0:RSA_AES_128_CBC_SHA1:128)	(Exim 4.80)	(envelope-from
+ <stefan.brandt@7pfad.de>)	id 1XyHCI-0000y6-Oo; Tue, 09 Dec 2014 10:35:15
+ +0100
+From: Stefan Brandt <stefan.brandt@7pfad.de>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_BB96FB7E-6762-4F1C-8927-E9CF905AE7C2";
+	protocol="application/pgp-signature"; micalg=pgp-sha512
+Message-ID: <341767BB-2BB5-419B-BD01-817E0B7CADD6@7pfad.de>
+Date: Tue, 9 Dec 2014 10:35:13 +0100
+Subject: Docker Meetup
+CC: =?iso-8859-1?Q?Tobias_Sebastian_B=E4cker?=
+	<tobiassebastian.baecker@7pfad.de>, Marcel Dahlke
+	<marcel.dahlke@7pfad.de>
+To: Hans Keller <hans.keller@7pfad.de>, Simon Wolff <simon.wolff@7pfad.de>, Hedi
+ Baumer <hedi.baumer@7pfad.de>, Amira Velasco <Amira.Velasco@7pfad.de>,
+	Sven Hartmann <sven.hartmann@7pfad.de>, Joachim Bergt
+	<joachim.bergt@7pfad.de>
+X-Mailer: Apple Mail (2.1878.6)
+X-Virus-Scanned: ClamAV@mvs-ha-bs
+Return-Path: stefan.brandt@7pfad.de
+X-MS-Exchange-Organization-AuthSource: KAPPEX001-CAS.united.domain
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Exchange-Organization-AVStamp-Mailbox: MSFTFF;1;0;0 0 0
+MIME-Version: 1.0
+
+--Apple-Mail=_BB96FB7E-6762-4F1C-8927-E9CF905AE7C2
+Content-Type: multipart/alternative;
+	boundary="Apple-Mail=_6D29036C-0BB2-428A-A863-E5FC6F5E26B5"
+
+
+--Apple-Mail=_6D29036C-0BB2-428A-A863-E5FC6F5E26B5
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=iso-8859-1
+
+Moin,=20
+
+falls noch nicht gesehen, Docker Meetup am 18.12.:
+http://www.meetup.com/inovex-karlsruhe/events/218871954/
+
+=20
+Stefan Brandt
+
+Expert Web Application Architectures / Division Architect
+Product Development MyWebsite
+
+1&1 Internet AG | Ernst-Frey-Stra=DFe 9 | 76135 Karlsruhe | Germany
+Phone: +49 721 91374-8015 | Fax: +49 721 91374-2736
+E-Mail: stefan.brandt@7pfad.de | Web: www.7pfad.de
+
+
+
+
+
+
+--Apple-Mail=_6D29036C-0BB2-428A-A863-E5FC6F5E26B5
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset=iso-8859-1
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html =
+charset=3Diso-8859-1"></head><body style=3D"word-wrap: break-word; =
+-webkit-nbsp-mode: space; -webkit-line-break: =
+after-white-space;"><div>Moin,&nbsp;</div><div><br></div>falls noch =
+nicht gesehen, Docker Meetup am 18.12.:<br><div><a =
+href=3D"http://www.meetup.com/inovex-karlsruhe/events/218871954/">http://w=
+ww.meetup.com/inovex-karlsruhe/events/218871954/</a></div><div><br></div><=
+div>&nbsp;<br><div>
+<div style=3D"color: rgb(0, 0, 0); letter-spacing: normal; orphans: =
+auto; text-align: start; text-indent: 0px; text-transform: none; =
+white-space: normal; widows: auto; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; word-wrap: break-word; =
+-webkit-nbsp-mode: space; -webkit-line-break: after-white-space;"><div =
+style=3D"color: rgb(0, 0, 0); letter-spacing: normal; orphans: auto; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-line-break: =
+after-white-space;"><p data-mce-style=3D"color: #000; font-size: 13px; =
+font-weight: bold; margin-bottom: 15px;" style=3D"font-family: Arial; =
+font-size: 13px; font-weight: bold; margin-bottom: 15px; =
+background-color: rgb(255, 255, 255);">Stefan Brandt</p><p =
+data-mce-style=3D"margin-bottom: 15px;" style=3D"color: rgb(136, 136, =
+136); font-family: Arial; font-size: 10px; margin-bottom: 15px; =
+background-color: rgb(255, 255, 255);">Expert Web Application =
+Architectures / Division Architect<br>Product Development =
+MyWebsite</p><p data-mce-style=3D"border-bottom: 1px solid #888; =
+padding-bottom: 15px; margin-bottom: 15px;" style=3D"color: rgb(136, =
+136, 136); font-family: Arial; font-size: 10px; border-bottom-width: =
+1px; border-bottom-style: solid; border-bottom-color: rgb(136, 136, =
+136); padding-bottom: 15px; margin-bottom: 15px; background-color: =
+rgb(255, 255, 255);">1&amp;1 Internet AG | Ernst-Frey-Stra=DFe 9 | 76135 =
+Karlsruhe | Germany<br>Phone: +49 721 91374-8015 | Fax: +49 721 =
+91374-2736<br>E-Mail:&nbsp;<a href=3D"mailto:stefan.brandt@7pfad.de" =
+data-mce-href=3D"mailto:stefan.brandt@7pfad.de">stefan.brandt@7pfad.de</=
+a>&nbsp;| Web:&nbsp;<a href=3D"http://www.7pfad.de/" =
+data-mce-href=3D"http://www.7pfad.de">www.7pfad.de</a></p><p =
+data-mce-style=3D"margin-bottom: 15px;" style=3D"color: rgb(136, 136, =
+136); font-family: Arial; font-size: 10px; margin-bottom: 15px; =
+background-color: rgb(255, 255, 255);"><br></p></div></div><br =
+class=3D"Apple-interchange-newline">
+</div>
+<br></div></body></html>=
+
+--Apple-Mail=_6D29036C-0BB2-428A-A863-E5FC6F5E26B5--
+
+--Apple-Mail=_BB96FB7E-6762-4F1C-8927-E9CF905AE7C2
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="signature.asc"
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Message signed with OpenPGP using GPGMail
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJUhsJRAAoJEKjrkzIgX20WbxcP/04IDw4gPV/YGLs5AHiLIIaE
+CuWbvedarjTRpe/TBfepvpmv6J/Azqe3X/mfnsi0R7CO3x5FUC+rg8SpECiYBMpA
+MyiMxxZgrt1XXDX6OJ9b2xJm1eeQlEqfccphdY4PALUaiLgbbdknh0LWIU2tTUCx
+/qRl/nwwkGF3wNjNKLuLqYPHiRrdYvhViMjrnbDmDxi0ABKT1CqIPtdGlz2nl5mw
+s5y81c5YhgGDcbTxoZ7DFtnj35o/WkY19KjD3JIYKmLl0qs74MIYt86wc6OzP3xL
+I9ygUuJwljvyl5aDHrzsmsavqkN0f9G/UOaddleW4uIB3broHg4sBA6IjT+TPbvN
+hcLCBRCr1kJigZ8VOA+gB0Ypzve+rFFtSsKoDtAxhUEvllWyeToqZ0XNpX5BKyTs
+Dz51srx8dgSUkIcLNsu1xjPa/X+LmRSTdrKCGXmskV96bVafmPZbaQ0pyuO+Dmtf
+S8OfcWC+0LBie3Ey31GO2qVABvZr4iEpz9It/8Y10oRcIu7gEqZsGfOyujx9XjuI
+UJLPgNDocHyizQrNBwaNzp6cWSRbYbCtOjsRDWnmiD/l0k7H6hJWq+Tpj1ftDMgd
+WRUtx9bFfbsy3RRPRKkq49uCdRpElA+HOj5o8K8NTxftYNhEnNaFfcFi0ZTCgvGu
+4fmhxJUA/EF+Muvg73uS
+=rQU3
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_BB96FB7E-6762-4F1C-8927-E9CF905AE7C2--

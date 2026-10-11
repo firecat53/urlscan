@@ -39,7 +39,7 @@ Relative to urlview, urlscan has the following additional features:
 
 - Jump to a URL by typing the number.
 
-- Incremental case-insensitive search with `/`.
+- Incremental case-insensitive search with `/`. `Esc` clears the search.
 
 - Execute an arbitrary function (for example, copy URL to clipboard) instead of
   opening URL in a browser.
@@ -61,7 +61,7 @@ Relative to urlview, urlscan has the following additional features:
 - Run a command with the selected URL as the argument or pipe the selected
   URL to a command.
 
-- Show complete help menu with `F1`. Hide header on startup with `--nohelp`.
+- Show complete help menu with `F1` or `?`. Hide header on startup with `--nohelp`.
 
 - Use a custom regular expression with `-E` for matching urls or any
   other pattern. In junction with `-r`, this effectively turns urlscan
@@ -185,19 +185,22 @@ be listed. You can either leave in place or delete any that will not be altered.
 
 To unset a binding, set it equal to "".  For example: `"P": ""`
 
+The space bar can be written as `"space"` or `" "`.
+
 The follow actions are supported:
 
 - `add_url` -- add a URL to the queue (default: `a`)
 - `all_escape` -- toggle unescape all URLs (default: `u`)
 - `all_shorten` -- toggle shorten all URLs (default: `S`)
 - `bottom` -- move cursor to last item (default: `G`)
+- `clear_search` -- clear the search and show all URLs (default: `Esc`)
 - `clear_screen` -- redraw screen (default: `Ctrl-l`)
 - `clipboard` -- copy highlighted URL to clipboard using xsel/xclip (default: `C`)
 - `clipboard_pri` -- copy highlighted URL to primary selection using xsel/xclip (default: `P`)
 - `context` -- show/hide context (default: `c`)
 - `del_url` -- delete URL from the queue (default: `d`)
 - `down` -- cursor down (default: `j`)
-- `help_menu` -- show/hide help menu (default: `F1`)
+- `help_menu` -- show/hide help menu (default: `F1` or `?`)
 - `link_handler` -- cycle link handling (webbrowser, xdg-open, --run-safe or --run) (default: `l`)
 - `next` -- jump to next URL (default: `J`)
 - `open_queue` -- open all URLs in queue (default: `o`)
@@ -231,6 +234,14 @@ The follow actions are supported:
 - pyproject.toml is configured for [hatch][2] for building and submitting to pypi.
 - flake.nix is available for a development shell or building/testing the package
   if desired. `nix develop`
+- Tests live in `tests/` and run with `make test`, which uses `pytest` from the
+  dev shell (`nix develop`) if it isn't already on your PATH. Pass extra pytest
+  arguments with `make test PYTEST_ARGS="-k extraction -v"`. `nix build` runs
+  them too.
+  The sample messages are in `tests/fixtures/`: some synthetic, the rest real
+  messages that have been de-identified. `test_emails/` remains available as a
+  gitignored scratch directory for your own mail; when it exists the suite also
+  runs its input-independent invariants over whatever is in it.
 - To update TLD list: `wget https://data.iana.org/TLD/tlds-alpha-by-domain.txt`
 - The version is hardcoded in `urlscan/__init__.py` (`make version` or
   `urlscan -V`). Anything else needing a version number reads from there.

@@ -1,0 +1,21 @@
+## Weekly digest
+
+The storage rewrite landed, so the [migration guide] is now the
+canonical reference. Please read it before upgrading, because the
+on-disk format changed.
+
+We also discussed release cadence in [the forum thread], and the rough
+consensus was quarterly releases. Nothing is decided yet.
+
+The annual survey closes at the end of the month; it takes six minutes
+and genuinely shapes the roadmap, so please [fill it in]. Last year\'s
+results led to the offline mode work. The [migration guide] covers that
+too.
+
+Thanks to everyone who came to the meetup. Photos are at [the recap
+page].
+
+  [migration guide]: https://docs.example.org/storage/migrating
+  [the forum thread]: https://forum.example.org/t/release-cadence/8891
+  [fill it in]: https://survey.example.org/2026/annual
+  [the recap page]: https://events.example.org/lisbon-2026/recap

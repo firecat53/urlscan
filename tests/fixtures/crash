@@ -1,0 +1,658 @@
+From info@linnea.fi  Sun Sep  6 10:19:19 2015
+Return-Path: <info@linnea.fi>
+X-Original-To: xxx@lxxx.fi
+Delivered-To: xxx@lxxx.fi
+Received: from smtp2.verkkoala.fi (smtp2.verkkoala.fi [89.250.63.5])
+	by xxx.fi (Postfix) with ESMTP id 8F27D6075D
+	for <xxx@lxxx.fi>; Sun,  6 Sep 2015 10:19:19 +0300 (EEST)
+Received: from localhost.localdomain (localhost [127.0.0.1])
+	by smtp2.verkkoala.fi (Postfix) with ESMTP id 750BC4401CE;
+	Sun,  6 Sep 2015 10:25:37 +0300 (EEST)
+From: info@linnea.fi
+Reply-To: info@linnea.fi
+To: xxx@lxxx.fi
+Subject: =?utf-8?Q?Tervetuloa_kauppaan?=
+MIME-Version: 1.0
+Content-Transfer-Encoding: binary
+Content-Type: multipart/alternative; boundary="_----------=_1441524337170392"; charset="utf-8"
+X-Mailer: MIME::Lite 3.027 (F2.78; T1.31; A2.07; B3.13; Q3.13)
+Date: Sun, 6 Sep 2015 10:25:37 +0300
+Message-Id: <20150906072537.750BC4401CE@smtp2.verkkoala.fi>
+Status: RO
+Content-Length: 11832
+Lines: 633
+
+This is a multi-part message in MIME format.
+
+--_----------=_1441524337170392
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+
+Hei Lasse Reinikainen,
+
+Olet rekister=C3=B6itynyt www-sivustollemme. Vahvista rekister=C3=B6itymine=
+n napsauttamalla alla olevaa vahvistuslinkki=C3=A4:
+Vahvista rekister=C3=B6ityminen <http://shop.linnea.fi/epages/linnea.=
+sf/fi_FI/?ViewObjectID=3D10794490&ViewAction=3DViewMyAccount&ChangeObjectID=
+=3D1422877&ChangeAction=3DConfirmUserAccount&Alias=3DmJmcjpugk52eapafl1iVoK=
+NYkJM%3D&EMail=3DmJmcjpugk52eapafl1iVoKNYkJM%3D&SecurityCode=3Dbc1db02f53ab=
+739b215947b6fee8309c&ErrorAction=3DViewMyAccount&ErrorObjectID=3D10794490>=
+=20
+
+Sen j=C3=A4lkeen voit kirjautua verkkosivustollemme s=C3=A4hk=C3=B6postioso=
+itteellasi xxx@lxxx.fi ja salasanallasi.
+
+K=C3=A4yt=C3=A4 sivuston "Unohtuiko salasana?" -toimintoa milloin tahansa, =
+kun haluat luoda uuden salasanan.
+
+--
+
+Suomen Elintarviketuonti Oy Linnea
+Tiilitie 6 B
+01720 Vantaa
+Suomi
+info@linnea.fi=20=
+
+--_----------=_1441524337170392
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="utf-8"
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org=
+/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang=3D"fi" xml:lang=3D"fi" xmlns=3D"http://www.w3.org/1999/xhtml"><h=
+ead><style type=3D"text/css">
+<!--
+/* ------------------------------------------------------------------------=
+---------------------------
+   ePages - Mail Style
+   ------------------------------------------------------------------------=
+--------------------------- */
+
+/* - settings for general tags --------------------------------------------=
+--------------------------- */
+  body {
+    font-family:  Arial, Verdana, Helvetica ;
+    font-size: 12px;
+    line-height: 140%;
+  }
+
+  p {
+    margin: 0 0 6px 0;
+  }
+
+  img {
+    border: 0;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 120%;
+    margin: 0px;
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 120%;
+    margin: 0px;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 120%;
+    margin: 0px;
+  }
+
+  hr {
+      height: 1px;
+      border: 0;
+      clear:both;
+      color: #000;
+      background-color: #000;
+  }
+
+/* - General Classes ------------------------------------------------------=
+----------------------- */
+
+  .Spacer {
+    height: 15px;
+  }
+
+  .Content .Text {
+    line-height: 130%;
+    color: #000;
+  }
+
+  .Content .Text a {
+    color: navy;
+    text-decoration: underline;
+  }
+  .Content .Text a:hover {
+    color: blue;
+    text-decoration: underline;
+  }
+
+  .TextBold{
+    font-weight: bold;
+  }
+
+  .Quantity,
+  td.Total,
+  .Money,
+  .TextRight {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+.AlignLeft {
+	text-align:left !important;
+}
+
+.AlignRight {
+	text-align:right !important;
+}
+
+.AlignCenter  {
+	text-align:center !important;
+}
+
+.AlignTop  {
+	vertical-align:top !important;
+}
+
+.AlignMiddle  {
+	vertical-align:middle !important;
+}
+
+.AlignBottom  {
+	vertical-align:bottom !important;
+}
+
+.NoMargin {
+	margin: 0 !important;
+}
+
+.NoPadding {
+	padding: 0 !important;
+}
+
+.NoBorder {
+	border: 0 !important;
+}
+
+.FloatLeft {
+	float: left;
+}
+
+.FloatRight {
+	float: right;
+}
+
+.FloatNone {
+	float: none !important;
+}
+
+.ClearBoth {
+	clear: both;
+}
+
+.ClearRight {
+	clear: right;
+}
+
+.ClearLeft {
+	clear: left;
+}
+
+.NoWrap {
+	white-space: nowrap !important;
+}
+
+.Pre {
+	white-space: pre !important;
+}
+
+.NormalWhiteSpace {
+	white-space:normal !important;
+}
+
+.DisplayBlock{
+	display: block;
+}
+
+.HideElement, .HideNode {
+	display: none !important;
+	height: 0;
+}
+
+.ShowNode {
+	display: auto !important;
+}
+
+.ShowElement {
+	display: block !important;
+}
+.ShowInlineElement {
+	display: inline !important;
+}
+
+.AutoWidth {
+	width: auto !important;
+}
+
+.MinimizeHeight {
+	font-size:0 !important;
+	line-height: 0 !important;
+	height:1px !important;
+	padding:0 !important;
+	margin:0 !important;
+}
+
+.FixedTableLayout {
+	table-layout:fixed;
+}
+
+.Bold {
+	font-weight:bold !important;
+}
+
+.Italic {
+	font-style:italic;
+}
+
+.Underline {
+	text-decoration: underline;
+}
+
+.NormalFontWeight {
+	font-weight:normal !important;
+}
+
+.WithBorder {
+	border: 1px solid #BFC2C3;
+}
+
+.HideRadioBoxes {
+	visibility: hidden;
+	overflow: hidden;
+	height: 0px;
+}
+
+.ExtractFromDom, .Extract, .PositionAbsolute, .AbsolutePosition {
+	position:absolute;
+}
+
+.epItemContent {
+	display:block;
+}
+
+/* - Table - */
+
+table.NoBorderSpace {
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+
+html body table.ResetPaddings td {
+	padding: 0px;
+}
+
+/* - Content --------------------------------------------------------------=
+-------------- */
+  .ContentList .alternate div,
+  .ContentList .alternate div p {
+    background: transparent;
+  }
+=20=20
+  .Content,
+  .Content div,
+  .Content p {
+    font-size: 12px;
+    color: #000;
+    background: white;
+  }
+=20=20
+
+  .Content {
+    padding:4px;
+  }
+  .Content h1 {
+    font-size: 18px;
+    color: #000;
+    font-weight: bold;
+    line-height: 120%;
+    margin: 0px;
+  }
+
+  .Content h2 {
+    font-size: 16px;
+    color: #000;
+    font-weight: bold;
+    line-height: 120%;
+    margin: 0px;
+  }
+
+  .Content h3 {
+    font-size: 14px;
+    color: #000;
+    font-weight: bold;
+    line-height: 120%;
+    margin: 0px;
+  }
+
+
+  .Content a {
+    color: navy;
+    text-decoration: none;
+  }
+  .Content a:hover {
+    color: blue;
+    text-decoration: underline;
+  }
+
+/* - Greeting -------------------------------------------------------------=
+--------------- */
+
+  .Greeting {
+    line-height: 130%;
+    color: #000;
+    border: 1px solid #666;
+    padding: 6px;
+    margin: 3px 0 0 0;
+  }
+
+/* - Product List ---------------------------------------------------------=
+------------------- */
+
+.ListItemProductContainer {
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	margin-top: 1px;
+	background: white;
+}
+
+.ListItemProduct {
+	height: auto;
+	_height: 100px;
+	clear: both;
+}
+
+.ListItemProduct .ImageArea .Spacer {
+	position:relative;
+	width:100px;
+	height:1px;
+	font-size:1px;
+	line-height:1px;
+}
+
+.AlternateRow .ListItemProduct {
+	background:#ccc;
+}
+
+.ListItemProduct .ImageArea{
+	_float: left;
+	_width: 100px;
+	_height: 100px;
+	min-width:100px;
+	min-height: 100px;
+
+	vertical-align:top;
+	text-align: center;
+	padding:6px 6px 2px 6px;
+	background: #eee !important;
+}
+
+.AlternateRow .ListItemProduct .ImageArea{
+	background:#ccc !important;
+}
+
+.ListItemProduct .InfoArea {
+	padding: 6px;
+	background: #eee !important;
+}
+
+.AlternateRow .ListItemProduct .InfoArea{
+	background:#ccc !important;
+}
+
+.ListItemProduct .InfoArea .FloatMinimizer {
+	width:18em;
+	position:relative;
+}
+
+.ListItemProduct .PriceArea {
+	display: block;
+	float: right;
+	margin-top:-1.4em;
+	position:relative;
+	padding-left:0.5em;
+}
+
+.AlternateRow .ListItemProduct .PriceArea{
+	background: #eee !important;
+}
+
+.InfoArea .Price {
+	text-align: right;
+	font-weight: bold;
+	white-space: nowrap;
+	background: transparent !important;
+	font-size: 20px;
+	color: #000;
+	font-weight: bold;
+	font-style: normal;
+}
+
+.ListItemProduct .DailyPrice,
+.ListItemProduct .ReferencePrice {
+	text-align: right;
+	font-weight: normal;
+	white-space: nowrap;
+	background: transparent !important;
+}
+
+.ListItemProduct .Description {
+	background: transparent !important;
+}
+
+.ListItemProduct .Links {
+	display: block;
+	text-align: right;
+	white-space:nowrap;
+	background: transparent !important;
+}
+
+.ListItemProduct h3 {
+	background: transparent !important;
+}
+
+.ListItemProduct h3.Headline {
+	width:auto;
+  overflow:hidden;
+}
+
+.ListItemProduct h3.Headline a{
+	_line-height: 140% !important;
+}
+
+.ProductListImageBox .NewProduct,
+.ListItemProduct .NewProduct {
+	font-size: 11px;
+	position: static;
+	float:left;
+	min-width: 28px;
+	width: auto;
+	_width: 28px !important;
+	min-height: 28px;
+	height: auto;
+	_height: 28px !important;
+	padding: 5px 0 0 0;
+	margin: 0 4px 0 0;
+	color: #044c37;
+	font-weight:bold;
+	text-align: center;
+	background: url("../../../../SF/Icon/BusinessSymbols/img_newproduct.png") =
+center top no-repeat;
+	_background:none;
+	_filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=3D#000000=
+00, endColorstr=3D#00000000)
+			progid:DXImageTransform.Microsoft.AlphaImageLoader(src=3D'/WebRoot/Store=
+Types/6.16.3/VilkasStore/SF/Icon/BusinessSymbols/img_newproduct.png');
+}
+
+.ListItemProduct li,
+.ListItemProduct ol,
+.ListItemProduct ul,
+.ListItemProduct div,
+.ListItemProduct p {
+	background: transparent !important;
+}
+
+.LineThrough {
+	text-decoration:line-through;
+}
+
+/* - OrderStatus ----------------------------------------------------------=
+----------------- */
+
+  table.OrderStatus {
+    border-collapse: collapse;
+  }
+
+  .OrderStatus th {
+    text-align: left;
+    background: #ccc;
+    color: #000;
+    padding: 3px;
+  }
+
+  .OrderStatus td {
+    background: #eee;
+    border: none;
+    padding-right: 10px;
+    padding-left: 3px;
+  }
+
+/* - ContentList ----------------------------------------------------------=
+---------------- */
+
+  table.ContentList {
+      width: 100%;
+      border-spacing: 1px;
+      border-collapse: collapse;
+      border-left: 1px solid #ccc;
+      border-top: 1px solid #ccc;
+      padding: 0;
+      margin: 0;
+      background: white;
+  }
+
+  table.ContentList thead td {
+      padding: 4px 4px 2px 4px;
+      background:#ccc;
+      color: #000;
+  }
+
+  table.ContentList tbody td {
+      vertical-align: top;
+      padding: 4px 4px 2px 4px;
+      background: white;
+      border-bottom: 1px solid #ccc;
+      border-right: 1px solid #ccc;
+      color: #000;
+  }
+
+  table.ContentList tbody tr.alternate td {
+    background: #eee !important;
+  }
+
+  .GrandTotal,
+  tr.GrandTotal td,
+  .ContentList tr.Total td {
+    font-weight: bold;
+  }
+
+/* - InnerListTable -------------------------------------------------------=
+-------------- */
+  tbody table.InnerListTable,
+  tbody table.InnerListTable td {
+      border: 0;
+      padding: 0 8px 0 0;
+      margin: 0;
+  }
+  tbody table.InnerListTable {
+      border-collapse: collapse;
+  }
+/* - Address --------------------------------------------------------------=
+-------------- */
+
+  div.Address {
+    padding:0;
+    margin: 0;
+    width: 49%;
+    float:left;
+  }
+
+  .ShippingAddress,
+  .BillingAddress {
+    padding: 0 20px 20px 0;
+    float: left;
+  }
+/* - CustomerInfo ---------------------------------------------------------=
+-------------- */
+
+  .CustomerInfo {
+    clear:both;
+  }
+  .CustomerInfo table {
+    border-spacing: 0;
+    border-collapse: collapse;
+  }
+  .CustomerInfo table td {
+    padding: 0 5px 0 0;
+  }
+
+/* - OrderText ------------------------------------------------------------=
+-------------- */
+  .OrderText {
+     margin: 6px 0 6px 0;
+  }
+-->
+</style>
+
+</head><body><p>Hei    Lasse Reinikainen,<p>
+    Olet rekister=C3=B6itynyt www-sivustollemme. Vahvista rekister=C3=B6ity=
+minen napsauttamalla alla olevaa vahvistuslinkki=C3=A4:<br /><a href=3D"htt=
+p://shop.linnea.fi/epages/linnea.sf/fi_FI/?ViewObjectID=3D10794490&am=
+p;ViewAction=3DViewMyAccount&amp;ChangeObjectID=3D1422877&amp;ChangeAction=
+=3DConfirmUserAccount&amp;Alias=3DmJmcjpugk52eapafl1iVoKNYkJM%3D&amp;EMail=
+=3DmJmcjpugk52eapafl1iVoKNYkJM%3D&amp;SecurityCode=3Dbc1db02f53ab739b215947=
+b6fee8309c&amp;ErrorAction=3DViewMyAccount&amp;ErrorObjectID=3D10794490">Va=
+hvista rekister=C3=B6ityminen</a>
+=20=20=20=20
+  <p>Sen j=C3=A4lkeen voit kirjautua verkkosivustollemme s=C3=A4hk=C3=B6pos=
+tiosoitteellasi xxx@lxxx.fi ja salasanallasi.<p>K=C3=A4yt=C3=A4 si=
+vuston &quot;Unohtuiko salasana?&quot; -toimintoa milloin tahansa, kun halu=
+at luoda uuden salasanan.<p><p>--<br /><br />
+Suomen Elintarviketuonti Oy Linnea<br />
+Tiilitie 6 B<br />
+01720 Vantaa<br />
+Suomi<br />
+info@linnea.fi
+
+</body>
+
+
+
+
+
+</html>=
+
+--_----------=_1441524337170392--
+
+

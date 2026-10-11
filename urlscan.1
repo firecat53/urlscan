@@ -1,6 +1,6 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 
-.TH URLSCAN 1 "16 August 2026"
+.TH URLSCAN 1 "11 October 2026"
 
 .SH NAME
 urlscan \- browse the URLs in an email message from a terminal
@@ -31,6 +31,10 @@ and base64.
 
 \fB2.\fR Extraction and display of the context surrounding each URL. Toggle
 context view on/off with \fBc\fR. Reverse displayed order of URLs with \fBR\fR.
+For mail converted from HTML, where the links are gathered into a footnote
+block and the text carries only a marker such as \fB[1]\fR, the prose around
+that marker is shown instead of the footnote line. The styles written by
+\fBw3m \-dump\fR, \fBlynx \-dump\fR and markdown are recognised.
 
 \fB3.\fR Copy current URL to primary selection with \fBP\fR or to clipboard with
 \fBC\fR.
@@ -39,7 +43,7 @@ context view on/off with \fBc\fR. Reverse displayed order of URLs with \fBR\fR.
 shortened URLs with \fBs\fR or \fBS\fR.
 
 \fB5.\fR Incremental case-insensitive search using \fB/\fR. Footer shows current
-search term. \fB/\fR again resets search.
+search term. \fB/\fR again resets search, and \fBEsc\fR clears it.
 
 \fB6.\fR Cycle through all available palettes (color and black & white available
 by default) using \fBp\fR. Running \fBurlscan \-g\fR will generate a
@@ -61,7 +65,7 @@ webbrowser module (default), xdg-open (if installed) or a function passed on the
 command line with \fB--run-safe\fR or \fB--run\fR. The \fB--run\fR and
 \fB--run-safe\fR functions will respect the value of \fB--pipe\fR.
 
-\fB10.\fR \fBF1\fR shows the help menu.
+\fB10.\fR \fBF1\fR or \fB?\fR shows the help menu.
 
 \fB11.\fR Scan certain email headers for URLs. Currently \fBLink\fR,
 \fBArchived-At\fR and \fBList-*\fR are scanned when \fB--headers\fR is passed.
@@ -123,7 +127,7 @@ used, but it is less secure. Examples:
     $ urlscan --run 'echo {} | xclip -i' file.txt
 .TP
 .B \-s, \-\-single
-Exit urlscan after opening or copying a single browser link.
+Exit urlscan after opening or copying a single browser link or queue of links.
 
     $ urlscan -s file.txt
 .TP
@@ -167,6 +171,8 @@ altered.
 
 To unset a binding, set it equal to "". For example: \fB"P": ""\fR
 
+The space bar can be written as \fB"space"\fR or \fB" "\fR.
+
 The follow actions are supported:
 .TP
 \fBadd_url\fR \-\- add a URL to the queue (Default: \fBa\fR)
@@ -176,6 +182,8 @@ The follow actions are supported:
 \fBall_shorten\fR \-\- toggle shorten all URLs (Default: \fBS\fR)
 .TP
 \fBbottom\fR \-\- move cursor to last item (Default: \fBG\fR)
+.TP
+\fBclear_search\fR \-\- clear the search and show all URLs (Default: \fBEsc\fR)
 .TP
 \fBclear_screen\fR \-\- redraw screen (Default: \fBCtrl-l\fR)
 .TP
@@ -189,7 +197,7 @@ The follow actions are supported:
 .TP
 \fBdown\fR \-\- cursor down (Default: \fBj\fR)
 .TP
-\fBhelp_menu\fR \-\- show/hide help menu (Default: \fBF1\fR)
+\fBhelp_menu\fR \-\- show/hide help menu (Default: \fBF1\fR or \fB?\fR)
 .TP
 \fBlink_handler\fR \-\- cycle link handling (webbrowser, xdg-open or custom) (Default: \fBl\fR)
 .TP
