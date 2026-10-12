@@ -7,6 +7,7 @@ name = "urlscan"
 dynamic = ["version"]
 description = "View/select the URLs in an email message or file"
 readme = "README.md"
+requires-python = ">=3.11"
 license = "GPL-2.0-or-later"
 authors = [
     { name = "Scott Hansen", email = "tech@firecat53.net" },
@@ -25,14 +26,11 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Utilities",
 ]
 dependencies = [
