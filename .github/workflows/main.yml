@@ -100,6 +100,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all tags and history
+      # checkout leaves the tag as a lightweight ref, which drops the
+      # annotation `make release` wrote. Re-fetch to restore the tag objects.
+      - name: Restore annotated tags
+        run: git fetch --force --tags
       - name: Download all the dists
         uses: actions/download-artifact@v4
         with:
@@ -111,21 +115,18 @@ jobs:
           inputs: >-
             ./dist/*.tar.gz
             ./dist/*.whl
-      - name: Get tag annotation
-        id: tag_annotation
-        run: |
-          # Extract the tag annotation for release notes
-          tag_annotation=$(git for-each-ref --format '%(contents:body)' refs/tags/${{ github.ref_name }})
-          echo "annotation=$tag_annotation" >> $GITHUB_ENV
+      # The release notes are the tag message body: %(contents:body) skips the
+      # subject line (just the version) and any GPG signature.
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create
-          '${{ github.ref_name }}'
-          --repo '${{ github.repository }}'
-          --title '${{ github.ref_name }}'
-          --notes "${{ env.annotation }}"
+        run: |
+          git for-each-ref --format='%(contents:body)' "refs/tags/$GITHUB_REF_NAME" \
+            | gh release create "$GITHUB_REF_NAME" \
+                --repo "$GITHUB_REPOSITORY" \
+                --title "$GITHUB_REF_NAME" \
+                --verify-tag \
+                --notes-file -
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
