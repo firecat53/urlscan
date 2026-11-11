@@ -24,6 +24,7 @@ properly.
 import argparse
 import io
 import os
+import re
 import sys
 from email import policy
 from email.parser import BytesParser
@@ -96,7 +97,13 @@ def parse_arguments():
                            help='Print urlscan version')
     arg_parse.add_argument('message', nargs='?', default=sys.stdin,
                            help="Filename of the message to parse")
-    return arg_parse.parse_args()
+    args = arg_parse.parse_args()
+    if args.regex is not None:
+        try:
+            re.compile(args.regex)
+        except re.error as exc:
+            arg_parse.error(f"invalid --regex {args.regex!r}: {exc}")
+    return args
 
 
 def close_stdin():
